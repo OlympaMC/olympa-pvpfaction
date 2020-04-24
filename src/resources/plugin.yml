@@ -1,6 +1,8 @@
 name: OlympaPvPFac
 version: 0.1
 api-version: 1.15
-depend: [OlympaCore, Citizens]
-authors: [Tristiisch]
+depend: [OlympaCore]
+author: Tristiisch
 main: fr.olympa.pvpfac.PvPFaction
+commands:
+  ne:
