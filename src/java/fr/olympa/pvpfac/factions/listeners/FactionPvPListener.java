@@ -30,10 +30,10 @@ public class FactionPvPListener implements Listener {
 		}
 		Player victim = (Player) entityVictim;
 		FactionPlayer victimfp = AccountProvider.get(victim.getUniqueId());
-		victimfaction = victimfp.getFaction();
-		if (victimfaction == null) {
-			return;
-		}
+		// victimfaction = victimfp.getFaction();
+		// if (victimfaction == null) {
+		// return;
+		// }
 		Player attacker;
 		if (entityAttacker instanceof Player) {
 			attacker = (Player) entityAttacker;
@@ -50,12 +50,12 @@ public class FactionPvPListener implements Listener {
 		}
 
 		FactionPlayer attackerfp = AccountProvider.get(attacker.getUniqueId());
-		OlympaFaction attackerfaction = attackerfp.getFaction();
-		if (attackerfaction == null) {
-			return;
-		} else if (victimfaction.getId() == attackerfaction.getId()) {
-			event.setCancelled(false);
-		}
+		// OlympaFaction attackerfaction = attackerfp.getFaction();
+		// if (attackerfaction == null) {
+		return;
+		// } else if (victimfaction.getId() == attackerfaction.getId()) {
+		// event.setCancelled(false);
+		// }
 
 	}
 
@@ -68,10 +68,10 @@ public class FactionPvPListener implements Listener {
 		}
 		Location location = event.getBlockClicked().getLocation();
 		FactionPlayer attackerfp = AccountProvider.get(player.getUniqueId());
-		OlympaFaction faction = attackerfp.getFaction();
-		if (faction.getOnlinePlayers().stream().filter(p -> SpigotUtils.playerisIn(p, location)).findFirst().isPresent()) {
-			player.sendMessage(ColorUtils.color(Prefix.FACTION + "Brûle pas le collègue !"));
-			event.setCancelled(true);
-		}
+		// OlympaFaction faction = attackerfp.getFaction();
+		//if (faction.getOnlinePlayers().stream().filter(p -> SpigotUtils.playerisIn(p, location)).findFirst().isPresent()) {
+//			player.sendMessage(ColorUtils.color(Prefix.FACTION + "Brûle pas le collègue !"));
+//			event.setCancelled(true);
+//		}
 	}
 }

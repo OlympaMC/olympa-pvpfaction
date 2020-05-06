@@ -1,38 +1,12 @@
 package fr.olympa.pvpfac.factions.commands;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import fr.olympa.api.command.OlympaCommand;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.utils.ColorUtils;
-import fr.olympa.api.utils.Prefix;
-import fr.olympa.pvpfac.factions.FactionHandler;
-import fr.olympa.pvpfac.factions.FactionMsg;
-import fr.olympa.pvpfac.factions.objects.FactionChat;
-import fr.olympa.pvpfac.factions.objects.FactionPlayer;
-import fr.olympa.pvpfac.factions.objects.OlympaFaction;
-import fr.olympa.pvpfac.factions.objects.OlympaFactionInvite;
-import fr.olympa.pvpfac.factions.objects.OlympaFactionRole;
-import fr.olympa.pvpfac.factions.utils.FactionUtils;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.HoverEvent.Action;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionCommand extends OlympaCommand {
 
@@ -44,9 +18,10 @@ public class FactionCommand extends OlympaCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (player != null) {
+		return false;
+		/*if (player != null) {
 			FactionPlayer fp = AccountProvider.get(player.getUniqueId());
-			OlympaFaction faction = fp.getFaction();
+			Faction faction = fp.getFaction();
 			if (args.length > 0) {
 				switch (args[0]) {
 				case "create":
@@ -571,7 +546,7 @@ public class FactionCommand extends OlympaCommand {
 			// console
 		}
 
-		return false;
+		return false;*/
 	}
 
 	@Override

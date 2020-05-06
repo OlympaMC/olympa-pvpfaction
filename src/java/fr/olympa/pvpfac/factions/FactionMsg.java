@@ -3,11 +3,9 @@ package fr.olympa.pvpfac.factions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Prefix;
-import fr.olympa.pvpfac.factions.objects.FactionPlayer;
-import fr.olympa.pvpfac.factions.objects.OlympaFaction;
+import fr.olympa.pvpfac.Faction;
 
 public class FactionMsg {
 
@@ -27,11 +25,11 @@ public class FactionMsg {
 		return false;
 	}
 
-	public static boolean youHaveNoFaction(Player player) {
-		return youHaveNoFaction(player, ((FactionPlayer) AccountProvider.get(player.getUniqueId())).getFaction());
-	}
+	//	public static boolean youHaveNoFaction(Player player) {
+	//		return youHaveNoFaction(player, ((FactionPlayer) AccountProvider.get(player.getUniqueId())).getFaction());
+	//	}
 
-	public static boolean youHaveNoFaction(Player player, OlympaFaction faction) {
+	public static boolean youHaveNoFaction(Player player, Faction faction) {
 		if (faction == null) {
 			player.sendMessage(ColorUtils.color(Prefix.DEFAULT_BAD + "Tu n'as pas de faction."));
 			return true;

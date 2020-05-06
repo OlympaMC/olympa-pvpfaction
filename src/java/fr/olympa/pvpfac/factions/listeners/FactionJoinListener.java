@@ -11,7 +11,6 @@ import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.pvpfac.factions.FactionHandler;
 import fr.olympa.pvpfac.factions.objects.OlympaFaction;
-import fr.olympa.pvpfac.factions.scoreboard.NametagEdit;
 
 public class FactionJoinListener implements Listener {
 
@@ -32,7 +31,6 @@ public class FactionJoinListener implements Listener {
 			faction.addConnected(player);
 		}
 		OlympaPlayer olympaPlayer = AccountProvider.get(player.getUniqueId());
-		NametagEdit.getApi().setNametag(olympaPlayer);
 	}
 
 	@EventHandler
@@ -48,6 +46,5 @@ public class FactionJoinListener implements Listener {
 			}
 		}
 		FactionHandler.removePlayerTryingToCreateFaction(player);
-		NametagEdit.getApi().clearNametag(player);
 	}
 }

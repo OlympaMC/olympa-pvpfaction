@@ -11,10 +11,10 @@ import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Prefix;
+import fr.olympa.pvpfac.Faction;
 import fr.olympa.pvpfac.factions.FactionHandler;
 import fr.olympa.pvpfac.factions.objects.FactionChat;
 import fr.olympa.pvpfac.factions.objects.FactionPlayer;
-import fr.olympa.pvpfac.factions.objects.OlympaFaction;
 
 public class FactionChatListener implements Listener {
 
@@ -23,7 +23,7 @@ public class FactionChatListener implements Listener {
 		Player player = event.getPlayer();
 		OlympaPlayer olympaPlayer = AccountProvider.get(player.getUniqueId());
 		FactionPlayer fp = (FactionPlayer) olympaPlayer;
-		OlympaFaction faction = fp.getFaction();
+		Faction faction = fp.getClan();
 		String message = event.getMessage();
 
 		FactionChat chat = fp.getChat();
@@ -35,10 +35,12 @@ public class FactionChatListener implements Listener {
 				if (startWith) {
 					message = message.replaceFirst("^! *", "");
 				}
-				event.getRecipients().removeIf(p -> !faction.getOnlinePlayers().contains(p));
-				event.setFormat(Prefix.FACTION + ColorUtils.color("&2") + faction.getRole(player).getName() + " %s " + group.getChatSufix() + " &a%s");
+				// event.getRecipients().removeIf(p -> !faction.getOnlinePlayers().contains(p));
+				// event.setFormat(Prefix.FACTION + ColorUtils.color("&2") +
+				// faction.getRole(player).getName() + " %s " + group.getChatSufix() + " &a%s");
 			} else {
-				event.setFormat(group.getPrefix(olympaPlayer.getGender()) + faction.getNamePrefixed(player) + " %s " + group.getChatSufix() + " %s");
+				// event.setFormat(group.getPrefix(olympaPlayer.getGender()) +
+				// faction.getNamePrefixed(player) + " %s " + group.getChatSufix() + " %s");
 			}
 		} else if (FactionHandler.isPlayerTryingToCreateFaction(player)) {
 			if (message.equalsIgnoreCase("annuler")) {

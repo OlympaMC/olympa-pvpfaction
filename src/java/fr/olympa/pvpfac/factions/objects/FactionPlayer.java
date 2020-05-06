@@ -12,12 +12,15 @@ import org.bukkit.inventory.ItemStack;
 
 import com.google.common.collect.ImmutableMap;
 
+import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.objects.OlympaMoney;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.provider.OlympaPlayerObject;
+import fr.olympa.pvpfac.Faction;
+import fr.olympa.pvpfac.PvPFaction;
 
-public class FactionPlayer extends OlympaPlayerObject {
+public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction> {
 
 	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
 			.put("power", "TINYINT(3) NULL DEFAULT 9")
@@ -33,8 +36,7 @@ public class FactionPlayer extends OlympaPlayerObject {
 	int power = 0;
 	private ItemStack[] enderChest = new ItemStack[9];
 	private OlympaMoney money = new OlympaMoney(0);
-
-	OlympaFaction faction;
+	Faction faction;
 	FactionChat chat;
 
 	public FactionPlayer(UUID uuid, String name, String ip) {
@@ -45,12 +47,17 @@ public class FactionPlayer extends OlympaPlayerObject {
 		return chat;
 	}
 
+	@Override
+	public Faction getClan() {
+		return faction;
+	}
+
 	public ItemStack[] getEnderChest() {
 		return enderChest;
 	}
 
-	public OlympaFaction getFaction() {
-		return faction;
+	public OlympaMoney getGameMoney() {
+		return money;
 	}
 
 	public int getPower() {
@@ -66,6 +73,7 @@ public class FactionPlayer extends OlympaPlayerObject {
 		try {
 			enderChest = ItemUtils.deserializeItemsArray(resultSet.getBytes("ender_chest"));
 			money.set(resultSet.getDouble("money"));
+			faction = PvPFaction.getInstance().getFactionManager().getClan(resultSet.getInt("faction"));
 			power = resultSet.getInt("power");
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
@@ -92,7 +100,8 @@ public class FactionPlayer extends OlympaPlayerObject {
 		this.chat = chat;
 	}
 
-	public void setFaction(OlympaFaction faction) {
+	@Override
+	public void setClan(Faction faction) {
 		this.faction = faction;
 	}
 }
