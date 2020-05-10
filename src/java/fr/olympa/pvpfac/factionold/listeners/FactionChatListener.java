@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.listeners;
+package fr.olympa.pvpfac.factionold.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,10 +11,10 @@ import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Prefix;
-import fr.olympa.pvpfac.Faction;
-import fr.olympa.pvpfac.factions.FactionHandler;
-import fr.olympa.pvpfac.factions.objects.FactionChat;
-import fr.olympa.pvpfac.factions.objects.FactionPlayer;
+import fr.olympa.pvpfac.faction.Faction;
+import fr.olympa.pvpfac.factionold.FactionHandler;
+import fr.olympa.pvpfac.factionold.objects.FactionChat;
+import fr.olympa.pvpfac.factionold.objects.FactionPlayer;
 
 public class FactionChatListener implements Listener {
 

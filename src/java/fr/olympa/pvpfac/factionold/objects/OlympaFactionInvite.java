@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.objects;
+package fr.olympa.pvpfac.factionold.objects;
 
 import org.bukkit.entity.Player;
 

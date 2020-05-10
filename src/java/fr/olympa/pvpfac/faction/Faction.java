@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac;
+package fr.olympa.pvpfac.faction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,9 @@ import fr.olympa.api.scoreboard.sign.DynamicLine;
 import fr.olympa.api.scoreboard.sign.FixedLine;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.utils.SpigotUtils;
-import fr.olympa.pvpfac.factions.objects.FactionPlayer;
-import fr.olympa.pvpfac.factions.objects.OlympaFactionRole;
+import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.factionold.objects.FactionPlayer;
+import fr.olympa.pvpfac.factionold.objects.OlympaFactionRole;
 
 public class Faction extends Clan<Faction> {
 

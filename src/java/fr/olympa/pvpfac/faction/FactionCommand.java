@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac;
+package fr.olympa.pvpfac.faction;
 
 import java.util.Map.Entry;
 import java.util.Set;
@@ -10,10 +10,12 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.clans.Clan;
 import fr.olympa.api.clans.ClansCommand;
 import fr.olympa.api.command.complex.Cmd;
+import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.utils.Prefix;
-import fr.olympa.pvpfac.factions.FactionMsg;
-import fr.olympa.pvpfac.factions.objects.OlympaFactionRole;
+import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.factionold.FactionMsg;
+import fr.olympa.pvpfac.factionold.objects.OlympaFactionRole;
 
 public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Faction> {
 
@@ -22,7 +24,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 	}
 
 	@Cmd(player = true)
-	public void claim() {
+	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
 			sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");

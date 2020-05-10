@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.objects;
+package fr.olympa.pvpfac.factionold.objects;
 
 import java.util.ArrayList;
 import java.util.HashMap;

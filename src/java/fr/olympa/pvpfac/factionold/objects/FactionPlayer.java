@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.objects;
+package fr.olympa.pvpfac.factionold.objects;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -17,8 +17,8 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.objects.OlympaMoney;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.provider.OlympaPlayerObject;
-import fr.olympa.pvpfac.Faction;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.faction.Faction;
 
 public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction> {
 

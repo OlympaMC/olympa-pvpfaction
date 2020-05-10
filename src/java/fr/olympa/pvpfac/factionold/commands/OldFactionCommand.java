@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.commands;
+package fr.olympa.pvpfac.factionold.commands;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.bukkit.plugin.Plugin;
 
 import fr.olympa.api.command.OlympaCommand;
 
-public class FactionCommand extends OlympaCommand {
+public class OldFactionCommand extends OlympaCommand {
 
-	public FactionCommand(Plugin plugin) {
+	public OldFactionCommand(Plugin plugin) {
 		super(plugin, "faction", "f", "factions");
 		addArgs(true, "create", "invite", "join", "who", "claim", "autoclaim", "map", "automap", "promote", "demote", "chat", "power");
 		addArgs(false, "joueur");

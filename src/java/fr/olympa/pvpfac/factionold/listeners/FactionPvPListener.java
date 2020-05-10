@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.listeners;
+package fr.olympa.pvpfac.factionold.listeners;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,8 +15,8 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.api.utils.SpigotUtils;
-import fr.olympa.pvpfac.factions.objects.FactionPlayer;
-import fr.olympa.pvpfac.factions.objects.OlympaFaction;
+import fr.olympa.pvpfac.factionold.objects.FactionPlayer;
+import fr.olympa.pvpfac.factionold.objects.OlympaFaction;
 
 public class FactionPvPListener implements Listener {
 

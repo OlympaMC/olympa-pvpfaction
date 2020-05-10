@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.listeners;
+package fr.olympa.pvpfac.factionold.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,8 +9,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.olympa.api.objects.OlympaPlayer;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.pvpfac.factions.FactionHandler;
-import fr.olympa.pvpfac.factions.objects.OlympaFaction;
+import fr.olympa.pvpfac.factionold.FactionHandler;
+import fr.olympa.pvpfac.factionold.objects.OlympaFaction;
 
 public class FactionJoinListener implements Listener {
 

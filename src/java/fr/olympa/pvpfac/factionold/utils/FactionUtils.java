@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions.utils;
+package fr.olympa.pvpfac.factionold.utils;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;

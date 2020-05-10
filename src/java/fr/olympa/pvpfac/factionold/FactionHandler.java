@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factions;
+package fr.olympa.pvpfac.factionold;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.PvPFaction;
-import fr.olympa.pvpfac.factions.objects.OlympaFaction;
-import fr.olympa.pvpfac.factions.objects.OlympaFactionInvite;
+import fr.olympa.pvpfac.factionold.objects.OlympaFaction;
+import fr.olympa.pvpfac.factionold.objects.OlympaFactionInvite;
 
 public class FactionHandler {
 
