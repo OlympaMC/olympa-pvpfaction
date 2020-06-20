@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factionold.commands;
+package fr.olympa.pvpfac.factionold;
 
 import java.util.List;
 

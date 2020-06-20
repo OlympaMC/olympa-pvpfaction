@@ -4,13 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
-public class FactionChunk {
+public class FactionClaim {
 
 	String worldName;
 	int x;
 	int z;
 	
-	public FactionChunk(Chunk chunk) {
+	public FactionClaim(Chunk chunk) {
 		worldName = chunk.getWorld().getName();
 		if (worldName.equals("world"))
 			worldName = null;

@@ -12,7 +12,9 @@ import fr.olympa.api.scoreboard.sign.lines.AnimLine;
 import fr.olympa.api.scoreboard.sign.lines.DynamicLine;
 import fr.olympa.api.scoreboard.sign.lines.FixedLine;
 import fr.olympa.core.spigot.OlympaCore;
+import fr.olympa.pvpfac.faction.FactionChatListener;
 import fr.olympa.pvpfac.faction.FactionManager;
+import fr.olympa.pvpfac.faction.FactionPvPListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class PvPFaction extends OlympaAPIPlugin {
@@ -45,6 +47,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 		//new FactionCommand(this).register();
 		
 		PluginManager pluginManager = getServer().getPluginManager();
+		pluginManager.registerEvents(new FactionChatListener(), this);
+		pluginManager.registerEvents(new FactionPvPListener(), this);
 		try {
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 		} catch (Exception ex) {

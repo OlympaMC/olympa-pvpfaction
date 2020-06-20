@@ -8,7 +8,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -16,12 +15,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class FactionPvPListener implements Listener {
-
-	@EventHandler
-	public void onPotionSplash(PotionSplashEvent event) {
-
-	}
-
+	
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
 		Entity entityVictim = event.getEntity();
@@ -46,7 +40,7 @@ public class FactionPvPListener implements Listener {
 		}
 		if (attacker == null)
 			return;
-		
+
 		FactionPlayer attackerfp = AccountProvider.get(attacker.getUniqueId());
 		// OlympaFaction attackerfaction = attackerfp.getFaction();
 		// if (attackerfaction == null) {
@@ -54,9 +48,9 @@ public class FactionPvPListener implements Listener {
 		// } else if (victimfaction.getId() == attackerfaction.getId()) {
 		// event.setCancelled(false);
 		// }
-		
-	}
 
+	}
+	
 	@EventHandler
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
 		Player player = event.getPlayer();
