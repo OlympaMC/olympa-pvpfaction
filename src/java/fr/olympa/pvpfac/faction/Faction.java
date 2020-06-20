@@ -17,18 +17,18 @@ import com.google.gson.Gson;
 import fr.olympa.api.clans.Clan;
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
+import fr.olympa.api.lines.FixedLine;
+import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
-import fr.olympa.api.scoreboard.sign.lines.FixedLine;
-import fr.olympa.api.scoreboard.sign.lines.TimerLine;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction> {
 	
-	private static FixedLine<FactionPlayer> header = new FixedLine<>("§e§oMa Faction:");
+	private static FixedLine header = new FixedLine("§e§oMa Faction:");
 	private static TimerLine<FactionPlayer> players = new TimerLine<>((x) -> {
 
 		Faction faction = x.getClan();
