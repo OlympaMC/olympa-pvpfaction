@@ -2,7 +2,6 @@ package fr.olympa.pvpfac.faction;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.StringJoiner;
 
 import org.bukkit.Chunk;
@@ -14,7 +13,7 @@ import fr.olympa.pvpfac.PvPFactionPermission;
 public class FactionManager extends ClansManager<Faction> {
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
-		super(PvPFaction.getInstance(), "pvpfac_faction", Collections.emptyList(), 5);
+		super(PvPFaction.getInstance(), "pvpfac_faction", 5);
 		new FactionCommand<>(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
 	}
 
@@ -28,8 +27,8 @@ public class FactionManager extends ClansManager<Faction> {
 	}
 
 	@Override
-	public StringJoiner getCollumsDb() {
-		StringJoiner columnsJoiner = super.getCollumsDb();
+	public StringJoiner addDBCollums(StringJoiner columnsJoiner) {
+		columnsJoiner = super.addDBCollums(columnsJoiner);
 		columnsJoiner.add("`tag` VARCHAR(6) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
 		columnsJoiner.add("`description` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
 		columnsJoiner.add("`ally` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
@@ -40,7 +39,8 @@ public class FactionManager extends ClansManager<Faction> {
 	}
 
 	@Override
-	protected Faction provideClan(int id, String name, long chief, int maxSize, long created, ResultSet resultSet) {
-		return new Faction(this, id, name, chief, maxSize, created);
+	protected Faction provideClan(int id, String name, long chief, int maxSize, double money, long created, ResultSet resultSet) {
+		return new Faction(this, id, name, chief, maxSize, money, created);
 	}
+
 }

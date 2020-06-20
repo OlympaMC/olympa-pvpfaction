@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.factionold.objects;
+package fr.olympa.pvpfac.faction;
 
 import java.util.Arrays;
 import java.util.List;

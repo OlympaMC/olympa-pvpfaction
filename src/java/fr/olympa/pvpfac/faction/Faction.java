@@ -13,37 +13,37 @@ import org.bukkit.entity.Player;
 import fr.olympa.api.clans.Clan;
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
-import fr.olympa.api.objects.OlympaPlayerInformations;
-import fr.olympa.api.scoreboard.sign.DynamicLine;
-import fr.olympa.api.scoreboard.sign.FixedLine;
+import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
-import fr.olympa.api.utils.SpigotUtils;
+import fr.olympa.api.scoreboard.sign.lines.FixedLine;
+import fr.olympa.api.scoreboard.sign.lines.TimerLine;
+import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
-import fr.olympa.pvpfac.factionold.objects.FactionPlayer;
-import fr.olympa.pvpfac.factionold.objects.OlympaFactionRole;
+import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction> {
 
-	private static FixedLine header = new FixedLine("§e§oMa Faction:");
-	private static DynamicLine<FactionPlayer> players = new DynamicLine<>((x) -> {
+	private static FixedLine<FactionPlayer> header = new FixedLine<>("§e§oMa Faction:");
+	private static TimerLine<FactionPlayer> players = new TimerLine<>((x) -> {
+		
 		Faction faction = x.getClan();
 		Player p = x.getPlayer();
 		StringJoiner joiner = new StringJoiner("\n");
 		for (Entry<OlympaPlayerInformations, ClanPlayerInterface<Faction>> member : faction.getMembers()) {
 			String memberName = member.getKey().getName();
-			if (member.getValue() == null) {
+			if (member.getValue() == null)
 				joiner.add("§c○ " + memberName);
-			} else if (member.getValue() == x) {
+			else if (member.getValue() == x)
 				joiner.add("§6● §l" + memberName);
-			} else {
+			else {
 				Location loc = member.getValue().getPlayer().getLocation();
 				joiner.add("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc));
 			}
 		}
 		return joiner.toString();
-	}, 1, 0);
+	}, PvPFaction.getInstance(), 10);
 	List<String> oldName = new ArrayList<>();
-	List<Chunk> claims = new ArrayList<>();
+	List<FactionChunk> claims = new ArrayList<>();
 	String tag;
 
 	String description;
@@ -53,17 +53,12 @@ public class Faction extends Clan<Faction> {
 		super(manager, id, name, chief, maxSize);
 	}
 
-	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize, long created) {
-		super(manager, id, name, chief, maxSize, created);
+	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize, double money, long created) {
+		super(manager, id, name, chief, maxSize, money, created);
 	}
 
 	public void claim(Chunk chunk) {
-		// TODO Auto-generated method stub
-		claims.add(chunk);
-	}
-
-	public boolean hasClaim(Chunk fChunk) {
-		return claims.contains(fChunk);
+		claims.add(new FactionChunk(chunk));
 	}
 
 	public Set<Player> getOnlinePlayers(OlympaFactionRole officer) {
@@ -71,12 +66,14 @@ public class Faction extends Clan<Faction> {
 	}
 
 	public OlympaFactionRole getRole(Player player) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	public boolean hasClaim(Chunk chunk) {
+		return claims.stream().anyMatch(claim -> claim.isChunk(chunk));
+	}
+
 	public boolean isOverClaimable() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -84,7 +81,7 @@ public class Faction extends Clan<Faction> {
 	public void memberJoin(ClanPlayerInterface<Faction> member) {
 		super.memberJoin(member);
 
-		Scoreboard scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard(member);
+		Scoreboard<FactionPlayer> scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard((FactionPlayer) member);
 		scoreboard.addLine(FixedLine.EMPTY_LINE);
 		scoreboard.addLine(header);
 		scoreboard.addLine(players);
@@ -93,14 +90,12 @@ public class Faction extends Clan<Faction> {
 	@Override
 	protected void removedOnlinePlayer(ClanPlayerInterface<Faction> oplayer) {
 		super.removedOnlinePlayer(oplayer);
-
-		PvPFaction.getInstance().scoreboards.removePlayerScoreboard(oplayer);
-		PvPFaction.getInstance().scoreboards.create(oplayer);
+		
+		PvPFaction.getInstance().scoreboards.removePlayerScoreboard((FactionPlayer) oplayer);
+		PvPFaction.getInstance().scoreboards.create((FactionPlayer) oplayer);
 	}
 
-	public void unclaim(Chunk chunk) {
-		// TODO Auto-generated method stub
-
-		claims.remove(chunk);
+	public boolean unclaim(Chunk chunk) {
+		return claims.removeIf(claim -> claim.isChunk(chunk));
 	}
 }
