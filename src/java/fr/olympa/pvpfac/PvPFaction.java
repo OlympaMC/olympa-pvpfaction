@@ -1,6 +1,5 @@
 package fr.olympa.pvpfac;
 
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 
 import fr.olympa.api.hook.ProtocolAction;
@@ -10,6 +9,7 @@ import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.pvpfac.faction.FactionChatListener;
@@ -31,6 +31,9 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public FactionManager getFactionManager() {
 		return factionManager;
 	}
+	
+	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
+	public DynamicLine<Scoreboard<FactionPlayer>> lineGroup = new DynamicLine<>(x -> "§7Rang: §b" + x.getOlympaPlayer().getGroupNameColored());
 
 	@Override
 	public void onDisable() {
@@ -61,11 +64,11 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 		scoreboards = new ScoreboardManager(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,
-				new DynamicLine<FactionPlayer>(x -> "§eRang : §6" + x.getGroupNameColored()),
+				lineMoney,
 				FixedLine.EMPTY_LINE,
-				new DynamicLine<FactionPlayer>(x -> "§eMonnaie : §6" + x.getGameMoney().getFormatted()),
+				lineGroup,
 				FixedLine.EMPTY_LINE,
-				new AnimLine(this, AnimLine.getAnim("play.olympa.fr", ChatColor.YELLOW, ChatColor.GOLD), 1, 10 * 20));
+				AnimLine.olympaAnimation());
 
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 		ProtocolAction protocolSupport = OlympaCore.getInstance().getProtocolSupport();

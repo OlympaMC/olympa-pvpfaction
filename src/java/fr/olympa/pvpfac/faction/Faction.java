@@ -28,17 +28,17 @@ import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction> {
 	
-	private static FixedLine header = new FixedLine("§e§oMa Faction:");
-	private static TimerLine<FactionPlayer> players = new TimerLine<>((x) -> {
-
-		Faction faction = x.getClan();
-		Player p = x.getPlayer();
+	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§e§oMa Faction:");
+	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
+		FactionPlayer fp = x.getOlympaPlayer();
+		Faction faction = fp.getClan();
+		Player p = fp.getPlayer();
 		StringJoiner joiner = new StringJoiner("\n");
 		for (Entry<OlympaPlayerInformations, ClanPlayerInterface<Faction>> member : faction.getMembers()) {
 			String memberName = member.getKey().getName();
 			if (member.getValue() == null)
 				joiner.add("§c○ " + memberName);
-			else if (member.getValue() == x)
+			else if (member.getValue() == fp)
 				joiner.add("§6● §l" + memberName);
 			else {
 				Location loc = member.getValue().getPlayer().getLocation();
