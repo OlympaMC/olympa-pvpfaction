@@ -23,15 +23,9 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.olympa</groupId>
-			<artifactId>olympa-api</artifactId>
+			<artifactId>olympa-core</artifactId>
 			<version>[0.0.1-SNAPSHOT,)</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>fr.olympa</groupId>
-			<artifactId>olympa-api</artifactId>
-			<version>[0.0.1-SNAPSHOT,)</version>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.citizensnpcs</groupId>
