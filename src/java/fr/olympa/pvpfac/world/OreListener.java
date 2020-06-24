@@ -10,13 +10,13 @@ import org.bukkit.event.world.ChunkPopulateEvent;
 import fr.olympa.pvpfac.PvPFaction;
 
 public class OreListener implements Listener {
-	
+
 	@EventHandler
 	public void onChunkPopulate(ChunkPopulateEvent event) {
 		//		if (!event.isNewChunk())
 		//			return;
 		Chunk chunk = event.getChunk();
-		PvPFaction.getInstance().getTask().runTask(() -> {
+		PvPFaction.getInstance().getTask().runTaskAsynchronously(() -> {
 			int i = 0;
 			for (int iY = 0; 132 > iY; iY++)
 				for (int iX = 0; 16 > iX; iX++)
