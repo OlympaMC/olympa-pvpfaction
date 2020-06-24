@@ -5,9 +5,12 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Chunk;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -23,23 +26,40 @@ import fr.olympa.pvpfac.faction.claim.FactionClaim;
 
 public class FactionManager extends ClansManager<Faction> {
 
+	public Cache<FactionClaim, Faction> claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
+	
 	public OlympaStatement updateFactionClaimsStatement;
 	public OlympaStatement updateFactionHomeStatement;
+	public OlympaStatement updateTagStatement;
+	public OlympaStatement updateDescriptionStatement;
 	
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_faction", 10);
 		new FactionCommand<>(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
 		updateFactionClaimsStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "claims");
 		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "home");
+		updateTagStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "tag");
+		updateDescriptionStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "description");
 	}
 
 	@Override
 	protected Faction createClan(int id, String name, long chief, int maxSize) {
 		return new Faction(this, id, name, chief, maxSize);
 	}
+	
+	public void removeCache(Chunk chunk) {
+		FactionClaim fc = claimCache.asMap().keySet().stream().filter(e -> e.isChunk(chunk)).findFirst().orElse(null);
+		if (fc != null)
+			claimCache.invalidate(fc);
+	}
 
 	public Faction getByChunk(Chunk chunk) {
-		return getClans().stream().filter(c -> c.getValue().hasClaim(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
+		Faction faction = claimCache.asMap().entrySet().stream().filter(e -> e.getKey().isChunk(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
+		if (faction == null) {
+			faction = getClans().stream().filter(c -> c.getValue().hasClaim(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
+			claimCache.put(faction.getClaim(chunk), faction);
+		}
+		return faction;
 	}
 
 	@Override
