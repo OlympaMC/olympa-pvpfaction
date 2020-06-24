@@ -111,31 +111,31 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		default:
 		case NORTH:
 			facingName = "Nord";
-			startX = chunkX - mapRaduisSize;
-			endX = chunkX + mapRaduisSize;
-			startZ = chunkZ - mapRaduisSize * 2;
-			endZ = chunkZ + mapRaduisSize * 2;
-			break;
-		case EAST:
-			facingName = "Est";
-			startX = chunkX + mapRaduisSize * 2;
-			endX = chunkX - mapRaduisSize * 2;
+			startX = chunkX - mapRaduisSize * 2;
+			endX = chunkX + mapRaduisSize * 2;
 			startZ = chunkZ - mapRaduisSize;
 			endZ = chunkZ + mapRaduisSize;
 			break;
+		case EAST:
+			facingName = "Est";
+			startX = chunkX + mapRaduisSize;
+			endX = chunkX - mapRaduisSize;
+			startZ = chunkZ - mapRaduisSize * 2;
+			endZ = chunkZ + mapRaduisSize * 2;
+			break;
 		case WEST:
 			facingName = "Ouest";
-			startX = chunkX - mapRaduisSize * 2;
-			endX = chunkX + mapRaduisSize * 2;
-			startZ = chunkZ + mapRaduisSize;
-			endZ = chunkZ - mapRaduisSize;
+			startX = chunkX - mapRaduisSize;
+			endX = chunkX + mapRaduisSize;
+			startZ = chunkZ + mapRaduisSize * 2;
+			endZ = chunkZ - mapRaduisSize * 2;
 			break;
 		case SOUTH:
 			facingName = "Sud";
-			startX = chunkX + mapRaduisSize;
-			endX = chunkX - mapRaduisSize;
-			startZ = chunkZ + mapRaduisSize * 2;
-			endZ = chunkZ - mapRaduisSize * 2;
+			startX = chunkX + mapRaduisSize * 2;
+			endX = chunkX - mapRaduisSize * 2;
+			startZ = chunkZ + mapRaduisSize;
+			endZ = chunkZ - mapRaduisSize;
 			break;
 		}
 		FactionManager manager = PvPFaction.getInstance().getFactionManager();
@@ -144,8 +144,10 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sj.add("&e&m------- &6MAP " + facingName + " &e&m-------&7");
 		StringBuilder sb = new StringBuilder();
 		int indexSymbole = 0;
-		for (int i1 = -mapRaduisSize; mapRaduisSize > i1; i1++) {
-			for (int i2 = -mapRaduisSize; mapRaduisSize > i2; i2++) {
+		int maxX = Math.abs(startX - endX);
+		int maxZ = Math.abs(startZ - endZ);
+		for (int i1 = 0; maxX > i1; i1++) {
+			for (int i2 = 0; maxZ > i2; i2++) {
 				Chunk targetChunk = world.getChunkAt(startX, startZ);
 				Faction fChunk = manager.getByChunk(targetChunk);
 				if (fChunk != null) {
