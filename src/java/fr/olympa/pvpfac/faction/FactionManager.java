@@ -33,6 +33,7 @@ public class FactionManager extends ClansManager<Faction> {
 	public OlympaStatement updateFactionHomeStatement;
 	public OlympaStatement updateTagStatement;
 	public OlympaStatement updateDescriptionStatement;
+	public OlympaStatement createDefaultClanStatement;
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_faction", 10);
@@ -41,10 +42,10 @@ public class FactionManager extends ClansManager<Faction> {
 		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "home");
 		updateTagStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "tag");
 		updateDescriptionStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "description");
+		createDefaultClanStatement = new OlympaStatement(StatementType.INSERT, tableName + "name", "chief");
 		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
-		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
-			super.createClan(AccountProvider.get("Console"), defaultFac.defaultName).setDescription(defaultFac.defaultName);
-		}
+		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList()))
+			new Faction(this, -defaultFac.ordinal(), defaultFac.defaultName, defaultFac.defaultName, 2, defaultFac);
 	}
 	
 	@Override

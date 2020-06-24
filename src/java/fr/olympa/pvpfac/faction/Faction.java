@@ -57,21 +57,18 @@ public class Faction extends Clan<Faction> {
 	Set<FactionClaim> claims = new HashSet<>();
 	String tag;
 	String description;
-
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	Location home;
 	FactionType type;
-	
+
 	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize) {
 		super(manager, id, name, chief, maxSize);
 		type = FactionType.PLAYER;
+	}
+	
+	public Faction(ClansManager<Faction> manager, int id, String name, String description, long chief, FactionType type) {
+		super(manager, id, name, chief, manager.defaultMaxSize);
+		this.description = description;
+		this.type = type;
 	}
 	
 	public FactionType getType() {
@@ -217,4 +214,13 @@ public class Faction extends Clan<Faction> {
 	public String getNameColored(Faction clan) {
 		return (clan != null && clan.getID() == id ? ChatColor.GREEN : ChatColor.RED) + getName();
 	}
+	
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 }
