@@ -22,54 +22,55 @@ import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.FactionChat;
 
 public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction> {
-	
+
 	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
 			.put("power", "TINYINT(3) NULL DEFAULT 9")
 			.put("ender_chest", "VARBINARY(8000) NULL")
+			.put("faction", "INT(11) NULL DEFAULT NULL")
 			.put("money", "DOUBLE NULL DEFAULT 0").build();
-	
-	static int maxPower = 10;
-	
+
+	public static int POWER_MAX = 10;
+
 	public static FactionPlayer get(Player p) {
 		return AccountProvider.get(p.getUniqueId());
 	}
-	
+
 	int power = 0;
 	private ItemStack[] enderChest = new ItemStack[9];
 	private OlympaMoney money = new OlympaMoney(0);
 	Faction faction;
 	FactionChat chat = FactionChat.GENERAL;
-	
+
 	public FactionPlayer(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
 	}
-	
+
 	public FactionChat getChat() {
 		return chat;
 	}
-	
+
 	@Override
 	public Faction getClan() {
 		return faction;
 	}
-	
+
 	public ItemStack[] getEnderChest() {
 		return enderChest;
 	}
-	
+
 	@Override
 	public OlympaMoney getGameMoney() {
 		return money;
 	}
-	
+
 	public int getPower() {
 		return power;
 	}
-	
+
 	public boolean hasFactionPermission() {
 		return true;
 	}
-	
+
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
 		try {
@@ -81,11 +82,11 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void removeChat(FactionChat chat) {
 		this.chat = chat;
 	}
-	
+
 	@Override
 	public void saveDatas(PreparedStatement statement) throws SQLException {
 		try {
@@ -97,11 +98,11 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void setChat(FactionChat chat) {
 		this.chat = chat;
 	}
-	
+
 	@Override
 	public void setClan(Faction faction) {
 		this.faction = faction;
