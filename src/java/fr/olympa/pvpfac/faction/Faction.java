@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
@@ -56,18 +57,34 @@ public class Faction extends Clan<Faction> {
 	Set<FactionClaim> claims = new HashSet<>();
 	String tag;
 	String description;
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	Location home;
+	FactionType type;
 	
 	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize) {
 		super(manager, id, name, chief, maxSize);
+		type = FactionType.PLAYER;
 	}
 	
-	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims) {
+	public FactionType getType() {
+		return type;
+	}
+	
+	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
 		super(manager, id, name, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
 		this.home = home;
 		this.claims = claims;
+		this.type = type;
 	}
 	
 	public Set<FactionClaim> getClaims() {
@@ -107,7 +124,7 @@ public class Faction extends Clan<Faction> {
 	}
 	
 	public boolean isOverClaimable() {
-		return claims.size() > getPower();
+		return claims.size() > getPower() && type == FactionType.PLAYER;
 	}
 	
 	@Override
@@ -172,7 +189,7 @@ public class Faction extends Clan<Faction> {
 	}
 	
 	public boolean updateTag(String tag) throws SQLException {
-		if (tag.length() == 1 || tag.length() > 6)
+		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find())
 			return false;
 		this.tag = tag;
 		PreparedStatement statement = ((FactionManager) manager).updateTagStatement.getStatement();
@@ -183,7 +200,7 @@ public class Faction extends Clan<Faction> {
 	}
 	
 	public boolean updateDescription(String description) throws SQLException {
-		if (description.length() < 3 || description.length() > 100)
+		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find())
 			return false;
 		this.description = description;
 		PreparedStatement statement = ((FactionManager) manager).updateDescriptionStatement.getStatement();

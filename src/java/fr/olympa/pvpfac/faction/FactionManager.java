@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.bukkit.Chunk;
 
@@ -41,6 +42,9 @@ public class FactionManager extends ClansManager<Faction> {
 		updateTagStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "tag");
 		updateDescriptionStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "description");
 		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
+		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
+			super.createClan(AccountProvider.get("Console"), defaultFac.defaultName).setDescription(defaultFac.defaultName);
+		}
 	}
 	
 	@Override
@@ -73,6 +77,7 @@ public class FactionManager extends ClansManager<Faction> {
 		columnsJoiner.add("`ennemy` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
 		columnsJoiner.add("`type` INT(1) NULL DEFAULT '0'");
 		columnsJoiner.add("`claims` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
+		columnsJoiner.add("`type` TINYINT(1) NOT NULL DEFAULT '0'");
 		return columnsJoiner;
 	}
 	
@@ -83,7 +88,8 @@ public class FactionManager extends ClansManager<Faction> {
 		if (jsonClaims != null && !jsonClaims.isBlank())
 			claims = new Gson().fromJson(jsonClaims, new TypeToken<Set<FactionClaim>>() {
 			}.getType());
-		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims);
+		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"),
+				SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims, FactionType.get(resultSet.getInt("type")));
 	}
 
 	public Faction getByName(String name) {
