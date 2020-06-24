@@ -47,17 +47,17 @@ public class FactionManager extends ClansManager<Faction> {
 		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
 		Faction fac;
 		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
-			fac = new Faction(this, 0, defaultFac.defaultName, defaultFac.defaultName, 2, defaultFac);
+			
 			PreparedStatement statement = createDefaultClanStatement.getStatement();
 			int i = 1;
-			statement.setString(i++, fac.getName());
-			statement.setLong(i++, fac.getChiefId());
-			statement.setString(i++, fac.getDescription());
+			statement.setString(i++, defaultFac.getDefaultName());
+			statement.setLong(i++, 2);
+			statement.setString(i++, defaultFac.getDefaultDesciption());
 			ResultSet resultSet = statement.getGeneratedKeys();
 			resultSet.next();
 			int id = resultSet.getInt(1);
 			resultSet.close();
-			super.clans.put(id, fac);
+			super.clans.put(id, new Faction(this, id, defaultFac.getDefaultName(), defaultFac.getDefaultDesciption(), 2, defaultFac));
 		}
 	}
 	

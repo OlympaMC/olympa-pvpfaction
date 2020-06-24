@@ -21,8 +21,8 @@ public enum FactionType {
 		return defaultDesciption;
 	}
 
-	String defaultName;
-	String defaultDesciption;
+	private String defaultName;
+	private String defaultDesciption;
 
 	private FactionType() {
 	}
