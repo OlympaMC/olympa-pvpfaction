@@ -83,7 +83,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 			power = resultSet.getInt("power");
 			byte[] content = resultSet.getBytes("inventory");
 			if (content != null && content.length != 0)
-				getPlayer().getInventory().setStorageContents(ItemUtils.deserializeItemsArray(resultSet.getBytes("inventory")));
+				getPlayer().getInventory().setStorageContents(ItemUtils.deserializeItemsArray(content));
 			else
 				SpigotUtils.clearPlayer(getPlayer());
 		} catch (ClassNotFoundException | IOException e) {
