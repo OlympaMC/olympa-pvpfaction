@@ -37,7 +37,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		super(manager, name, description, permission, aliases);
 	}
 	
-	@Cmd(player = true)
+	@Cmd(player = true, aliases = "cl")
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
@@ -78,13 +78,13 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 	
 	private static List<String> symboles = Arrays.asList("#", "%", "&", "$", "@", "=", "+", "A", "B", "C", "D", "E", "G", "0", "7");
 	
-	@Cmd(player = true)
+	@Cmd(player = true, aliases = "m")
 	public void map(CommandContext cmd) {
 		Chunk chunk = player.getLocation().getChunk();
 		World world = chunk.getWorld();
 		int chunkX = chunk.getX();
 		int chunkZ = chunk.getZ();
-		int mapRaduisSize = 10;
+		int mapRaduisSize = 5;
 		int startX, startZ, endX, endZ;
 		String facingName;
 		BlockFace facing = SpigotUtils.yawToFace(player.getLocation().getYaw(), false);
@@ -122,8 +122,8 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		FactionManager manager = PvPFaction.getInstance().getFactionManager();
 		Map<Faction, String> factions = new HashMap<>();
 		StringJoiner sj = new StringJoiner("\n");
-		sj.add("&e&m----- &6MAP " + facingName + " &e&m-----&7");
-		StringJoiner sj2 = new StringJoiner(" ");
+		sj.add("&e&m------- &6MAP " + facingName + " &e&m-------&7");
+		StringBuilder sb = new StringBuilder();
 		int indexSymbole = 0;
 		for (int i1 = -mapRaduisSize; mapRaduisSize > i1; i1++) {
 			for (int i2 = -mapRaduisSize; mapRaduisSize > i2; i2++) {
@@ -135,9 +135,9 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 						symb = symboles.get(indexSymbole++);
 						factions.put(fChunk, symb);
 					}
-					sj2.add(symb);
+					sb.append(symb);
 				} else
-					sj2.add("-");
+					sb.append("-");
 				if (startX > endX)
 					startX--;
 				else
@@ -147,16 +147,16 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 				startZ--;
 			else
 				startZ++;
-			sj2.add("\n");
+			sb.append("\n");
 		}
-		sj.add(sj2.toString());
+		sj.add(sb.toString());
 		if (!factions.isEmpty())
 			sj.add(factions.entrySet().stream().map(entry -> "&2" + entry.getValue() + "&a = &2" + entry.getKey().getName()).collect(Collectors.joining("&7, ")));
 		sj.add("&6TIPS &aFaites F3 + G pour voir la taille des claims.");
 		player.sendMessage(ColorUtils.color(sj.toString()));
 	}
 	
-	@Cmd(player = true)
+	@Cmd(player = true, aliases = "ucl")
 	public void unclaim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
@@ -180,7 +180,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lun&aclaim un chunk.", player.getName());
 	}
 	
-	@Cmd(player = true)
+	@Cmd(player = true, aliases = "c")
 	public void chat(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
@@ -205,10 +205,10 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sendMessage(Prefix.FACTION, "Tu parle désormais en chat &2" + askChat.getName() + "&a.");
 	}
 	
-	@Cmd(player = true)
+	@Cmd(player = true, aliases = { "who", "f" })
 	public void show(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
-		if (cmd.getArgumentsLength() == 1) {
+		if (cmd.getArgumentsLength() == 0) {
 			if (FactionMsg.youHaveNoFaction(player, faction)) {
 				sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f show <nom|tag|joueur>&c pour plus d'infos.");
 				return;
@@ -230,7 +230,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		Faction playerFaction = ((FactionPlayer) getOlympaPlayer()).getClan();
 		ChatColor color = playerFaction != null && faction.getID() == playerFaction.getID() ? ChatColor.GREEN : ChatColor.RED;
 		StringJoiner sj = new StringJoiner("\n");
-		sj.add("&e&m----- " + color + faction.getName() + "&e&m -----");
+		sj.add("&e&m------ " + color + faction.getName() + "&e&m ------");
 		String tag = faction.getTag();
 		if (tag != null && !tag.isBlank())
 			sj.add("&3Tag: &b" + tag);
@@ -243,6 +243,6 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sj.add("&3Joueurs max: &b" + faction.getMaxSize());
 		sj.add("&3Joueurs connectés: &a" + faction.getOnlineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &a")));
 		sj.add("&3Joueurs déconnectés: &c" + faction.getOfflineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &c")));
-		player.sendMessage(sj.toString());
+		player.sendMessage(ColorUtils.color(sj.toString()));
 	}
 }
