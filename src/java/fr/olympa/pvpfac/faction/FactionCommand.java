@@ -84,7 +84,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		World world = chunk.getWorld();
 		int chunkX = chunk.getX();
 		int chunkZ = chunk.getZ();
-		int mapRaduisSize = 5;
+		int mapRaduisSize = 10;
 		int startX, startZ, endX, endZ;
 		String facingName;
 		BlockFace facing = SpigotUtils.yawToFace(player.getLocation().getYaw(), false);
@@ -122,12 +122,12 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		FactionManager manager = PvPFaction.getInstance().getFactionManager();
 		Map<Faction, String> factions = new HashMap<>();
 		StringJoiner sj = new StringJoiner("\n");
-		sj.add("&e&m----- &6MAP " + facingName + " &e&m-----");
+		sj.add("&e&m----- &6MAP " + facingName + " &e&m-----&7");
 		StringJoiner sj2 = new StringJoiner(" ");
 		int indexSymbole = 0;
-		for (int iX = startX; endX > iX; iX++) {
-			for (int iZ = startZ; endZ > iZ; iZ++) {
-				Chunk targetChunk = world.getChunkAt(iX, iZ);
+		for (int i1 = -mapRaduisSize; mapRaduisSize > i1; i1++) {
+			for (int i2 = -mapRaduisSize; mapRaduisSize > i2; i2++) {
+				Chunk targetChunk = world.getChunkAt(startX, startZ);
 				Faction fChunk = manager.getByChunk(targetChunk);
 				if (fChunk != null) {
 					String symb = factions.get(fChunk);
@@ -138,7 +138,15 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 					sj2.add(symb);
 				} else
 					sj2.add("-");
+				if (startX > endX)
+					startX--;
+				else
+					startX++;
 			}
+			if (startZ > endZ)
+				startZ--;
+			else
+				startZ++;
 			sj2.add("\n");
 		}
 		sj.add(sj2.toString());
