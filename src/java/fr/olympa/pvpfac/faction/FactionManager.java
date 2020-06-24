@@ -1,5 +1,6 @@
 package fr.olympa.pvpfac.faction;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -42,10 +43,22 @@ public class FactionManager extends ClansManager<Faction> {
 		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "home");
 		updateTagStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "tag");
 		updateDescriptionStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "description");
-		createDefaultClanStatement = new OlympaStatement(StatementType.INSERT, tableName + "name", "chief");
+		createDefaultClanStatement = new OlympaStatement(StatementType.INSERT, tableName + "name", "chief", "description");
 		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
-		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList()))
-			new Faction(this, -defaultFac.ordinal(), defaultFac.defaultName, defaultFac.defaultName, 2, defaultFac);
+		Faction fac;
+		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
+			fac = new Faction(this, 0, defaultFac.defaultName, defaultFac.defaultName, 2, defaultFac);
+			PreparedStatement statement = createDefaultClanStatement.getStatement();
+			int i = 0;
+			statement.setString(i++, fac.getName());
+			statement.setLong(i++, fac.getChiefId());
+			statement.setString(i++, fac.getDescription());
+			ResultSet resultSet = statement.getGeneratedKeys();
+			resultSet.next();
+			int id = resultSet.getInt(1);
+			resultSet.close();
+			super.clans.put(id, fac);
+		}
 	}
 	
 	@Override
