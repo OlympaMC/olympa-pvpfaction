@@ -2,6 +2,7 @@ package fr.olympa.pvpfac.faction;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -48,8 +49,11 @@ public class FactionManager extends ClansManager<Faction> {
 	
 	@Override
 	protected Faction provideClan(int id, String name, long chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
-		Set<FactionClaim> claims = new Gson().fromJson(resultSet.getString("claims"), new TypeToken<Set<FactionClaim>>() {
-		}.getType());
+		String jsonClaims = resultSet.getString("claims");
+		Set<FactionClaim> claims = new HashSet<>();
+		if (!jsonClaims.isBlank())
+			claims = new Gson().fromJson(resultSet.getString("claims"), new TypeToken<Set<FactionClaim>>() {
+			}.getType());
 		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims);
 	}
 
