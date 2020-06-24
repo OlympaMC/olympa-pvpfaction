@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.faction;
+package fr.olympa.pvpfac.faction.claim;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class FactionPvPListener implements Listener {

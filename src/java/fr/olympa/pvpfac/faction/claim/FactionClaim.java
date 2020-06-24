@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.faction;
+package fr.olympa.pvpfac.faction.claim;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;

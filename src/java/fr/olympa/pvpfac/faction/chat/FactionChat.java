@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.faction;
+package fr.olympa.pvpfac.faction.chat;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,10 +1,11 @@
-package fr.olympa.pvpfac.faction;
+package fr.olympa.pvpfac.faction.utils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Prefix;
+import fr.olympa.pvpfac.faction.Faction;
 
 public class FactionMsg {
 

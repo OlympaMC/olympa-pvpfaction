@@ -12,9 +12,9 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.pvpfac.faction.FactionChatListener;
 import fr.olympa.pvpfac.faction.FactionManager;
-import fr.olympa.pvpfac.faction.FactionPvPListener;
+import fr.olympa.pvpfac.faction.chat.FactionChatListener;
+import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class PvPFaction extends OlympaAPIPlugin {

@@ -21,20 +21,39 @@ import fr.olympa.api.clans.OlympaFactionRole;
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.api.utils.Utils;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.faction.chat.FactionChat;
+import fr.olympa.pvpfac.faction.utils.FactionMsg;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Faction> {
-	
+
 	public FactionCommand(FactionManager manager, String name, String description, OlympaPermission permission, String... aliases) {
 		super(manager, name, description, permission, aliases);
+	}
+	
+	@Cmd(player = true, aliases = { "p", "powers" }, args = "PLAYERS")
+	public void power(CommandContext cmd) {
+		FactionPlayer fp;
+		if (cmd.getArgumentsLength() > 0)
+			try {
+				fp = AccountProvider.get(cmd.getArgument(0, new String()));
+			} catch (SQLException e) {
+				sendError("Une erreur est survenu.");
+				e.printStackTrace();
+				return;
+			}
+		else
+			fp = getOlympaPlayer();
+		sendMessage(Prefix.FACTION, "&2%s%a a &2%s&a/%s de power.", fp.getName(), fp.getPower(), FactionPlayer.POWER_MAX);
 	}
 	
 	@Cmd(player = true, aliases = "cl")
@@ -180,18 +199,19 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lun&aclaim un chunk.", player.getName());
 	}
 	
-	@Cmd(player = true, aliases = "c")
+	@Cmd(player = true, aliases = "c", args = { "Géneral", "Faction", "Allié" })
 	public void chat(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
 			return;
 		}
+
 		FactionPlayer player = getOlympaPlayer();
 		FactionChat askChat;
 		FactionChat chat = player.getChat();
-		if (cmd.getArgumentsLength() > 1) {
-			askChat = FactionChat.get(cmd.getArgument(1));
+		if (cmd.getArgumentsLength() > 0) {
+			askChat = FactionChat.get(cmd.getArgument(0));
 			if (askChat == null) {
 				sendMessage(Prefix.FACTION, "&cLe chat &4" + cmd.getArgument(1) + "&c n'existe pas.");
 				return;
@@ -202,6 +222,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			player.setChat(askChat);
 		} else
 			askChat = chat.getOther();
+		player.setChat(askChat);
 		sendMessage(Prefix.FACTION, "Tu parle désormais en chat &2" + askChat.getName() + "&a.");
 	}
 	

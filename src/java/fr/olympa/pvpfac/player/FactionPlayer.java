@@ -19,7 +19,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
-import fr.olympa.pvpfac.faction.FactionChat;
+import fr.olympa.pvpfac.faction.chat.FactionChat;
 
 public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction> {
 	

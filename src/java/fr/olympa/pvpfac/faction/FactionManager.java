@@ -17,6 +17,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
+import fr.olympa.pvpfac.faction.claim.FactionClaim;
 
 public class FactionManager extends ClansManager<Faction> {
 	

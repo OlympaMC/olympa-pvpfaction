@@ -25,6 +25,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.faction.claim.FactionClaim;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction> {
