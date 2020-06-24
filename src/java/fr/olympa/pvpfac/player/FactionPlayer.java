@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -25,56 +24,56 @@ import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 
 public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction> {
-	
-	public static int POWER_MAX = 10;
 
+	public static int POWER_MAX = 10;
+	
 	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
 			.put("power", "TINYINT(3) NULL DEFAULT 9")
 			.put("ender_chest", "VARBINARY(8000) NULL")
 			.put("clan", "INT(11) NULL DEFAULT NULL")
 			.put("money", "DOUBLE NULL DEFAULT 0")
 			.put("inventory", "VARBINARY(8000) NULL").build();
-	
+
 	public static FactionPlayer get(Player p) {
 		return AccountProvider.get(p.getUniqueId());
 	}
-	
+
 	int power = 0;
 	private Inventory enderChest = Bukkit.createInventory(null, 9, "Enderchest de " + getName());
 	private OlympaMoney money = new OlympaMoney(0);
 	Faction faction;
 	FactionChat chat = FactionChat.GENERAL;
-	
+
 	public FactionPlayer(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
 	}
-	
+
 	public FactionChat getChat() {
 		return chat;
 	}
-	
+
 	@Override
 	public Faction getClan() {
 		return faction;
 	}
-	
+
 	public Inventory getEnderChest() {
 		return enderChest;
 	}
-	
+
 	@Override
 	public OlympaMoney getGameMoney() {
 		return money;
 	}
-	
+
 	public int getPower() {
 		return power;
 	}
-	
+
 	public boolean hasFactionPermission() {
 		return true;
 	}
-	
+
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
 		try {
@@ -82,20 +81,20 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 			money.set(resultSet.getDouble("money"));
 			faction = PvPFaction.getInstance().getFactionManager().getClan(resultSet.getInt("clan"));
 			power = resultSet.getInt("power");
-			ItemStack[] content = ItemUtils.deserializeItemsArray(resultSet.getBytes("inventory"));
+			byte[] content = resultSet.getBytes("inventory");
 			if (content != null && content.length != 0)
-				getPlayer().getInventory().setStorageContents(content);
+				getPlayer().getInventory().setStorageContents(ItemUtils.deserializeItemsArray(resultSet.getBytes("inventory")));
 			else
 				SpigotUtils.clearPlayer(getPlayer());
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void removeChat(FactionChat chat) {
 		this.chat = chat;
 	}
-	
+
 	@Override
 	public void saveDatas(PreparedStatement statement) throws SQLException {
 		try {
@@ -109,11 +108,11 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void setChat(FactionChat chat) {
 		this.chat = chat;
 	}
-	
+
 	@Override
 	public void setClan(Faction faction) {
 		this.faction = faction;
