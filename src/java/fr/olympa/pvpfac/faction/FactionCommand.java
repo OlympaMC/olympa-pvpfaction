@@ -33,11 +33,11 @@ import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Faction> {
-
+	
 	public FactionCommand(FactionManager manager, String name, String description, OlympaPermission permission, String... aliases) {
 		super(manager, name, description, permission, aliases);
 	}
-	
+
 	@Cmd(player = true, aliases = { "p", "powers" }, args = "PLAYERS")
 	public void power(CommandContext cmd) {
 		FactionPlayer fp;
@@ -53,7 +53,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			fp = getOlympaPlayer();
 		sendMessage(Prefix.FACTION, "&2" + fp.getName() + "%a a &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + " de power.");
 	}
-	
+
 	@Cmd(player = true, aliases = "cl")
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -76,7 +76,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		}
 		Set<Entry<Integer, Faction>> clans = PvPFaction.getInstance().getFactionManager().getClans();
 		Faction fChunk = clans.stream().filter(c -> c.getValue().hasClaim(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
-		
+
 		if (fChunk != null) {
 			if (!fChunk.isOverClaimable()) {
 				TextComponent text = new TextComponent(TextComponent.fromLegacyText(ColorUtils.color("&cImpossible de &lsur&cclaim le chunk de la faction &4%s&c.".replace("%s", fChunk.getName()))));
@@ -92,7 +92,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		faction.claim(chunk);
 		sendMessage(faction.getPlayers(), Prefix.FACTION, "&2" + player.getName() + "&a a claim un chunk.");
 	}
-
+	
 	@Cmd(player = true, aliases = "m")
 	public void map(CommandContext cmd) {
 		Chunk chunk = player.getLocation().getChunk();
@@ -119,7 +119,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			endZ = chunkZ + mapRaduisSize;
 			for (int iZ = startZ; endZ > iZ; iZ++) {
 				for (int iX = startX; endX > iX; iX++)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++));
+					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole));
 				sb.append("\n");
 			}
 			break;
@@ -131,7 +131,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			endZ = chunkZ + mapRaduisSize * 2;
 			for (int iX = startX; endX <= iX; iX--) {
 				for (int iZ = startZ; endZ > iZ; iZ++)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++));
+					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole));
 				sb.append("\n");
 			}
 			break;
@@ -143,7 +143,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			endZ = chunkZ - mapRaduisSize * 2;
 			for (int iX = startX; endX > iX; iX++) {
 				for (int iZ = startZ; endZ <= iZ; iZ--)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++));
+					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole));
 				sb.append("\n");
 			}
 			break;
@@ -155,7 +155,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			endZ = chunkZ - mapRaduisSize;
 			for (int iZ = startZ; endZ <= iZ; iZ--) {
 				for (int iX = startX; endX <= iX; iX--)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++));
+					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole));
 				sb.append("\n");
 			}
 			break;
@@ -169,7 +169,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sj.add("&6TIPS &aFaites F3 + G pour voir la taille des claims.");
 		player.sendMessage(ColorUtils.color(sj.toString().replace("%facing", facingName)));
 	}
-	
+
 	@Cmd(player = true, aliases = "ucl")
 	public void unclaim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -193,7 +193,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		faction.unclaim(chunk);
 		sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lun&aclaim un chunk.", player.getName());
 	}
-	
+
 	@Cmd(player = true, aliases = "c", args = { "Géneral", "Faction", "Allié" })
 	public void chat(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -201,7 +201,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
 			return;
 		}
-
+		
 		FactionPlayer player = getOlympaPlayer();
 		FactionChat askChat;
 		FactionChat chat = player.getChat();
@@ -220,7 +220,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		player.setChat(askChat);
 		sendMessage(Prefix.FACTION, "Tu parle désormais en chat &2" + askChat.getName() + "&a.");
 	}
-	
+
 	@Cmd(player = true, aliases = { "who", "f" })
 	public void show(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
