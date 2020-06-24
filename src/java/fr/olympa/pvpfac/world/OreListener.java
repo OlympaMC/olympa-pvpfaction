@@ -13,10 +13,10 @@ public class OreListener implements Listener {
 	
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event) {
-		if (!event.isNewChunk())
-			return;
+		//		if (!event.isNewChunk())
+		//			return;
 		Chunk chunk = event.getChunk();
-		PvPFaction.getInstance().getTask().runTaskAsynchronously(() -> {
+		PvPFaction.getInstance().getTask().runTask(() -> {
 			int i = 0;
 			for (int iY = 0; 132 > iY; iY++)
 				for (int iX = 0; 16 > iX; iX++)
@@ -24,7 +24,8 @@ public class OreListener implements Listener {
 						Block block = chunk.getBlock(iX, iY, iZ);
 						if (block.getType().name().contains("_ORE")) {
 							i++;
-							PvPFaction.getInstance().getTask().runTask(() -> block.setType(Material.COBWEB));
+							//							PvPFaction.getInstance().getTask().runTask(() -> block.setType(Material.COBWEB));
+							block.setType(Material.COBWEB);
 						}
 					}
 			System.out.println("ORE " + i + " " + chunk.getX() + " " + chunk.getZ());
