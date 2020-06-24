@@ -129,7 +129,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			endX = chunkX - mapRaduisSize;
 			startZ = chunkZ - mapRaduisSize * 2;
 			endZ = chunkZ + mapRaduisSize * 2;
-			for (int iX = startX; endX > iX; iX--) {
+			for (int iX = startX; endX <= iX; iX--) {
 				for (int iZ = startZ; endZ > iZ; iZ++)
 					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++));
 				sb.append("\n");
@@ -142,7 +142,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			startZ = chunkZ + mapRaduisSize * 2;
 			endZ = chunkZ - mapRaduisSize * 2;
 			for (int iX = startX; endX > iX; iX++) {
-				for (int iZ = startZ; endZ > iZ; iZ--)
+				for (int iZ = startZ; endZ <= iZ; iZ--)
 					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++));
 				sb.append("\n");
 			}
@@ -153,8 +153,8 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			endX = chunkX - mapRaduisSize * 2;
 			startZ = chunkZ + mapRaduisSize;
 			endZ = chunkZ - mapRaduisSize;
-			for (int iZ = startZ; endZ > iZ; iZ--) {
-				for (int iX = startX; endX > iX; iX--)
+			for (int iZ = startZ; endZ <= iZ; iZ--) {
+				for (int iX = startX; endX <= iX; iX--)
 					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++));
 				sb.append("\n");
 			}
