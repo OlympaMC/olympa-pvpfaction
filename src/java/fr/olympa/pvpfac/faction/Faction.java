@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import fr.olympa.api.clans.Clan;
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
+import fr.olympa.api.clans.OlympaFactionRole;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.player.OlympaPlayerInformations;
@@ -27,7 +28,8 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction> {
-
+	
+	public static int MAX_POWER = 10;
 	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7§oMa Faction:");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
 		FactionPlayer fp = x.getOlympaPlayer();
@@ -48,16 +50,16 @@ public class Faction extends Clan<Faction> {
 		return joiner.toString();
 	}, PvPFaction.getInstance(), 10);
 	//	List<String> oldName = new ArrayList<>();
-	
+
 	Set<FactionClaim> claims = new HashSet<>();
 	String tag;
 	String description;
 	Location home;
-
+	
 	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize) {
 		super(manager, id, name, chief, maxSize);
 	}
-
+	
 	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims) {
 		super(manager, id, name, chief, maxSize, money, created);
 		this.tag = tag;
@@ -65,53 +67,72 @@ public class Faction extends Clan<Faction> {
 		this.home = home;
 		this.claims = claims;
 	}
-
-	public void claim(Chunk chunk) {
-		claims.add(new FactionClaim(chunk));
+	
+	public Set<FactionClaim> getClaims() {
+		return claims;
 	}
 	
-	public Set<FactionPlayer> getOnlinePlayers() {
+	public String getTag() {
+		return tag;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public Location getHome() {
+		return home;
+	}
+
+	public Set<FactionPlayer> getOnlineFactionPlayers() {
 		return getPlayers().stream().map(p -> (FactionPlayer) AccountProvider.get(p.getUniqueId())).collect(Collectors.toSet());
 	}
 
-	public OlympaFactionRole getRole(Player player) {
-		return null;
+	public Set<FactionPlayer> getOfflineFactionPlayers() {
+		return members.values().stream().filter(entry -> entry.getValue() == null).map(entry -> (FactionPlayer) AccountProvider.get(entry.getKey().getUUID())).collect(Collectors.toSet());
 	}
-	
+
 	public int getPower() {
 		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getPower()).sum();
 	}
-
+	
 	public boolean hasClaim(Chunk chunk) {
 		return claims.stream().anyMatch(claim -> claim.isChunk(chunk));
 	}
-
+	
 	public boolean isOverClaimable() {
 		return false;
 	}
-
+	
 	@Override
 	public void memberJoin(ClanPlayerInterface<Faction> member) {
 		super.memberJoin(member);
-
+		
 		Scoreboard<FactionPlayer> scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard((FactionPlayer) member);
 		scoreboard.addLine(FixedLine.EMPTY_LINE);
 		scoreboard.addLine(header);
 		scoreboard.addLine(players);
 	}
-
+	
 	@Override
 	protected void removedOnlinePlayer(ClanPlayerInterface<Faction> oplayer) {
 		super.removedOnlinePlayer(oplayer);
-		
+
 		PvPFaction.getInstance().scoreboards.removePlayerScoreboard((FactionPlayer) oplayer);
 		PvPFaction.getInstance().scoreboards.create((FactionPlayer) oplayer);
 	}
-
-	public boolean unclaim(Chunk chunk) {
-		return claims.removeIf(claim -> claim.isChunk(chunk));
+	
+	public void claim(Chunk chunk) {
+		claims.add(new FactionClaim(chunk));
+		updateClaims();
 	}
 
+	public boolean unclaim(Chunk chunk) {
+		boolean b = claims.removeIf(claim -> claim.isChunk(chunk));
+		updateClaims();
+		return b;
+	}
+	
 	private void updateClaims() {
 		try {
 			PreparedStatement statement = manager.updateClanMoneyStatement.getStatement();
@@ -123,8 +144,21 @@ public class Faction extends Clan<Faction> {
 			broadcast("Une erreur est survenue.");
 		}
 	}
-	
+
+	// TODO ROLES
 	public Set<FactionPlayer> getOnlinePlayers(OlympaFactionRole officer) {
 		return null;
+	}
+
+	public OlympaFactionRole getRole(Player player) {
+		return null;
+	}
+	
+	public int getMaxPower() {
+		return getMembersAmount() * MAX_POWER;
+	}
+
+	public String getClaimsPowerMaxPower() {
+		return getClaims().size() + "/" + getPower() + "/" + getMaxPower();
 	}
 }

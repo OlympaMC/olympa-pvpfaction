@@ -10,7 +10,9 @@ import org.bukkit.Chunk;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
+import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
@@ -18,7 +20,7 @@ import fr.olympa.pvpfac.PvPFactionPermission;
 public class FactionManager extends ClansManager<Faction> {
 	
 	public FactionManager() throws SQLException, ReflectiveOperationException {
-		super(PvPFaction.getInstance(), "pvpfac_faction", 5);
+		super(PvPFaction.getInstance(), "pvpfac_faction", 10);
 		new FactionCommand<>(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
 	}
 	
@@ -50,5 +52,24 @@ public class FactionManager extends ClansManager<Faction> {
 		}.getType());
 		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims);
 	}
+
+	public Faction getByName(String name) {
+		return getClans().stream().filter(c -> c.getValue().getName().equalsIgnoreCase(name)).map(c -> c.getValue()).findFirst().orElse(null);
+	}
 	
+	public Faction getByTag(String tag) {
+		return getClans().stream().filter(c -> c.getValue().getTag().equalsIgnoreCase(tag)).map(c -> c.getValue()).findFirst().orElse(null);
+	}
+	
+	public Faction get(String nameOrTagOrPlayer) throws SQLException {
+		Faction faction = getByName(nameOrTagOrPlayer);
+		if (faction == null)
+			faction = getByTag(nameOrTagOrPlayer);
+		if (faction == null) {
+			ClanPlayerInterface<Faction> target = AccountProvider.get(nameOrTagOrPlayer);
+			faction = target.getClan();
+		}
+		return faction;
+	}
+
 }
