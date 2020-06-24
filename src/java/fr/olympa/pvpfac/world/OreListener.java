@@ -11,11 +11,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 
 public class OreListener implements Listener {
-	
-	private static List<Material> ores = Arrays.asList(Material.DIAMOND_ORE, Material.GOLD_ORE, Material.IRON_ORE, Material.EMERALD_ORE, Material.LAPIS_ORE, Material.COAL_ORE);
 
+	private static List<Material> ores = Arrays.asList(Material.DIAMOND_ORE, Material.GOLD_ORE, Material.IRON_ORE, Material.EMERALD_ORE, Material.LAPIS_ORE, Material.COAL_ORE);
+	
 	@EventHandler
-	public void on(ChunkLoadEvent event) {
+	public void onChunkLoad(ChunkLoadEvent event) {
 		if (!event.isNewChunk())
 			return;
 		Chunk chunk = event.getChunk();

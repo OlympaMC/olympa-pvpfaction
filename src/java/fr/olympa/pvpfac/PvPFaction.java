@@ -54,12 +54,12 @@ public class PvPFaction extends OlympaAPIPlugin {
 		//new FactionCommand(this).register();
 		
 		PluginManager pluginManager = getServer().getPluginManager();
-		pluginManager.registerEvents(new FactionChatListener(), this);
-		pluginManager.registerEvents(new FactionPvPListener(), this);
-		pluginManager.registerEvents(new FactionClaimListener(), this);
-		pluginManager.registerEvents(new FactionPowerListener(), this);
 		pluginManager.registerEvents(new OreListener(), this);
 		try {
+			pluginManager.registerEvents(new FactionChatListener(), this);
+			pluginManager.registerEvents(new FactionPvPListener(), this);
+			pluginManager.registerEvents(new FactionClaimListener(), this);
+			pluginManager.registerEvents(new FactionPowerListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 		} catch (Exception ex) {
 			ex.printStackTrace();
