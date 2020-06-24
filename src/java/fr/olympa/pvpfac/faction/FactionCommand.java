@@ -32,11 +32,11 @@ import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Faction> {
-
+	
 	public FactionCommand(FactionManager manager, String name, String description, OlympaPermission permission, String... aliases) {
 		super(manager, name, description, permission, aliases);
 	}
-
+	
 	@Cmd(player = true)
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -44,14 +44,14 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
 			return;
 		}
-		if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
-			Set<FactionPlayer> can = faction.getOnlinePlayers(OlympaFactionRole.OFFICER);
-			StringBuilder sb = new StringBuilder();
-			if (!can.isEmpty())
-				sb.append(" Demande à &4" + can.stream().map(FactionPlayer::getName).collect(Collectors.joining("&c, &4")) + "&c.");
-			sendMessage(Prefix.FACTION, "&cTu n'a pas la permission." + sb.toString());
-			return;
-		}
+		//		if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
+		//			Set<FactionPlayer> can = faction.getOnlinePlayers(OlympaFactionRole.OFFICER);
+		//			StringBuilder sb = new StringBuilder();
+		//			if (!can.isEmpty())
+		//				sb.append(" Demande à &4" + can.stream().map(FactionPlayer::getName).collect(Collectors.joining("&c, &4")) + "&c.");
+		//			sendMessage(Prefix.FACTION, "&cTu n'a pas la permission." + sb.toString());
+		//			return;
+		//		}
 		Chunk chunk = player.getLocation().getChunk();
 		if (faction.hasClaim(chunk)) {
 			sendMessage(Prefix.FACTION, "&cCe claim appartient déjà à ta faction.");
@@ -59,7 +59,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		}
 		Set<Entry<Integer, Faction>> clans = PvPFaction.getInstance().getFactionManager().getClans();
 		Faction fChunk = clans.stream().filter(c -> c.getValue().hasClaim(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
-
+		
 		if (fChunk != null) {
 			if (!fChunk.isOverClaimable()) {
 				TextComponent text = new TextComponent(TextComponent.fromLegacyText(ColorUtils.color("&cImpossible de &lsur&cclaim le chunk de la faction &4%s&c.".replace("%s", fChunk.getName()))));
@@ -75,9 +75,9 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		faction.claim(chunk);
 		sendMessage(faction.getPlayers(), Prefix.FACTION, "&2" + player.getName() + "&a a claim un chunk.");
 	}
-
+	
 	private static List<String> symboles = Arrays.asList("#", "%", "&", "$", "@", "=", "+", "A", "B", "C", "D", "E", "G", "0", "7");
-
+	
 	@Cmd(player = true)
 	public void map(CommandContext cmd) {
 		Chunk chunk = player.getLocation().getChunk();
@@ -144,9 +144,10 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sj.add(sj2.toString());
 		if (!factions.isEmpty())
 			sj.add(factions.entrySet().stream().map(entry -> "&2" + entry.getValue() + "&a = &2" + entry.getKey().getName()).collect(Collectors.joining("&7, ")));
+		sj.add("&6TIPS &aFaites F3 + G pour voir la taille des claims.");
 		player.sendMessage(ColorUtils.color(sj.toString()));
 	}
-
+	
 	@Cmd(player = true)
 	public void unclaim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -170,7 +171,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		faction.unclaim(chunk);
 		sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lun&aclaim un chunk.", player.getName());
 	}
-
+	
 	@Cmd(player = true)
 	public void chat(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -191,13 +192,11 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 				return;
 			}
 			player.setChat(askChat);
-		} else if (chat == null)
-			askChat = FactionChat.FACTION;
-		else
+		} else
 			askChat = chat.getOther();
 		sendMessage(Prefix.FACTION, "Tu parle désormais en chat &2" + askChat.getName() + "&a.");
 	}
-
+	
 	@Cmd(player = true)
 	public void show(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
