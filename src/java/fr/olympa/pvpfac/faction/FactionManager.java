@@ -45,7 +45,6 @@ public class FactionManager extends ClansManager<Faction> {
 		updateDescriptionStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "description");
 		createDefaultClanStatement = new OlympaStatement(StatementType.INSERT, tableName, "name", "chief", "description");
 		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
-		Faction fac;
 		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
 			
 			PreparedStatement statement = createDefaultClanStatement.getStatement();
@@ -55,7 +54,7 @@ public class FactionManager extends ClansManager<Faction> {
 			statement.setString(i++, defaultFac.getDefaultDesciption());
 			ResultSet resultSet = statement.getGeneratedKeys();
 			resultSet.next();
-			int id = resultSet.getInt(1);
+			int id = resultSet.getInt("id");
 			resultSet.close();
 			super.clans.put(id, new Faction(this, id, defaultFac.getDefaultName(), defaultFac.getDefaultDesciption(), 2, defaultFac));
 		}
