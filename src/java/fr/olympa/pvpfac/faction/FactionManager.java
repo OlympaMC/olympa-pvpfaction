@@ -51,8 +51,8 @@ public class FactionManager extends ClansManager<Faction> {
 	protected Faction provideClan(int id, String name, long chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
 		String jsonClaims = resultSet.getString("claims");
 		Set<FactionClaim> claims = new HashSet<>();
-		if (!jsonClaims.isBlank())
-			claims = new Gson().fromJson(resultSet.getString("claims"), new TypeToken<Set<FactionClaim>>() {
+		if (jsonClaims != null && !jsonClaims.isBlank())
+			claims = new Gson().fromJson(jsonClaims, new TypeToken<Set<FactionClaim>>() {
 			}.getType());
 		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims);
 	}
