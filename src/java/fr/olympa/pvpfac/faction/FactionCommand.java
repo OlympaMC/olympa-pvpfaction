@@ -53,7 +53,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			}
 		else
 			fp = getOlympaPlayer();
-		sendMessage(Prefix.FACTION, "&2%s%a a &2%s&a/%s de power.", fp.getName(), String.valueOf(fp.getPower()), String.valueOf(FactionPlayer.POWER_MAX));
+		sendMessage(Prefix.FACTION, "&2" + fp.getName() + "%a a &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + " de power.");
 	}
 
 	@Cmd(player = true, aliases = "cl")
@@ -111,31 +111,31 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		default:
 		case NORTH:
 			facingName = "Nord";
-			startX = chunkX - mapRaduisSize * 2;
-			endX = chunkX + mapRaduisSize * 2;
-			startZ = chunkZ - mapRaduisSize;
-			endZ = chunkZ + mapRaduisSize;
-			break;
-		case EAST:
-			facingName = "Est";
-			startX = chunkX + mapRaduisSize;
-			endX = chunkX - mapRaduisSize;
+			startX = chunkX - mapRaduisSize;
+			endX = chunkX + mapRaduisSize;
 			startZ = chunkZ - mapRaduisSize * 2;
 			endZ = chunkZ + mapRaduisSize * 2;
 			break;
+		case EAST:
+			facingName = "Est";
+			startX = chunkX + mapRaduisSize * 2;
+			endX = chunkX - mapRaduisSize * 2;
+			startZ = chunkZ - mapRaduisSize;
+			endZ = chunkZ + mapRaduisSize;
+			break;
 		case WEST:
 			facingName = "Ouest";
-			startX = chunkX - mapRaduisSize;
-			endX = chunkX + mapRaduisSize;
-			startZ = chunkZ + mapRaduisSize * 2;
-			endZ = chunkZ - mapRaduisSize * 2;
+			startX = chunkX - mapRaduisSize * 2;
+			endX = chunkX + mapRaduisSize * 2;
+			startZ = chunkZ + mapRaduisSize;
+			endZ = chunkZ - mapRaduisSize;
 			break;
 		case SOUTH:
 			facingName = "Sud";
-			startX = chunkX + mapRaduisSize * 2;
-			endX = chunkX - mapRaduisSize * 2;
-			startZ = chunkZ + mapRaduisSize;
-			endZ = chunkZ - mapRaduisSize;
+			startX = chunkX + mapRaduisSize;
+			endX = chunkX - mapRaduisSize;
+			startZ = chunkZ + mapRaduisSize * 2;
+			endZ = chunkZ - mapRaduisSize * 2;
 			break;
 		}
 		FactionManager manager = PvPFaction.getInstance().getFactionManager();
