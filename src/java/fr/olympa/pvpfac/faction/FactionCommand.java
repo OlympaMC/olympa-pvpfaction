@@ -146,9 +146,9 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		int indexSymbole = 0;
 		int maxX = Math.abs(startX - endX);
 		int maxZ = Math.abs(startZ - endZ);
-		System.out.println("MAP " + facingName + " maxX " + maxX + " maxZ " + maxZ);
-		for (int i1 = 0; maxZ > i1; i1++) {
-			for (int i2 = 0; maxX > i2; i2++) {
+		System.out.println("MAP " + facingName + " sizeX " + maxX + " sizeZ " + maxZ);
+		for (int i1 = 1; maxZ > i1; i1++) {
+			for (int i2 = 1; maxX > i2; i2++) {
 				Chunk targetChunk = world.getChunkAt(startX, startZ);
 				System.out.println("MAP X " + startX + " Z " + startZ);
 				Faction fChunk = manager.getByChunk(targetChunk);
@@ -170,7 +170,8 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 				startZ--;
 			else
 				startZ++;
-			sb.append("\n");
+			if (maxZ == mapRaduisSize * 2)
+				sb.append("\n");
 		}
 		sj.add(sb.toString());
 		if (!factions.isEmpty())
