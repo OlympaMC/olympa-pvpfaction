@@ -29,8 +29,8 @@ public class FactionManager extends ClansManager<Faction> {
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_faction", 10);
 		new FactionCommand<>(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
-		updateFactionClaimsStatement = new OlympaStatement(StatementType.UPDATE, tableName, "id", "claims");
-		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, tableName, "id", "home");
+		updateFactionClaimsStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "claims");
+		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "home");
 	}
 
 	@Override
