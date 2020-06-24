@@ -18,45 +18,47 @@ import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
 import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
+import fr.olympa.pvpfac.world.OreListener;
 
 public class PvPFaction extends OlympaAPIPlugin {
-
+	
 	private static PvPFaction instance;
-
+	
 	public static PvPFaction getInstance() {
 		return instance;
 	}
-
+	
 	public ScoreboardManager<FactionPlayer> scoreboards;
 	public FactionManager factionManager;
-
+	
 	public FactionManager getFactionManager() {
 		return factionManager;
 	}
-	
+
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
 	public DynamicLine<Scoreboard<FactionPlayer>> lineGroup = new DynamicLine<>(x -> "§7Rang: §b" + x.getOlympaPlayer().getGroupNameColored());
-
+	
 	@Override
 	public void onDisable() {
 		scoreboards.unload();
 		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactiver.");
 	}
-
+	
 	@Override
 	public void onEnable() {
 		instance = this;
 		super.onEnable();
-
+		
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 		//new FactionCommand(this).register();
-
+		
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(new FactionChatListener(), this);
 		pluginManager.registerEvents(new FactionPvPListener(), this);
 		pluginManager.registerEvents(new FactionClaimListener(), this);
 		pluginManager.registerEvents(new FactionPowerListener(), this);
+		pluginManager.registerEvents(new OreListener(), this);
 		try {
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 		} catch (Exception ex) {
@@ -66,7 +68,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 		// pluginManager.registerEvents(new FactionJoinListener(), this);
 		// .registerEvents(new FactionChatListener(), this);
 		// pluginManager.registerEvents(new FactionPvPListener(), this);
-
+		
 		scoreboards = new ScoreboardManager(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,
 				lineMoney,
@@ -74,7 +76,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 				lineGroup,
 				FixedLine.EMPTY_LINE,
 				AnimLine.olympaAnimation());
-
+		
 		ProtocolAction protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)
 			protocolSupport.disable1_8();
