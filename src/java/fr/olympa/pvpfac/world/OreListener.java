@@ -5,14 +5,14 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkPopulateEvent;
 
 import fr.olympa.pvpfac.PvPFaction;
 
 public class OreListener implements Listener {
 	
 	@EventHandler
-	public void onChunkLoad(ChunkLoadEvent event) {
+	public void onChunkPopulate(ChunkPopulateEvent event) {
 		//		if (!event.isNewChunk())
 		//			return;
 		Chunk chunk = event.getChunk();
