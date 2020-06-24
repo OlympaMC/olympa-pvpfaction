@@ -9,28 +9,28 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionUtils {
-
+	
 	public static TextComponent getFirstSep() {
 		TextComponent textComponent = new TextComponent();
 		TextComponent textComponent2 = new TextComponent("----------------");
-
+		
 		textComponent2.setColor(ChatColor.GOLD);
 		textComponent2.setBold(true);
 		textComponent2.setStrikethrough(true);
 		textComponent.addExtra(textComponent2);
-
+		
 		textComponent2 = new TextComponent(" [");
 		textComponent2.setColor(ChatColor.GRAY);
 		textComponent.addExtra(textComponent2);
-
+		
 		textComponent2 = new TextComponent("Faction");
 		textComponent2.setColor(ChatColor.YELLOW);
 		textComponent.addExtra(textComponent2);
-
+		
 		textComponent2 = new TextComponent("] ");
 		textComponent2.setColor(ChatColor.GRAY);
 		textComponent.addExtra(textComponent2);
-
+		
 		textComponent2 = new TextComponent("----------------\n");
 		textComponent2.setColor(ChatColor.GOLD);
 		textComponent2.setBold(true);
@@ -38,7 +38,7 @@ public class FactionUtils {
 		textComponent.addExtra(textComponent2);
 		return textComponent;
 	}
-
+	
 	public static TextComponent getLastSep() {
 		TextComponent textComponent = new TextComponent();
 		TextComponent textComponent2 = new TextComponent("---------------------------------------");
@@ -48,10 +48,10 @@ public class FactionUtils {
 		textComponent.addExtra(textComponent2);
 		return textComponent;
 	}
-
+	
 	private static List<String> symboles = Arrays.asList("#", "%", "&", "$", "@", "=", "+", "A", "B", "C", "D", "E", "G", "0", "7");
-
-	public static String getChunkLetter(Faction fChunk, Map<Faction, String> factions, int indexSymbole) {
+	
+	public static String getChunkLetter(Faction fChunk, Map<Faction, String> factions, int indexSymbole, Faction faction) {
 		if (fChunk == null)
 			return "-";
 		String symb = factions.get(fChunk);
@@ -59,7 +59,10 @@ public class FactionUtils {
 			symb = symboles.get(indexSymbole++);
 			factions.put(fChunk, symb);
 		}
-		return symb;
+		ChatColor color = ChatColor.RED;
+		if (faction != null && faction.getID() == fChunk.getID())
+			color = ChatColor.GREEN;
+		return color + symb;
 	}
-
+	
 }
