@@ -3,7 +3,6 @@ package fr.olympa.pvpfac.faction;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -18,6 +17,7 @@ import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 
 import fr.olympa.api.clans.Clan;
+import fr.olympa.api.clans.ClanPlayerData;
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
 import fr.olympa.api.clans.OlympaFactionRole;
@@ -39,14 +39,14 @@ public class Faction extends Clan<Faction> {
 		Faction faction = fp.getClan();
 		Player p = fp.getPlayer();
 		StringJoiner joiner = new StringJoiner("\n");
-		for (Entry<OlympaPlayerInformations, ClanPlayerInterface<Faction>> member : faction.getMembers()) {
-			String memberName = member.getKey().getName();
-			if (member.getValue() == null)
+		for (ClanPlayerData<Faction> member : faction.getMembers()) {
+			String memberName = member.getPlayerInformations().getName();
+			if (member.isConnected())
 				joiner.add("§c○ " + memberName);
-			else if (member.getValue() == fp)
+			else if (member.getConnectedPlayer() == x.getOlympaPlayer())
 				joiner.add("§6● §l" + memberName);
 			else {
-				Location loc = member.getValue().getPlayer().getLocation();
+				Location loc = member.getConnectedPlayer().getPlayer().getLocation();
 				joiner.add("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc));
 			}
 		}
@@ -60,12 +60,12 @@ public class Faction extends Clan<Faction> {
 	Location home;
 	FactionType type;
 
-	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize) {
+	public Faction(ClansManager<Faction> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
 		super(manager, id, name, chief, maxSize);
 		type = FactionType.PLAYER;
 	}
 	
-	public Faction(ClansManager<Faction> manager, int id, String name, String description, long chief, FactionType type) {
+	public Faction(ClansManager<Faction> manager, int id, String name, String description, OlympaPlayerInformations chief, FactionType type) {
 		super(manager, id, name, chief, manager.defaultMaxSize);
 		this.description = description;
 		this.type = type;
@@ -75,7 +75,7 @@ public class Faction extends Clan<Faction> {
 		return type;
 	}
 	
-	public Faction(ClansManager<Faction> manager, int id, String name, long chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
+	public Faction(ClansManager<Faction> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
 		super(manager, id, name, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
@@ -105,7 +105,7 @@ public class Faction extends Clan<Faction> {
 	}
 
 	public Set<FactionPlayer> getOfflineFactionPlayers() {
-		return members.values().stream().filter(entry -> entry.getValue() == null).map(entry -> (FactionPlayer) AccountProvider.get(entry.getKey().getUUID())).collect(Collectors.toSet());
+		return members.values().stream().filter(entry -> !entry.isConnected()).map(p -> (FactionPlayer) AccountProvider.get(p.getPlayerInformations().getUUID())).collect(Collectors.toSet());
 	}
 
 	public int getPower() {

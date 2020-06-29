@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
+import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.sql.OlympaStatement;
 import fr.olympa.api.sql.OlympaStatement.StatementType;
@@ -59,7 +60,7 @@ public class FactionManager extends ClansManager<Faction> {
 	}
 	
 	@Override
-	protected Faction createClan(int id, String name, long chief, int maxSize) {
+	protected Faction createClan(int id, String name, OlympaPlayerInformations chief, int maxSize) {
 		return new Faction(this, id, name, chief, maxSize);
 	}
 
@@ -93,7 +94,7 @@ public class FactionManager extends ClansManager<Faction> {
 	}
 	
 	@Override
-	protected Faction provideClan(int id, String name, long chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
+	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
 		String jsonClaims = resultSet.getString("claims");
 		Set<FactionClaim> claims = new HashSet<>();
 		if (jsonClaims != null && !jsonClaims.isBlank())
