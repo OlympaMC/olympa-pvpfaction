@@ -1,0 +1,1 @@
+git pull && mvn install && cp target/Olympa*.jar /home/serveurs/pvpfac1/plugins/ && mc restart pvpfac1
