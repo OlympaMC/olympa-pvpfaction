@@ -2,7 +2,7 @@ package fr.olympa.pvpfac;
 
 import org.bukkit.plugin.PluginManager;
 
-import fr.olympa.api.hook.ProtocolAction;
+import fr.olympa.api.hook.IProtocolSupport;
 import fr.olympa.api.lines.AnimLine;
 import fr.olympa.api.lines.DynamicLine;
 import fr.olympa.api.lines.FixedLine;
@@ -20,39 +20,39 @@ import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class PvPFaction extends OlympaAPIPlugin {
-	
+
 	private static PvPFaction instance;
-	
+
 	public static PvPFaction getInstance() {
 		return instance;
 	}
-	
+
 	public ScoreboardManager<FactionPlayer> scoreboards;
 	public FactionManager factionManager;
-	
+
 	public FactionManager getFactionManager() {
 		return factionManager;
 	}
 
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
 	public DynamicLine<Scoreboard<FactionPlayer>> lineGroup = new DynamicLine<>(x -> "§7Rang: §b" + x.getOlympaPlayer().getGroupNameColored());
-	
+
 	@Override
 	public void onDisable() {
 		if (scoreboards != null)
 			scoreboards.unload();
 		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactiver.");
 	}
-	
+
 	@Override
 	public void onEnable() {
 		instance = this;
 		super.onEnable();
-		
+
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 		//new FactionCommand(this).register();
-		
+
 		PluginManager pluginManager = getServer().getPluginManager();
 		//		pluginManager.registerEvents(new OreListener(), this);
 		try {
@@ -73,8 +73,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 				lineGroup,
 				FixedLine.EMPTY_LINE,
 				AnimLine.olympaAnimation());
-		
-		ProtocolAction protocolSupport = OlympaCore.getInstance().getProtocolSupport();
+
+		IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)
 			protocolSupport.disable1_8();
 		sendMessage("§2" + getDescription().getName() + "§a (" + getDescription().getVersion() + ") est activé.");
