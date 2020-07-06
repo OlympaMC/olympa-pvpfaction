@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 
@@ -39,7 +40,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 	public FactionCommand(FactionManager manager, String name, String description, OlympaPermission permission, String... aliases) {
 		super(manager, name, description, permission, aliases);
 	}
-	
+
 	@Cmd(player = true, aliases = { "setdesc", "adddesc", "setdescription", "adddescription" }, args = { "100_lettres_max" }, min = 1)
 	public void description(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -63,7 +64,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			sendError();
 		}
 	}
-	
+
 	@Cmd(player = true, aliases = { "settag", "addtag" }, args = { "6_lettres_max" }, min = 1)
 	public void tag(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -108,7 +109,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			fp = getOlympaPlayer();
 		sendMessage(Prefix.FACTION, "&2" + fp.getName() + "&a a &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + " de power.");
 	}
-	
+
 	@Cmd(player = true, aliases = "cl")
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -139,7 +140,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		}
 		Set<Entry<Integer, Faction>> clans = PvPFaction.getInstance().getFactionManager().getClans();
 		Faction fChunk = clans.stream().filter(c -> c.getValue().hasClaim(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
-		
+
 		try {
 			if (fChunk != null) {
 				if (!fChunk.isOverClaimable()) {
@@ -160,7 +161,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			sendError();
 		}
 	}
-	
+
 	@Cmd(player = true, aliases = "ucl")
 	public void unclaim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -197,10 +198,11 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 			sendError();
 		}
 	}
-	
+
 	@Cmd(player = true, aliases = "m")
 	public void map(CommandContext cmd) {
-		Chunk chunk = player.getLocation().getChunk();
+		Location playerLocation = player.getLocation();
+		Chunk chunk = playerLocation.getChunk();
 		World world = chunk.getWorld();
 		int chunkX = chunk.getX();
 		int chunkZ = chunk.getZ();
@@ -213,7 +215,8 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		Map<Faction, String> factions = new HashMap<>();
 		int indexSymbole = 0;
 		StringJoiner sj = new StringJoiner("\n");
-		sj.add("&e&m--------------&6 MAP %facing &e&m--------------&7");
+
+		sj.add("&e&m---------&6 MAP %facing %co &e&m---------&7".replace("%co", playerLocation.getBlockX() + " " + playerLocation.getBlockZ()));
 		StringBuilder sb = new StringBuilder();
 		switch (facing) {
 		default:
@@ -302,7 +305,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		player.setChat(askChat);
 		sendMessage(Prefix.FACTION, "Tu parle désormais en chat &2" + askChat.getName() + "&a.");
 	}
-	
+
 	@Cmd(player = true, aliases = { "who", "f" })
 	public void show(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
