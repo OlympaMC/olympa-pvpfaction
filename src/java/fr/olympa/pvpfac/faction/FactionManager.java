@@ -25,7 +25,7 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
 
-public class FactionManager extends ClansManager<Faction> {
+public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
 	public Cache<FactionClaim, Faction> claimCache;
 	
@@ -37,7 +37,7 @@ public class FactionManager extends ClansManager<Faction> {
 	
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_faction", 10);
-		new FactionCommand<>(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
+		new FactionCommand(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
 		updateFactionClaimsStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "claims");
 		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "home");
 		updateTagStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "tag");
@@ -93,6 +93,11 @@ public class FactionManager extends ClansManager<Faction> {
 		columnsJoiner.add("`type` TINYINT(1) NOT NULL DEFAULT '0'");
 		return columnsJoiner;
 	}
+	
+	@Override
+	protected FactionPlayerData createClanData(OlympaPlayerInformations informations) {
+		return new FactionPlayerData(informations);
+	}
 
 	@Override
 	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
@@ -118,7 +123,7 @@ public class FactionManager extends ClansManager<Faction> {
 		if (faction == null)
 			faction = getByTag(nameOrTagOrPlayer);
 		if (faction == null) {
-			ClanPlayerInterface<Faction> target = AccountProvider.get(nameOrTagOrPlayer);
+			ClanPlayerInterface<Faction, FactionPlayerData> target = AccountProvider.get(nameOrTagOrPlayer);
 			faction = target.getClan();
 		}
 		return faction;

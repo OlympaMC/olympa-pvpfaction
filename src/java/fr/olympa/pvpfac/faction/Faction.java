@@ -17,10 +17,8 @@ import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 
 import fr.olympa.api.clans.Clan;
-import fr.olympa.api.clans.ClanPlayerData;
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
-import fr.olympa.api.clans.OlympaFactionRole;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.player.OlympaPlayerInformations;
@@ -31,7 +29,7 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
-public class Faction extends Clan<Faction> {
+public class Faction extends Clan<Faction, FactionPlayerData> {
 	
 	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7§oMa Faction:");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
@@ -39,7 +37,7 @@ public class Faction extends Clan<Faction> {
 		Faction faction = fp.getClan();
 		Player p = fp.getPlayer();
 		StringJoiner joiner = new StringJoiner("\n");
-		for (ClanPlayerData<Faction> member : faction.getMembers()) {
+		for (FactionPlayerData member : faction.getMembers()) {
 			String memberName = member.getPlayerInformations().getName();
 			if (member.isConnected())
 				joiner.add("§c○ " + memberName);
@@ -60,28 +58,28 @@ public class Faction extends Clan<Faction> {
 	Location home;
 	FactionType type;
 
-	public Faction(ClansManager<Faction> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
 		super(manager, id, name, chief, maxSize);
 		type = FactionType.PLAYER;
 	}
 	
-	public Faction(ClansManager<Faction> manager, int id, String name, String description, OlympaPlayerInformations chief, FactionType type) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String description, OlympaPlayerInformations chief, FactionType type) {
 		super(manager, id, name, chief, manager.defaultMaxSize);
 		this.description = description;
 		this.type = type;
 	}
 	
-	public FactionType getType() {
-		return type;
-	}
-	
-	public Faction(ClansManager<Faction> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
 		super(manager, id, name, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
 		this.home = home;
 		this.claims = claims;
 		this.type = type;
+	}
+	
+	public FactionType getType() {
+		return type;
 	}
 	
 	public Set<FactionClaim> getClaims() {
@@ -125,7 +123,7 @@ public class Faction extends Clan<Faction> {
 	}
 	
 	@Override
-	public void memberJoin(ClanPlayerInterface<Faction> member) {
+	public void memberJoin(ClanPlayerInterface<Faction, FactionPlayerData> member) {
 		super.memberJoin(member);
 		
 		Scoreboard<FactionPlayer> scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard((FactionPlayer) member);
@@ -135,7 +133,7 @@ public class Faction extends Clan<Faction> {
 	}
 	
 	@Override
-	protected void removedOnlinePlayer(ClanPlayerInterface<Faction> oplayer) {
+	protected void removedOnlinePlayer(ClanPlayerInterface<Faction, FactionPlayerData> oplayer) {
 		super.removedOnlinePlayer(oplayer);
 
 		PvPFaction.getInstance().scoreboards.removePlayerScoreboard((FactionPlayer) oplayer);
@@ -166,15 +164,6 @@ public class Faction extends Clan<Faction> {
 		statement.setString(1, SpigotUtils.convertLocationToString(home));
 		statement.setInt(2, id);
 		statement.executeUpdate();
-	}
-
-	// TODO ROLES
-	public Set<FactionPlayer> getOnlinePlayers(OlympaFactionRole officer) {
-		return null;
-	}
-
-	public OlympaFactionRole getRole(Player player) {
-		return null;
 	}
 	
 	public int getMaxPower() {
