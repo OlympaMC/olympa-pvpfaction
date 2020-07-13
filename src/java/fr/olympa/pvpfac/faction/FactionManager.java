@@ -3,6 +3,7 @@ package fr.olympa.pvpfac.faction;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
@@ -18,11 +19,13 @@ import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.sql.Column;
 import fr.olympa.api.sql.OlympaStatement;
 import fr.olympa.api.sql.OlympaStatement.StatementType;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
+import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
 
 public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
@@ -36,12 +39,12 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	public OlympaStatement createDefaultClanStatement;
 	
 	public FactionManager() throws SQLException, ReflectiveOperationException {
-		super(PvPFaction.getInstance(), "pvpfac_faction", 10);
+		super(PvPFaction.getInstance(), "pvpfac_factions", 10);
 		new FactionCommand(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
-		updateFactionClaimsStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "claims");
-		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "home");
-		updateTagStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "tag");
-		updateDescriptionStatement = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "id" }, "description");
+		updateFactionClaimsStatement = new OlympaStatement(StatementType.UPDATE, clansTable, new String[] { "id" }, "claims");
+		updateFactionHomeStatement = new OlympaStatement(StatementType.UPDATE, clansTable, new String[] { "id" }, "home");
+		updateTagStatement = new OlympaStatement(StatementType.UPDATE, clansTable, new String[] { "id" }, "tag");
+		updateDescriptionStatement = new OlympaStatement(StatementType.UPDATE, clansTable, new String[] { "id" }, "description");
 		//		createDefaultClanStatement = new OlympaStatement(StatementType.INSERT, tableName, "name", "chief", "description");
 		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
 		//		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
@@ -64,6 +67,48 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		return new Faction(this, id, name, chief, maxSize);
 	}
 	
+	@Override
+	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
+		String jsonClaims = resultSet.getString("claims");
+		Set<FactionClaim> claims = new HashSet<>();
+		if (jsonClaims != null && !jsonClaims.isBlank())
+			claims = new Gson().fromJson(jsonClaims, new TypeToken<Set<FactionClaim>>() {}.getType());
+		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims, FactionType.get(resultSet.getInt("type")));
+	}
+	
+	@Override
+	protected FactionPlayerData createClanData(OlympaPlayerInformations informations) {
+		return new FactionPlayerData(informations);
+	}
+
+	@Override
+	protected FactionPlayerData provideClanData(OlympaPlayerInformations informations, ResultSet resultSet) throws SQLException {
+		FactionPlayerData datas = new FactionPlayerData(informations);
+		datas.setRole(FactionRole.values()[resultSet.getInt("role")]);
+		return datas;
+	}
+	
+	@Override
+	public StringJoiner addDBClansCollums(StringJoiner columnsJoiner) {
+		columnsJoiner = super.addDBClansCollums(columnsJoiner);
+		columnsJoiner.add("`tag` VARCHAR(6) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
+		columnsJoiner.add("`description` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
+		columnsJoiner.add("`ally` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
+		columnsJoiner.add("`truce` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
+		columnsJoiner.add("`ennemy` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
+		columnsJoiner.add("`type` INT(1) NULL DEFAULT '0'");
+		columnsJoiner.add("`claims` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
+		columnsJoiner.add("`type` TINYINT(1) NOT NULL DEFAULT '0'");
+		return columnsJoiner;
+	}
+	
+	@Override
+	public List<Column> addDBPlayersCollums(List<Column> columns) {
+		columns = super.addDBPlayersCollums(columns);
+		columns.add(new Column("role", "TINYINT NOT NULL DEFAULT " + FactionRole.RECRUT.ordinal()));
+		return columns;
+	}
+	
 	public void removeCache(Chunk chunk) {
 		FactionClaim fc = claimCache.asMap().keySet().stream().filter(e -> e.isChunk(chunk)).findFirst().orElse(null);
 		if (fc != null)
@@ -78,36 +123,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 				claimCache.put(faction.getClaim(chunk), faction);
 		}
 		return faction;
-	}
-
-	@Override
-	public StringJoiner addDBCollums(StringJoiner columnsJoiner) {
-		columnsJoiner = super.addDBCollums(columnsJoiner);
-		columnsJoiner.add("`tag` VARCHAR(6) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
-		columnsJoiner.add("`description` VARCHAR(100) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
-		columnsJoiner.add("`ally` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
-		columnsJoiner.add("`truce` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
-		columnsJoiner.add("`ennemy` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
-		columnsJoiner.add("`type` INT(1) NULL DEFAULT '0'");
-		columnsJoiner.add("`claims` TEXT(65535) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'");
-		columnsJoiner.add("`type` TINYINT(1) NOT NULL DEFAULT '0'");
-		return columnsJoiner;
-	}
-	
-	@Override
-	protected FactionPlayerData createClanData(OlympaPlayerInformations informations) {
-		return new FactionPlayerData(informations);
-	}
-
-	@Override
-	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
-		String jsonClaims = resultSet.getString("claims");
-		Set<FactionClaim> claims = new HashSet<>();
-		if (jsonClaims != null && !jsonClaims.isBlank())
-			claims = new Gson().fromJson(jsonClaims, new TypeToken<Set<FactionClaim>>() {
-			}.getType());
-		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"),
-				SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims, FactionType.get(resultSet.getInt("type")));
 	}
 	
 	public Faction getByName(String name) {
