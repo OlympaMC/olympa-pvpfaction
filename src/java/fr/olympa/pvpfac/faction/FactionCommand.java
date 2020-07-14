@@ -26,6 +26,7 @@ import fr.olympa.api.utils.Utils;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
+import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 import fr.olympa.pvpfac.faction.utils.FactionMsg;
 import fr.olympa.pvpfac.faction.utils.FactionUtils;
@@ -109,6 +110,18 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		sendMessage(Prefix.FACTION, "&2" + fp.getName() + "&a a &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + " de power.");
 	}
 
+	@Cmd (player = true, args = "CLANPLAYER", min = 1)
+	public void promote(CommandContext cmd) {
+		FactionPlayerData player = cmd.getArgument(0);
+		FactionRole above = player.getRole().getAbove();
+		if (above == null) {
+			sendError("Le joueur %s est déjà au rang maximal possible !", player.getPlayerInformations().getName());
+		}else {
+			player.setRole(above);
+			sendSuccess("Tu as promu le joueur %s au rang %s!", player.getPlayerInformations().getName(), above.name);
+		}
+	}
+	
 	@Cmd(player = true, aliases = "cl")
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);

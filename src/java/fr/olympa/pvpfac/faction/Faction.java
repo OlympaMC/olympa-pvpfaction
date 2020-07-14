@@ -1,7 +1,7 @@
 package fr.olympa.pvpfac.faction;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -50,7 +50,6 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		}
 		return joiner.toString();
 	}, PvPFaction.getInstance(), 10);
-	//	List<String> oldName = new ArrayList<>();
 
 	Set<FactionClaim> claims = new HashSet<>();
 	String tag;
@@ -122,6 +121,10 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return claims.size() > getPower() && type == FactionType.PLAYER;
 	}
 	
+	public FactionManager getFactionManager() {
+		return getClansManager();
+	}
+	
 	@Override
 	public void memberJoin(ClanPlayerInterface<Faction, FactionPlayerData> member) {
 		super.memberJoin(member);
@@ -152,18 +155,12 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	private void updateClaims() throws SQLException {
-		PreparedStatement statement = ((FactionManager) manager).updateFactionClaimsStatement.getStatement();
-		statement.setString(1, new Gson().toJson(claims));
-		statement.setInt(2, id);
-		statement.executeUpdate();
+		getFactionManager().claimsColumn.updateValue(this, new Gson().toJson(claims), Types.VARCHAR);
 	}
 	
 	public void updateHome(Location home) throws SQLException {
+		getFactionManager().homeColumn.updateValue(this, SpigotUtils.convertLocationToString(home), Types.VARCHAR);
 		this.home = home;
-		PreparedStatement statement = ((FactionManager) manager).updateFactionHomeStatement.getStatement();
-		statement.setString(1, SpigotUtils.convertLocationToString(home));
-		statement.setInt(2, id);
-		statement.executeUpdate();
 	}
 	
 	public int getMaxPower() {
@@ -177,22 +174,16 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public boolean updateTag(String tag) throws SQLException {
 		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find())
 			return false;
+		getFactionManager().tagColumn.updateValue(this, tag, Types.VARCHAR);
 		this.tag = tag;
-		PreparedStatement statement = ((FactionManager) manager).updateTagStatement.getStatement();
-		statement.setString(1, tag);
-		statement.setInt(2, id);
-		statement.executeUpdate();
 		return true;
 	}
 	
 	public boolean updateDescription(String description) throws SQLException {
 		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find())
 			return false;
+		getFactionManager().descriptionColumn.updateValue(this, description, Types.VARCHAR);
 		this.description = description;
-		PreparedStatement statement = ((FactionManager) manager).updateDescriptionStatement.getStatement();
-		statement.setString(1, description);
-		statement.setInt(2, id);
-		statement.executeUpdate();
 		return true;
 	}
 	

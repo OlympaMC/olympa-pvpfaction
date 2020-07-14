@@ -1,22 +1,39 @@
 package fr.olympa.pvpfac.faction;
 
+import java.sql.SQLException;
+import java.sql.Types;
+
 import fr.olympa.api.clans.ClanPlayerData;
 import fr.olympa.api.player.OlympaPlayerInformations;
+import fr.olympa.api.utils.observable.ObservableValue;
+import fr.olympa.pvpfac.PvPFaction;
 
 public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData> {
 
-	private FactionRole role = FactionRole.RECRUT;
+	private final ObservableValue<FactionRole> role;
 	
 	public FactionPlayerData(OlympaPlayerInformations informations) {
+		this(informations, FactionRole.RECRUT);
+	}
+	
+	public FactionPlayerData(OlympaPlayerInformations informations, FactionRole role) {
 		super(informations);
+		this.role = new ObservableValue<>(role);
+		this.role.observe("updateSQL", () -> {
+			try {
+				PvPFaction.getInstance().factionManager.roleColumn.updateValue(this, this.role.get().ordinal(), Types.TINYINT);
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	public FactionRole getRole() {
-		return role;
+		return role.get();
 	}
 	
 	public void setRole(FactionRole role) {
-		this.role = role;
+		this.role.set(role);
 	}
 	
 	public enum FactionRole {
@@ -34,6 +51,22 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 			this.power = power;
 			this.name = name;
 			this.prefix = prefix;
+		}
+		
+		public FactionRole getAbove() {
+			try {
+				return values()[ordinal() - 1];
+			}catch (ArrayIndexOutOfBoundsException ex) {
+				return null;
+			}
+		}
+		
+		public FactionRole getBelow() {
+			try {
+				return values()[ordinal() + 1];
+			}catch (ArrayIndexOutOfBoundsException ex) {
+				return null;
+			}
 		}
 		
 	}
