@@ -31,19 +31,18 @@ import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction, FactionPlayerData> {
 	
-	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7§oMa Faction:");
+	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7Ma faction:");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
-		FactionPlayer fp = x.getOlympaPlayer();
-		Faction faction = fp.getClan();
-		Player p = fp.getPlayer();
+		Faction fac = x.getOlympaPlayer().getClan();
+		Player p = x.getOlympaPlayer().getPlayer();
 		StringJoiner joiner = new StringJoiner("\n");
-		for (FactionPlayerData member : faction.getMembers()) {
+		for (FactionPlayerData member : fac.getMembers()) {
 			String memberName = member.getPlayerInformations().getName();
-			if (member.isConnected())
+			if (!member.isConnected()) {
 				joiner.add("§c○ " + memberName);
-			else if (member.getConnectedPlayer() == x.getOlympaPlayer())
+			}else if (member.getConnectedPlayer() == x.getOlympaPlayer()) {
 				joiner.add("§6● §l" + memberName);
-			else {
+			}else {
 				Location loc = member.getConnectedPlayer().getPlayer().getLocation();
 				joiner.add("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc));
 			}
