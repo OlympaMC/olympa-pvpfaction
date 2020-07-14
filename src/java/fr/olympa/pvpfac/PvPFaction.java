@@ -70,8 +70,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 				FixedLine.EMPTY_LINE,
 				lineMoney,
 				FixedLine.EMPTY_LINE,
-				lineGroup,
-				FixedLine.EMPTY_LINE).addFooters(
+				lineGroup).addFooters(
+				FixedLine.EMPTY_LINE,
 				CyclingLine.olympaAnimation());
 
 		IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();

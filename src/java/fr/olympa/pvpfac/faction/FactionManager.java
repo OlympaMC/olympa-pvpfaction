@@ -44,7 +44,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions", 10);
-		new FactionCommand(this, "faction", "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
+		new FactionCommand(this, "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
 		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
 		//		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
 		//
@@ -95,6 +95,11 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringItemDisband = "§cDémenteler la faction";
 	}
 
+	@Override
+	protected String getClansCommand() {
+		return "faction";
+	}
+	
 	@Override
 	protected Faction createClan(int id, String name, OlympaPlayerInformations chief, int maxSize) {
 		return new Faction(this, id, name, chief, maxSize);

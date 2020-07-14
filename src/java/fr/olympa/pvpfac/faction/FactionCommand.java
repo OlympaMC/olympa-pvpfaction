@@ -37,8 +37,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
-	public FactionCommand(FactionManager manager, String name, String description, OlympaPermission permission, String... aliases) {
-		super(manager, name, description, permission, aliases);
+	public FactionCommand(FactionManager manager, String description, OlympaPermission permission, String... aliases) {
+		super(manager, description, permission, aliases);
 	}
 
 	@Cmd(player = true, aliases = { "setdesc", "adddesc", "setdescription", "adddescription" }, args = { "100_lettres_max" }, min = 1)
