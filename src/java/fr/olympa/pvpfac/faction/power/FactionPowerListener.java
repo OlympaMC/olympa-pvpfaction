@@ -25,20 +25,20 @@ public class FactionPowerListener implements Listener {
 		FactionPlayer fp = AccountProvider.get(uuid);
 		PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30 * 60 * 20, 60 * 60 * 20);
 	}
-	
+
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		UUID uuid = player.getUniqueId();
 		PvPFaction.getInstance().getTask().cancelTaskByName("pvpfac_power_" + uuid);
 	}
-	
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		UUID uuid = player.getUniqueId();
 		FactionPlayer fp = AccountProvider.get(uuid);
-		if (!fp.removePower())
+		if (!fp.removePower() || !fp.removePower())
 			return;
 		OlympaTask task = PvPFaction.getInstance().getTask();
 		if (!task.taskExist("pvpfac_power_" + uuid))

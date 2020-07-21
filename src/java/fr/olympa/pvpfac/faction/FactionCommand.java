@@ -216,7 +216,7 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		int indexSymbole = 0;
 		StringJoiner sj = new StringJoiner("\n");
 
-		sj.add("&e&m---------&6 MAP %facing %co &e&m---------&7".replace("%co", playerLocation.getBlockX() + " " + playerLocation.getBlockZ()));
+		sj.add("&e&m-------&6 MAP %facing %co &e&m-------&7".replace("%co", playerLocation.getBlockX() + " " + playerLocation.getBlockZ()));
 		StringBuilder sb = new StringBuilder();
 		switch (facing) {
 		default:
