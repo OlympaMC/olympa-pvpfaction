@@ -14,7 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 
-import fr.olympa.api.clans.Clan;
 import fr.olympa.api.clans.ClansCommand;
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
@@ -27,6 +26,7 @@ import fr.olympa.api.utils.Utils;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
+import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 import fr.olympa.pvpfac.faction.utils.FactionMsg;
 import fr.olympa.pvpfac.faction.utils.FactionUtils;
@@ -35,10 +35,10 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Faction> {
+public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
-	public FactionCommand(FactionManager manager, String name, String description, OlympaPermission permission, String... aliases) {
-		super(manager, name, description, permission, aliases);
+	public FactionCommand(FactionManager manager, String description, OlympaPermission permission, String... aliases) {
+		super(manager, description, permission, aliases);
 	}
 
 	@Cmd(player = true, aliases = { "setdesc", "adddesc", "setdescription", "adddescription" }, args = { "100_lettres_max" }, min = 1)
@@ -110,6 +110,18 @@ public class FactionCommand<T extends Clan<Faction>> extends ClansCommand<Factio
 		sendMessage(Prefix.FACTION, "&2" + fp.getName() + "&a a &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + " de power.");
 	}
 
+	@Cmd (player = true, args = "CLANPLAYER", min = 1)
+	public void promote(CommandContext cmd) {
+		FactionPlayerData player = cmd.getArgument(0);
+		FactionRole above = player.getRole().getAbove();
+		if (above == null) {
+			sendError("Le joueur %s est déjà au rang maximal possible !", player.getPlayerInformations().getName());
+		}else {
+			player.setRole(above);
+			sendSuccess("Tu as promu le joueur %s au rang %s!", player.getPlayerInformations().getName(), above.name);
+		}
+	}
+	
 	@Cmd(player = true, aliases = "cl")
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);

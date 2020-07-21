@@ -3,7 +3,7 @@ package fr.olympa.pvpfac;
 import org.bukkit.plugin.PluginManager;
 
 import fr.olympa.api.hook.IProtocolSupport;
-import fr.olympa.api.lines.AnimLine;
+import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.DynamicLine;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.permission.OlympaPermission;
@@ -66,13 +66,13 @@ public class PvPFaction extends OlympaAPIPlugin {
 			getLogger().severe("Une erreur est survenue lors de l'initialisation du système de faction.");
 		}
 
-		scoreboards = new ScoreboardManager(this, "§6Olympa §e§lPvPFaction").addLines(
+		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,
 				lineMoney,
 				FixedLine.EMPTY_LINE,
-				lineGroup,
+				lineGroup).addFooters(
 				FixedLine.EMPTY_LINE,
-				AnimLine.olympaAnimation());
+				CyclingLine.olympaAnimation());
 
 		IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)

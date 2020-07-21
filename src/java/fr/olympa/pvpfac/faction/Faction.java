@@ -1,7 +1,7 @@
 package fr.olympa.pvpfac.faction;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -17,10 +17,8 @@ import org.bukkit.entity.Player;
 import com.google.gson.Gson;
 
 import fr.olympa.api.clans.Clan;
-import fr.olympa.api.clans.ClanPlayerData;
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
-import fr.olympa.api.clans.OlympaFactionRole;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.player.OlympaPlayerInformations;
@@ -31,28 +29,26 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
-public class Faction extends Clan<Faction> {
+public class Faction extends Clan<Faction, FactionPlayerData> {
 	
-	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7§oMa Faction:");
+	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7Ma faction:");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
-		FactionPlayer fp = x.getOlympaPlayer();
-		Faction faction = fp.getClan();
-		Player p = fp.getPlayer();
+		Faction fac = x.getOlympaPlayer().getClan();
+		Player p = x.getOlympaPlayer().getPlayer();
 		StringJoiner joiner = new StringJoiner("\n");
-		for (ClanPlayerData<Faction> member : faction.getMembers()) {
+		for (FactionPlayerData member : fac.getMembers()) {
 			String memberName = member.getPlayerInformations().getName();
-			if (member.isConnected())
+			if (!member.isConnected()) {
 				joiner.add("§c○ " + memberName);
-			else if (member.getConnectedPlayer() == x.getOlympaPlayer())
+			}else if (member.getConnectedPlayer() == x.getOlympaPlayer()) {
 				joiner.add("§6● §l" + memberName);
-			else {
+			}else {
 				Location loc = member.getConnectedPlayer().getPlayer().getLocation();
 				joiner.add("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc));
 			}
 		}
 		return joiner.toString();
 	}, PvPFaction.getInstance(), 10);
-	//	List<String> oldName = new ArrayList<>();
 
 	Set<FactionClaim> claims = new HashSet<>();
 	String tag;
@@ -60,28 +56,28 @@ public class Faction extends Clan<Faction> {
 	Location home;
 	FactionType type;
 
-	public Faction(ClansManager<Faction> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
 		super(manager, id, name, chief, maxSize);
 		type = FactionType.PLAYER;
 	}
 	
-	public Faction(ClansManager<Faction> manager, int id, String name, String description, OlympaPlayerInformations chief, FactionType type) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String description, OlympaPlayerInformations chief, FactionType type) {
 		super(manager, id, name, chief, manager.defaultMaxSize);
 		this.description = description;
 		this.type = type;
 	}
 	
-	public FactionType getType() {
-		return type;
-	}
-	
-	public Faction(ClansManager<Faction> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
 		super(manager, id, name, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
 		this.home = home;
 		this.claims = claims;
 		this.type = type;
+	}
+	
+	public FactionType getType() {
+		return type;
 	}
 	
 	public Set<FactionClaim> getClaims() {
@@ -124,8 +120,12 @@ public class Faction extends Clan<Faction> {
 		return claims.size() > getPower() && type == FactionType.PLAYER;
 	}
 	
+	public FactionManager getFactionManager() {
+		return getClansManager();
+	}
+	
 	@Override
-	public void memberJoin(ClanPlayerInterface<Faction> member) {
+	public void memberJoin(ClanPlayerInterface<Faction, FactionPlayerData> member) {
 		super.memberJoin(member);
 		
 		Scoreboard<FactionPlayer> scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard((FactionPlayer) member);
@@ -135,7 +135,7 @@ public class Faction extends Clan<Faction> {
 	}
 	
 	@Override
-	protected void removedOnlinePlayer(ClanPlayerInterface<Faction> oplayer) {
+	protected void removedOnlinePlayer(ClanPlayerInterface<Faction, FactionPlayerData> oplayer) {
 		super.removedOnlinePlayer(oplayer);
 
 		PvPFaction.getInstance().scoreboards.removePlayerScoreboard((FactionPlayer) oplayer);
@@ -154,27 +154,12 @@ public class Faction extends Clan<Faction> {
 	}
 
 	private void updateClaims() throws SQLException {
-		PreparedStatement statement = ((FactionManager) manager).updateFactionClaimsStatement.getStatement();
-		statement.setString(1, new Gson().toJson(claims));
-		statement.setInt(2, id);
-		statement.executeUpdate();
+		getFactionManager().claimsColumn.updateValue(this, new Gson().toJson(claims), Types.VARCHAR);
 	}
 	
 	public void updateHome(Location home) throws SQLException {
+		getFactionManager().homeColumn.updateValue(this, SpigotUtils.convertLocationToString(home), Types.VARCHAR);
 		this.home = home;
-		PreparedStatement statement = ((FactionManager) manager).updateFactionHomeStatement.getStatement();
-		statement.setString(1, SpigotUtils.convertLocationToString(home));
-		statement.setInt(2, id);
-		statement.executeUpdate();
-	}
-
-	// TODO ROLES
-	public Set<FactionPlayer> getOnlinePlayers(OlympaFactionRole officer) {
-		return null;
-	}
-
-	public OlympaFactionRole getRole(Player player) {
-		return null;
 	}
 	
 	public int getMaxPower() {
@@ -188,22 +173,16 @@ public class Faction extends Clan<Faction> {
 	public boolean updateTag(String tag) throws SQLException {
 		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find())
 			return false;
+		getFactionManager().tagColumn.updateValue(this, tag, Types.VARCHAR);
 		this.tag = tag;
-		PreparedStatement statement = ((FactionManager) manager).updateTagStatement.getStatement();
-		statement.setString(1, tag);
-		statement.setInt(2, id);
-		statement.executeUpdate();
 		return true;
 	}
 	
 	public boolean updateDescription(String description) throws SQLException {
 		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find())
 			return false;
+		getFactionManager().descriptionColumn.updateValue(this, description, Types.VARCHAR);
 		this.description = description;
-		PreparedStatement statement = ((FactionManager) manager).updateDescriptionStatement.getStatement();
-		statement.setString(1, description);
-		statement.setInt(2, id);
-		statement.executeUpdate();
 		return true;
 	}
 	

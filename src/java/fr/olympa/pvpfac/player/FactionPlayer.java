@@ -18,20 +18,21 @@ import fr.olympa.api.economy.OlympaMoney;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.provider.OlympaPlayerObject;
-import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
+import fr.olympa.pvpfac.faction.FactionPlayerData;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 
-public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction> {
+public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction, FactionPlayerData> {
 
 	public static int POWER_MAX = 5;
 
 	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
 			.put("power", "TINYINT(3) NULL DEFAULT 9")
 			.put("ender_chest", "VARBINARY(8000) NULL")
-			.put("clan", "INT(11) NULL DEFAULT NULL")
 			.put("money", "DOUBLE NULL DEFAULT 0")
-			/*.put("inventory", "VARBINARY(8000) NULL")*/.build();
+			/*.put("inventory", "VARBINARY(8000) NULL").build();*/
+
+			.build();
 
 	public static FactionPlayer get(Player p) {
 		return AccountProvider.get(p.getUniqueId());
@@ -40,7 +41,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	int power = 0;
 	private Inventory enderChest = Bukkit.createInventory(null, 9, "Enderchest de " + getName());
 	private OlympaMoney money = new OlympaMoney(0);
-	Faction faction;
+	private Faction faction;
 	FactionChat chat = FactionChat.GENERAL;
 
 	public FactionPlayer(UUID uuid, String name, String ip) {
@@ -100,13 +101,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 		try {
 			power = resultSet.getInt("power");
 			enderChest.setContents(ItemUtils.deserializeItemsArray(resultSet.getBytes("ender_chest")));
-			faction = PvPFaction.getInstance().getFactionManager().getClan(resultSet.getInt("clan"));
 			money.set(resultSet.getDouble("money"));
-			//			byte[] content = resultSet.getBytes("inventory");
-			//			if (content != null && content.length != 0)
-			//				getPlayer().getInventory().setStorageContents(ItemUtils.deserializeItemsArray(content));
-			//			else
-			//				SpigotUtils.clearPlayer(getPlayer());
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
@@ -122,9 +117,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 			int i = 1;
 			statement.setInt(i++, power);
 			statement.setBytes(i++, ItemUtils.serializeItemsArray(enderChest.getContents()));
-			statement.setInt(i++, faction == null ? -1 : faction.getID());
 			statement.setDouble(i++, money.get());
-			//			statement.setBytes(i++, ItemUtils.serializeItemsArray(getPlayer().getInventory().getStorageContents()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
