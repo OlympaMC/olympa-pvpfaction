@@ -18,6 +18,10 @@ import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
 import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
+import fr.olympa.pvpfac.tpa.commands.TpaCommand;
+import fr.olympa.pvpfac.tpa.commands.TpaHereCommand;
+import fr.olympa.pvpfac.tpa.commands.TpnoCommand;
+import fr.olympa.pvpfac.tpa.commands.TpyesCommand;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -52,6 +56,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 		//new FactionCommand(this).register();
+		new TpaCommand(this).register();
+		new TpyesCommand(this).register();
+		new TpnoCommand(this).register();
+		new TpaHereCommand(this).register();
 
 		PluginManager pluginManager = getServer().getPluginManager();
 		//		pluginManager.registerEvents(new OreListener(), this);
@@ -71,8 +79,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 				lineMoney,
 				FixedLine.EMPTY_LINE,
 				lineGroup).addFooters(
-				FixedLine.EMPTY_LINE,
-				CyclingLine.olympaAnimation());
+						FixedLine.EMPTY_LINE,
+						CyclingLine.olympaAnimation());
 
 		IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)
