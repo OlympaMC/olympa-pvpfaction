@@ -1,8 +1,6 @@
 package fr.olympa.pvpfac.faction;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -10,9 +8,6 @@ import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 
 import fr.olympa.api.clans.ClansCommand;
 import fr.olympa.api.command.complex.Cmd;
@@ -23,13 +18,12 @@ import fr.olympa.api.utils.ColorUtils;
 import fr.olympa.api.utils.Matcher;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.api.utils.Utils;
-import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
+import fr.olympa.pvpfac.faction.map.FactionMap;
 import fr.olympa.pvpfac.faction.utils.FactionMsg;
-import fr.olympa.pvpfac.faction.utils.FactionUtils;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -110,18 +104,18 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		sendMessage(Prefix.FACTION, "&2" + fp.getName() + "&a a &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + " de power.");
 	}
 
-	@Cmd (player = true, args = "CLANPLAYER", min = 1)
+	@Cmd(player = true, args = "CLANPLAYER", min = 1)
 	public void promote(CommandContext cmd) {
 		FactionPlayerData player = cmd.getArgument(0);
 		FactionRole above = player.getRole().getAbove();
-		if (above == null) {
+		if (above == null)
 			sendError("Le joueur %s est déjà au rang maximal possible !", player.getPlayerInformations().getName());
-		}else {
+		else {
 			player.setRole(above);
 			sendSuccess("Tu as promu le joueur %s au rang %s!", player.getPlayerInformations().getName(), above.name);
 		}
 	}
-	
+
 	@Cmd(player = true, aliases = "cl")
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -213,82 +207,12 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
 	@Cmd(player = true, aliases = "m")
 	public void map(CommandContext cmd) {
-		Location playerLocation = player.getLocation();
-		Chunk chunk = playerLocation.getChunk();
-		World world = chunk.getWorld();
-		int chunkX = chunk.getX();
-		int chunkZ = chunk.getZ();
-		int mapRaduisSize = 7;
-		int sidesCoeff = 2;
-		int startX, startZ, endX, endZ;
-		String facingName;
-		BlockFace facing = SpigotUtils.yawToFace(player.getLocation().getYaw(), false);
-		FactionManager manager = PvPFaction.getInstance().getFactionManager();
-		Map<Faction, String> factions = new HashMap<>();
-		int indexSymbole = 0;
-		StringJoiner sj = new StringJoiner("\n");
+		FactionMap.sendMap(player, getPlayerClan(false));
+	}
 
-		sj.add("&e&m-------&6 MAP %facing %co &e&m-------&7".replace("%co", playerLocation.getBlockX() + " " + playerLocation.getBlockZ()));
-		StringBuilder sb = new StringBuilder();
-		switch (facing) {
-		default:
-		case NORTH:
-			facingName = "Nord";
-			startX = chunkX - mapRaduisSize * sidesCoeff;
-			endX = chunkX + mapRaduisSize * sidesCoeff;
-			startZ = chunkZ - mapRaduisSize;
-			endZ = chunkZ + mapRaduisSize;
-			for (int iZ = startZ; endZ > iZ; iZ++) {
-				for (int iX = startX; endX > iX; iX++)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, getPlayerClan(false)));
-				sb.append("\n");
-			}
-			break;
-		case EAST:
-			facingName = "Est";
-			startX = chunkX + mapRaduisSize;
-			endX = chunkX - mapRaduisSize;
-			startZ = chunkZ - mapRaduisSize * sidesCoeff;
-			endZ = chunkZ + mapRaduisSize * sidesCoeff;
-			for (int iX = startX; endX <= iX; iX--) {
-				for (int iZ = startZ; endZ > iZ; iZ++)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, getPlayerClan(false)));
-				sb.append("\n");
-			}
-			break;
-		case WEST:
-			facingName = "Ouest";
-			startX = chunkX - mapRaduisSize;
-			endX = chunkX + mapRaduisSize;
-			startZ = chunkZ + mapRaduisSize * sidesCoeff;
-			endZ = chunkZ - mapRaduisSize * sidesCoeff;
-			for (int iX = startX; endX > iX; iX++) {
-				for (int iZ = startZ; endZ <= iZ; iZ--)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, getPlayerClan(false)));
-				sb.append("\n");
-			}
-			break;
-		case SOUTH:
-			facingName = "Sud";
-			startX = chunkX + mapRaduisSize * sidesCoeff;
-			endX = chunkX - mapRaduisSize * sidesCoeff;
-			startZ = chunkZ + mapRaduisSize;
-			endZ = chunkZ - mapRaduisSize;
-			for (int iZ = startZ; endZ <= iZ; iZ--) {
-				for (int iX = startX; endX <= iX; iX--)
-					sb.append(FactionUtils.getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, getPlayerClan(false)));
-				sb.append("\n");
-			}
-			break;
-		}
-		int maxX = Math.abs(startX - endX);
-		int maxZ = Math.abs(startZ - endZ);
-		System.out.println("MAP " + facingName + " sizeX " + maxX + " sizeZ " + maxZ);
-		sj.add(sb.toString());
-		if (!factions.isEmpty())
-			sj.add(factions.entrySet().stream().map(entry -> "&7" + entry.getValue() + "&a = &7" + entry.getKey().getName()).collect(Collectors.joining("&7, ")));
-		sj.add("&6TIPS &aFaites F3 + G pour voir la taille des claims.");
-		player.sendMessage(ColorUtils.color(sj.toString().replace("%facing", facingName)));
+	@Cmd(player = true, aliases = "am")
+	public void automap(CommandContext cmd) {
+		FactionMap.addAutoMap(player);
 	}
 
 	@Cmd(player = true, aliases = "c", args = { "Géneral", "Faction", "Allié" })

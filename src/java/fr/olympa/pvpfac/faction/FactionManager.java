@@ -29,10 +29,10 @@ import fr.olympa.pvpfac.faction.gui.FactionManagementGUI;
 
 public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
-	public Cache<FactionClaim, Faction> claimCache;
-	
+	private Cache<FactionClaim, Faction> claimCache;
+
 	protected Column<FactionPlayerData> roleColumn;
-	
+
 	protected Column<Faction> homeColumn;
 	protected Column<Faction> typeColumn;
 	protected Column<Faction> claimsColumn;
@@ -41,7 +41,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected Column<Faction> allyColumn;
 	protected Column<Faction> descriptionColumn;
 	protected Column<Faction> tagColumn;
-	
+
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions", 10);
 		new FactionCommand(this, "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
@@ -99,21 +99,23 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected String getClansCommand() {
 		return "faction";
 	}
-	
+
 	@Override
 	protected Faction createClan(int id, String name, OlympaPlayerInformations chief, int maxSize) {
 		return new Faction(this, id, name, chief, maxSize);
 	}
-	
+
 	@Override
 	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
 		String jsonClaims = resultSet.getString("claims");
 		Set<FactionClaim> claims = new HashSet<>();
 		if (jsonClaims != null && !jsonClaims.isBlank())
-			claims = new Gson().fromJson(jsonClaims, new TypeToken<Set<FactionClaim>>() {}.getType());
-		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims, FactionType.get(resultSet.getInt("type")));
+			claims = new Gson().fromJson(jsonClaims, new TypeToken<Set<FactionClaim>>() {
+			}.getType());
+		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims,
+				FactionType.get(resultSet.getInt("type")));
 	}
-	
+
 	@Override
 	protected FactionPlayerData createClanData(OlympaPlayerInformations informations) {
 		return new FactionPlayerData(informations);
@@ -123,7 +125,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected FactionPlayerData provideClanData(OlympaPlayerInformations informations, ResultSet resultSet) throws SQLException {
 		return new FactionPlayerData(informations, FactionRole.values()[resultSet.getInt("role")]);
 	}
-	
+
 	@Override
 	public List<Column<Faction>> addDBClansCollums(List<Column<Faction>> columns) {
 		columns = super.addDBClansCollums(columns);
@@ -137,19 +139,19 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		columns.add(homeColumn = new Column<Faction>("home", "VARCHAR(15) NULL").setUpdatable(true));
 		return columns;
 	}
-	
+
 	@Override
 	public List<Column<FactionPlayerData>> addDBPlayersCollums(List<Column<FactionPlayerData>> columns) {
 		columns = super.addDBPlayersCollums(columns);
 		columns.add(roleColumn = new Column<FactionPlayerData>("role", "TINYINT NOT NULL DEFAULT " + FactionRole.RECRUT.ordinal()).setUpdatable(true));
 		return columns;
 	}
-	
+
 	@Override
 	public ClanManagementGUI<Faction, FactionPlayerData> provideManagementGUI(ClanPlayerInterface<Faction, FactionPlayerData> player) {
 		return new FactionManagementGUI(player, this);
 	}
-	
+
 	public void removeCache(Chunk chunk) {
 		FactionClaim fc = claimCache.asMap().keySet().stream().filter(e -> e.isChunk(chunk)).findFirst().orElse(null);
 		if (fc != null)
@@ -165,7 +167,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		}
 		return faction;
 	}
-	
+
 	public Faction getByName(String name) {
 		return getClans().stream().filter(c -> c.getValue().getName().equalsIgnoreCase(name)).map(c -> c.getValue()).findFirst().orElse(null);
 	}
@@ -184,5 +186,5 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		}
 		return faction;
 	}
-	
+
 }

@@ -30,7 +30,7 @@ import fr.olympa.pvpfac.faction.claim.FactionClaim;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction, FactionPlayerData> {
-	
+
 	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7Ma faction:");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
 		Faction fac = x.getOlympaPlayer().getClan();
@@ -38,11 +38,11 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		StringJoiner joiner = new StringJoiner("\n");
 		for (FactionPlayerData member : fac.getMembers()) {
 			String memberName = member.getPlayerInformations().getName();
-			if (!member.isConnected()) {
+			if (!member.isConnected())
 				joiner.add("§c○ " + memberName);
-			}else if (member.getConnectedPlayer() == x.getOlympaPlayer()) {
+			else if (member.getConnectedPlayer() == x.getOlympaPlayer())
 				joiner.add("§6● §l" + memberName);
-			}else {
+			else {
 				Location loc = member.getConnectedPlayer().getPlayer().getLocation();
 				joiner.add("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc));
 			}
@@ -60,14 +60,15 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		super(manager, id, name, chief, maxSize);
 		type = FactionType.PLAYER;
 	}
-	
+
 	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String description, OlympaPlayerInformations chief, FactionType type) {
 		super(manager, id, name, chief, manager.defaultMaxSize);
 		this.description = description;
 		this.type = type;
 	}
-	
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims, FactionType type) {
+
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims,
+			FactionType type) {
 		super(manager, id, name, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
@@ -75,23 +76,23 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		this.claims = claims;
 		this.type = type;
 	}
-	
+
 	public FactionType getType() {
 		return type;
 	}
-	
+
 	public Set<FactionClaim> getClaims() {
 		return claims;
 	}
-	
+
 	public String getTag() {
 		return tag;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
-	
+
 	public Location getHome() {
 		return home;
 	}
@@ -107,33 +108,33 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public int getPower() {
 		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getPower()).sum();
 	}
-	
+
 	public FactionClaim getClaim(Chunk chunk) {
 		return claims.stream().filter(claim -> claim.isChunk(chunk)).findFirst().orElse(null);
 	}
-	
+
 	public boolean hasClaim(Chunk chunk) {
 		return claims.stream().anyMatch(claim -> claim.isChunk(chunk));
 	}
-	
+
 	public boolean isOverClaimable() {
 		return claims.size() > getPower() && type == FactionType.PLAYER;
 	}
-	
+
 	public FactionManager getFactionManager() {
 		return getClansManager();
 	}
-	
+
 	@Override
 	public void memberJoin(ClanPlayerInterface<Faction, FactionPlayerData> member) {
 		super.memberJoin(member);
-		
+
 		Scoreboard<FactionPlayer> scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard((FactionPlayer) member);
 		scoreboard.addLine(FixedLine.EMPTY_LINE);
 		scoreboard.addLine(header);
 		scoreboard.addLine(players);
 	}
-	
+
 	@Override
 	protected void removedOnlinePlayer(ClanPlayerInterface<Faction, FactionPlayerData> oplayer) {
 		super.removedOnlinePlayer(oplayer);
@@ -141,7 +142,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		PvPFaction.getInstance().scoreboards.removePlayerScoreboard((FactionPlayer) oplayer);
 		PvPFaction.getInstance().scoreboards.create((FactionPlayer) oplayer);
 	}
-	
+
 	public void claim(Chunk chunk) throws SQLException {
 		claims.add(new FactionClaim(chunk));
 		updateClaims();
@@ -156,12 +157,12 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	private void updateClaims() throws SQLException {
 		getFactionManager().claimsColumn.updateValue(this, new Gson().toJson(claims), Types.VARCHAR);
 	}
-	
+
 	public void updateHome(Location home) throws SQLException {
 		getFactionManager().homeColumn.updateValue(this, SpigotUtils.convertLocationToString(home), Types.VARCHAR);
 		this.home = home;
 	}
-	
+
 	public int getMaxPower() {
 		return getMembersAmount() * FactionPlayer.POWER_MAX;
 	}
@@ -169,7 +170,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public String getClaimsPowerMaxPower() {
 		return getClaims().size() + "/" + getPower() + "/" + getMaxPower();
 	}
-	
+
 	public boolean updateTag(String tag) throws SQLException {
 		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find())
 			return false;
@@ -177,7 +178,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		this.tag = tag;
 		return true;
 	}
-	
+
 	public boolean updateDescription(String description) throws SQLException {
 		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find())
 			return false;
@@ -185,7 +186,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		this.description = description;
 		return true;
 	}
-	
+
 	public String getNameColored(UUID uuid) {
 		return getNameColored(((FactionPlayer) AccountProvider.get(uuid)).getClan());
 	}
@@ -193,7 +194,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public String getNameColored(Faction clan) {
 		return (clan != null && clan.getID() == id ? ChatColor.GREEN : ChatColor.RED) + getName();
 	}
-	
+
 	public void setTag(String tag) {
 		this.tag = tag;
 	}

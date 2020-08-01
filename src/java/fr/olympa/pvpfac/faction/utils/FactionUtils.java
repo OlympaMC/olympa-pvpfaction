@@ -1,10 +1,5 @@
 package fr.olympa.pvpfac.faction.utils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import fr.olympa.pvpfac.faction.Faction;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -47,22 +42,6 @@ public class FactionUtils {
 		textComponent2.setStrikethrough(true);
 		textComponent.addExtra(textComponent2);
 		return textComponent;
-	}
-
-	private static List<String> symboles = Arrays.asList("#", "%", "&", "$", "@", "=", "+", "A", "B", "C", "D", "E", "G", "0", "7");
-
-	public static String getChunkLetter(Faction fChunk, Map<Faction, String> factions, int indexSymbole, Faction faction) {
-		if (fChunk == null)
-			return "&7-";
-		String symb = factions.get(fChunk);
-		if (symb == null) {
-			symb = symboles.get(indexSymbole++);
-			factions.put(fChunk, symb);
-		}
-		ChatColor color = ChatColor.RED;
-		if (faction != null && faction.getID() == fChunk.getID())
-			color = ChatColor.GREEN;
-		return color + symb;
 	}
 
 }

@@ -12,10 +12,13 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.core.spigot.OlympaCore;
+import fr.olympa.pvpfac.armorstand.ArmorStandWithHandListener;
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
-import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
+import fr.olympa.pvpfac.faction.claim.FactionClaimEnterListener;
+import fr.olympa.pvpfac.faction.claim.FactionClaimProtectionListener;
 import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
+import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import fr.olympa.pvpfac.tpa.commands.TpaCommand;
@@ -66,8 +69,11 @@ public class PvPFaction extends OlympaAPIPlugin {
 		try {
 			pluginManager.registerEvents(new FactionChatListener(), this);
 			pluginManager.registerEvents(new FactionPvPListener(), this);
-			pluginManager.registerEvents(new FactionClaimListener(), this);
+			pluginManager.registerEvents(new FactionClaimEnterListener(), this);
 			pluginManager.registerEvents(new FactionPowerListener(), this);
+			pluginManager.registerEvents(new AutoMapListener(), this);
+			pluginManager.registerEvents(new FactionClaimProtectionListener(), this);
+			pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 		} catch (Exception ex) {
 			ex.printStackTrace();

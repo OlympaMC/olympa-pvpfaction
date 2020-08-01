@@ -1,5 +1,6 @@
 package fr.olympa.pvpfac.faction.claim;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -12,11 +13,15 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
 import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.utils.ColorUtils;
+import fr.olympa.api.utils.Prefix;
+import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class FactionPvPListener implements Listener {
-	
+
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
 		Entity entityVictim = event.getEntity();
@@ -26,10 +31,9 @@ public class FactionPvPListener implements Listener {
 			return;
 		Player victim = (Player) entityVictim;
 		FactionPlayer victimfp = AccountProvider.get(victim.getUniqueId());
-		// victimfaction = victimfp.getFaction();
-		// if (victimfaction == null) {
-		// return;
-		// }
+		victimfaction = victimfp.getClan();
+		if (victimfaction == null)
+			return;
 		Player attacker = null;
 		if (entityAttacker instanceof Player)
 			attacker = (Player) entityAttacker;
@@ -43,15 +47,22 @@ public class FactionPvPListener implements Listener {
 			return;
 
 		FactionPlayer attackerfp = AccountProvider.get(attacker.getUniqueId());
-		// OlympaFaction attackerfaction = attackerfp.getFaction();
-		// if (attackerfaction == null) {
-		return;
-		// } else if (victimfaction.getId() == attackerfaction.getId()) {
-		// event.setCancelled(false);
-		// }
-
+		Faction attackerfaction = attackerfp.getClan();
+		if (attackerfaction == null)
+			return;
+		if (!victimfaction.isSameClan(attackerfaction)) {
+			Chunk victimChunk = victim.getLocation().getChunk();
+			Faction factionvictimChunk = PvPFaction.getInstance().getFactionManager().getByChunk(victimChunk);
+			if (factionvictimChunk.isSameClan(victimfaction)) {
+				Prefix.FACTION.sendMessage(attacker, "&cImpossible d'attaquer &4%s&c dans son claim.", victim.getName());
+				event.setCancelled(false);
+			}
+		} else {
+			Prefix.FACTION.sendMessage(attacker, "&cAttaque pas le collègue &4%s&c !", victim.getName());
+			event.setCancelled(false);
+		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
 		Player player = event.getPlayer();
@@ -60,10 +71,11 @@ public class FactionPvPListener implements Listener {
 			return;
 		Location location = event.getBlockClicked().getLocation();
 		FactionPlayer attackerfp = AccountProvider.get(player.getUniqueId());
-		// OlympaFaction faction = attackerfp.getFaction();
-		//if (faction.getOnlinePlayers().stream().filter(p -> SpigotUtils.playerisIn(p, location)).findFirst().isPresent()) {
-		//			player.sendMessage(ColorUtils.color(Prefix.FACTION + "Brûle pas le collègue !"));
-		//			event.setCancelled(true);
-		//		}
+		Faction faction = attackerfp.getClan();
+		if (faction.getOnlineFactionPlayers().stream().filter(p -> SpigotUtils.playerisIn(p.getPlayer(), location)).findFirst().isPresent()) {
+			player.sendMessage(ColorUtils.color(Prefix.FACTION + "Brûle pas le collègue !"));
+			event.setCancelled(true);
+			player.updateInventory();
+		}
 	}
 }
