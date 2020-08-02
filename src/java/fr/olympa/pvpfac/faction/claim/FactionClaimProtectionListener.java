@@ -52,7 +52,7 @@ public class FactionClaimProtectionListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBlockPlace(PlayerInteractEvent event) {
+	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
 		Location blockLocation = block.getLocation();

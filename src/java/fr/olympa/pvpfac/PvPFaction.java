@@ -48,7 +48,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public void onDisable() {
 		if (scoreboards != null)
 			scoreboards.unload();
-		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactiver.");
+		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactivé.");
 	}
 
 	@Override

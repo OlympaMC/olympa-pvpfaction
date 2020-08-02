@@ -43,6 +43,6 @@ public class FactionPowerListener implements Listener {
 		OlympaTask task = PvPFaction.getInstance().getTask();
 		if (!task.taskExist("pvpfac_power_" + uuid))
 			PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30 * 60 * 20, 60 * 60 * 20);
-		Prefix.FACTION.sendMessage(fp.getPlayer(), "&c-1 power (&4%s&c/%s)", fp.getPower(), FactionPlayer.POWER_MAX);
+		Prefix.FACTION.sendMessage(fp.getPlayer(), "&c-2 powers (&4%s&c/%s)", fp.getPower(), FactionPlayer.POWER_MAX);
 	}
 }
