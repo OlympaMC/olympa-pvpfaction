@@ -15,7 +15,7 @@ import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class FactionChatListener implements Listener {
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
 		FactionPlayer factionPlayer = AccountProvider.get(player.getUniqueId());
@@ -36,6 +36,8 @@ public class FactionChatListener implements Listener {
 			event.setCancelled(true);
 			break;
 		case GENERAL:
+			if (factionPlayer.getClan() != null)
+				event.setFormat("§7[" + factionPlayer.getClan().getName() + "] §r" + factionPlayer.getGroupNameColored() + " %s §r§7: %s");
 		default:
 			return;
 		}

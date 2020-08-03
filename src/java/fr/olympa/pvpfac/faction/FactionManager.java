@@ -129,11 +129,11 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	}
 
 	public Faction getByName(String name) {
-		return getClans().stream().filter(c -> c.getValue().getName().equalsIgnoreCase(name)).map(c -> c.getValue()).findFirst().orElse(null);
+		return getClans().stream().filter(c -> name.equalsIgnoreCase(c.getValue().getName())).map(c -> c.getValue()).findFirst().orElse(null);
 	}
 
 	public Faction getByTag(String tag) {
-		return getClans().stream().filter(c -> c.getValue().getTag().equalsIgnoreCase(tag)).map(c -> c.getValue()).findFirst().orElse(null);
+		return getClans().stream().filter(c -> tag.equalsIgnoreCase(c.getValue().getTag())).map(c -> c.getValue()).findFirst().orElse(null);
 	}
 
 	public Faction get(String nameOrTagOrPlayer) throws SQLException {

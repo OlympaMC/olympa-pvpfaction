@@ -15,6 +15,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import fr.olympa.api.utils.ColorUtils;
+import fr.olympa.api.utils.Prefix;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
@@ -68,7 +69,7 @@ public class FactionMap {
 			endX = chunkX - mapRaduisSize;
 			startZ = chunkZ - mapRaduisSize * sidesCoeff;
 			endZ = chunkZ + mapRaduisSize * sidesCoeff;
-			for (int iX = startX; endX <= iX; iX--) {
+			for (int iX = startX; endX < iX; iX--) {
 				for (int iZ = startZ; endZ > iZ; iZ++)
 					sb.append(getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
@@ -81,7 +82,7 @@ public class FactionMap {
 			startZ = chunkZ + mapRaduisSize * sidesCoeff;
 			endZ = chunkZ - mapRaduisSize * sidesCoeff;
 			for (int iX = startX; endX > iX; iX++) {
-				for (int iZ = startZ; endZ <= iZ; iZ--)
+				for (int iZ = startZ; endZ < iZ; iZ--)
 					sb.append(getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
@@ -92,8 +93,8 @@ public class FactionMap {
 			endX = chunkX - mapRaduisSize * sidesCoeff;
 			startZ = chunkZ + mapRaduisSize;
 			endZ = chunkZ - mapRaduisSize;
-			for (int iZ = startZ; endZ <= iZ; iZ--) {
-				for (int iX = startX; endX <= iX; iX--)
+			for (int iZ = startZ; endZ < iZ; iZ--) {
+				for (int iX = startX; endX < iX; iX--)
 					sb.append(getChunkLetter(manager.getByChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
@@ -121,7 +122,14 @@ public class FactionMap {
 		return color + (isCenter ? "§m" : "") + symb;
 	}
 
-	public static void addAutoMap(Player player) {
-		autoMapPlayers.add(player);
+	public static void toggleAutoMap(Player player) {
+		if (autoMapPlayers.contains(player)) {
+			autoMapPlayers.add(player);
+			Prefix.FACTION.sendMessage(player, "AutoMap activée.");
+		} else {
+
+			autoMapPlayers.remove(player);
+			Prefix.FACTION.sendMessage(player, "&cAutoMap désactivée.");
+		}
 	}
 }

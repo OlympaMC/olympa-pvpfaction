@@ -21,6 +21,7 @@ import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
+import fr.olympa.pvpfac.faction.claim.FactionClaimType;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.faction.map.FactionMap;
 import fr.olympa.pvpfac.faction.utils.FactionMsg;
@@ -113,6 +114,38 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		else {
 			player.setRole(above);
 			sendSuccess("Tu as promu le joueur %s au rang %s!", player.getPlayerInformations().getName(), above.name);
+		}
+	}
+
+	@Cmd(player = true, min = 1, args = { "wilderness", "safezone", "warnzone", "ap", "spawn" })
+	public void forceclaim(CommandContext cmd) {
+		if (!PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player)) {
+			sendDoNotHavePermission();
+			return;
+		}
+		Faction faction = null;
+		try {
+			faction = PvPFaction.getInstance().getFactionManager().getByName(cmd.getArgument(0));
+			FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+			Chunk chunk = player.getLocation().getChunk();
+			FactionClaim claim = claimManager.getByChunk(chunk);
+			if (faction != null) {
+				claim.setFaction(faction);
+				claimManager.updateClaim(claim);
+				sendMessage(Prefix.FACTION, "Tu as claim pour &2%s&a.", faction.getName());
+			} else {
+				FactionClaimType type = FactionClaimType.get(cmd.getArgument(0, new String()));
+				if (type == null) {
+					sendMessage(Prefix.FACTION, "&cFaction &4%s%c inconnu.", cmd.getArgument(0, new String()));
+					return;
+				}
+				claim.setType(type);
+				claimManager.updateClaim(claim);
+				sendMessage(Prefix.FACTION, "Tu as claim pour &2%s&a.", type.getName());
+			}
+		} catch (SQLException e) {
+			sendError();
+			e.printStackTrace();
 		}
 	}
 
@@ -216,7 +249,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
 	@Cmd(player = true, aliases = "am")
 	public void automap(CommandContext cmd) {
-		FactionMap.addAutoMap(player);
+		FactionMap.toggleAutoMap(player);
 	}
 
 	@Cmd(player = true, aliases = "c", args = { "Géneral", "Faction", "Allié" })
@@ -233,7 +266,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		if (cmd.getArgumentsLength() > 0) {
 			askChat = FactionChat.get(cmd.getArgument(0));
 			if (askChat == null) {
-				sendMessage(Prefix.FACTION, "&cLe chat &4" + cmd.getArgument(1) + "&c n'existe pas.");
+				sendMessage(Prefix.FACTION, "&cLe chat &4" + cmd.getArgument(0) + "&c n'existe pas.");
 				return;
 			} else if (chat != null && chat.equals(askChat)) {
 				sendMessage(Prefix.FACTION, "&cTu utilise déjà le chat &4" + chat.getName() + "&c.");
