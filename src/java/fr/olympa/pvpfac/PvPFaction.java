@@ -17,6 +17,7 @@ import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimEnterListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimProtectionListener;
+import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
@@ -36,9 +37,14 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 	public ScoreboardManager<FactionPlayer> scoreboards;
 	public FactionManager factionManager;
+	public FactionClaimsManager factionClaimsManager;
 
 	public FactionManager getFactionManager() {
 		return factionManager;
+	}
+
+	public FactionClaimsManager getClaimsManager() {
+		return factionClaimsManager;
 	}
 
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
@@ -51,6 +57,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactivé.");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
 		instance = this;
@@ -73,12 +80,13 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new FactionPowerListener(), this);
 			pluginManager.registerEvents(new AutoMapListener(), this);
 			pluginManager.registerEvents(new FactionClaimProtectionListener(), this);
-			pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
+			pluginManager.registerEvents(factionClaimsManager = new FactionClaimsManager(), this);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			getLogger().severe("Une erreur est survenue lors de l'initialisation du système de faction.");
 		}
+		pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,

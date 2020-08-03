@@ -1,8 +1,6 @@
 package fr.olympa.pvpfac.faction;
 
 import java.sql.SQLException;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -22,6 +20,8 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
+import fr.olympa.pvpfac.faction.claim.FactionClaim;
+import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.faction.map.FactionMap;
 import fr.olympa.pvpfac.faction.utils.FactionMsg;
 import fr.olympa.pvpfac.player.FactionPlayer;
@@ -144,24 +144,25 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			sendMessage(Prefix.FACTION, "&cCe claim appartient déjà à ta faction.");
 			return;
 		}
-		Set<Entry<Integer, Faction>> clans = PvPFaction.getInstance().getFactionManager().getClans();
-		Faction fChunk = clans.stream().filter(c -> c.getValue().hasClaim(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
+		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+		FactionClaim claim = claimManager.getByChunk(chunk);
+		Faction claimOldFaction = (claimOldFaction = claim.getFaction()) != null ? claimOldFaction.clone() : null;
 
 		try {
-			if (fChunk != null) {
-				if (!fChunk.isOverClaimable()) {
-					TextComponent text = new TextComponent(TextComponent.fromLegacyText(ColorUtils.color("&cImpossible de &lsur&cclaim le chunk de la faction &4%s&c.".replace("%s", fChunk.getName()))));
-					text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(ColorUtils.color("&6&lTIPS &ePour surclaim une faction, celle-ci doit avoir moins de power que de claim."))));
-					sendComponents(text);
-					return;
-				}
-				fChunk.unclaim(chunk);
-				faction.claim(chunk);
-				sendMessage(faction.getPlayers(), Prefix.FACTION, "&2" + player.getName() + "&a a &lsur&aclaim un chunk de &c" + fChunk.getName() + "&a.");
+			if (!claim.isOverClaimable()) {
+				TextComponent text = new TextComponent(TextComponent.fromLegacyText("§cImpossible de &lsur&cclaim le chunk de la faction §4%s&c.".replace("%s", claim.getFactionNameColored())));
+				text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(
+						"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entourée de claims §nuniquement§e de la même faction.")));
+				sendComponents(text);
 				return;
 			}
-			faction.claim(chunk);
-			sendMessage(faction.getPlayers(), Prefix.FACTION, "&2" + player.getName() + "&a a claim un chunk.");
+			claim.setFaction(faction);
+			claimManager.updateClaim(claim);
+			if (claimOldFaction != null) {
+				sendMessage(claimOldFaction.getPlayers(), Prefix.FACTION, "&4Vous avez perdu un claim, une autre faction vous a &lsur&4claim.");
+				sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lsur&aclaim un chunk de &c%s&a.", player.getName(), claimOldFaction.getName());
+			} else
+				sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a claim un chunk.", player.getName());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			sendError();
@@ -192,12 +193,15 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		//			return;
 		//		}
 		Chunk chunk = player.getLocation().getChunk();
+		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+		FactionClaim claim = claimManager.getByChunk(chunk);
 		if (!faction.hasClaim(chunk)) {
 			sendMessage(Prefix.FACTION, "&cCe claim n'appartient pas à ta faction.");
 			return;
 		}
 		try {
-			faction.unclaim(chunk);
+			claim.setFaction(null);
+			claimManager.updateClaim(claim);
 			sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lun&aclaim un chunk.", player.getName());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -256,7 +260,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 				faction = manager.get(cmd.getArgument(1));
 			} catch (SQLException e) {
 				e.printStackTrace();
-				sendMessage(Prefix.FACTION, "&cUne erreur est survenu.");
+				sendError();
 				return;
 			}
 			if (faction == null) {
@@ -279,7 +283,12 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		sj.add("&3Claims/Power/MaxPower : &b" + faction.getClaimsPowerMaxPower());
 		sj.add("&3Joueurs max: &b" + faction.getMaxSize());
 		sj.add("&3Joueurs connectés: &a" + faction.getOnlineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &a")));
-		sj.add("&3Joueurs déconnectés: &c" + faction.getOfflineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &c")));
+		try {
+			// BUG java.lang.NullPointerException -> pas plus d'infos, c'est la ligne du dessous
+			sj.add("&3Joueurs déconnectés: &c" + faction.getOfflineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &c")));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		player.sendMessage(ColorUtils.color(sj.toString()));
 	}
 }

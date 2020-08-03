@@ -2,9 +2,10 @@ package fr.olympa.pvpfac.faction;
 
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -14,11 +15,10 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.google.gson.Gson;
-
 import fr.olympa.api.clans.Clan;
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
+import fr.olympa.api.lines.DynamicLine;
 import fr.olympa.api.lines.FixedLine;
 import fr.olympa.api.lines.TimerLine;
 import fr.olympa.api.player.OlympaPlayerInformations;
@@ -27,62 +27,48 @@ import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
+import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction, FactionPlayerData> {
 
-	private static FixedLine<Scoreboard<FactionPlayer>> header = new FixedLine<>("§7Ma faction:");
+	private static DynamicLine<Scoreboard<FactionPlayer>> header = new DynamicLine<>(x -> "§7" + x.getOlympaPlayer().getClan().getName() + ":");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
 		Faction fac = x.getOlympaPlayer().getClan();
 		Player p = x.getOlympaPlayer().getPlayer();
-		StringJoiner joiner = new StringJoiner("\n");
+		Map<String, Integer> players = new HashMap<>();
 		for (FactionPlayerData member : fac.getMembers()) {
 			String memberName = member.getPlayerInformations().getName();
 			if (!member.isConnected())
-				joiner.add("§c○ " + memberName);
+				players.put("§c○ " + memberName, 3);
 			else if (member.getConnectedPlayer() == x.getOlympaPlayer())
-				joiner.add("§6● §l" + memberName);
+				players.put("§6● §l" + memberName, 1);
 			else {
 				Location loc = member.getConnectedPlayer().getPlayer().getLocation();
-				joiner.add("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc));
+				players.put("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc), 2);
 			}
 		}
-		return joiner.toString();
+		return players.entrySet().stream().sorted(Map.Entry.comparingByValue()).map(Entry::getKey).collect(Collectors.joining("\n"));
 	}, PvPFaction.getInstance(), 10);
 
-	Set<FactionClaim> claims = new HashSet<>();
 	String tag;
 	String description;
 	Location home;
-	FactionType type;
 
 	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
 		super(manager, id, name, chief, maxSize);
-		type = FactionType.PLAYER;
 	}
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String description, OlympaPlayerInformations chief, FactionType type) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String description, OlympaPlayerInformations chief) {
 		super(manager, id, name, chief, manager.defaultMaxSize);
 		this.description = description;
-		this.type = type;
 	}
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home, Set<FactionClaim> claims,
-			FactionType type) {
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home) {
 		super(manager, id, name, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
 		this.home = home;
-		this.claims = claims;
-		this.type = type;
-	}
-
-	public FactionType getType() {
-		return type;
-	}
-
-	public Set<FactionClaim> getClaims() {
-		return claims;
 	}
 
 	public String getTag() {
@@ -102,29 +88,39 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	public Set<FactionPlayer> getOfflineFactionPlayers() {
-		return members.values().stream().filter(entry -> !entry.isConnected()).map(p -> (FactionPlayer) AccountProvider.get(p.getPlayerInformations().getUUID())).collect(Collectors.toSet());
+		return members.values().stream()
+				.filter(entry -> !entry.isConnected())
+				.map(p -> (FactionPlayer) AccountProvider.get(p.getPlayerInformations().getUUID()))
+				.collect(Collectors.toSet());
 	}
 
 	public int getPower() {
 		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getPower()).sum();
 	}
 
-	public FactionClaim getClaim(Chunk chunk) {
-		return claims.stream().filter(claim -> claim.isChunk(chunk)).findFirst().orElse(null);
+	// TODO Optimize getByFaction
+	public Set<FactionClaim> getClaims() {
+		return PvPFaction.getInstance().getClaimsManager().getByFaction(this);
 	}
 
 	public boolean hasClaim(Chunk chunk) {
-		return claims.stream().anyMatch(claim -> claim.isChunk(chunk));
+		return hasClaim(PvPFaction.getInstance().getClaimsManager().getByChunk(chunk));
+	}
+
+	public boolean hasClaim(FactionClaim chunk) {
+		Faction faction = chunk.getFaction();
+		return faction != null && faction.getID() == getID();
 	}
 
 	public boolean isOverClaimable() {
-		return claims.size() > getPower() && type == FactionType.PLAYER;
+		return getClaims().size() > getPower();
 	}
 
 	public FactionManager getFactionManager() {
 		return getClansManager();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void memberJoin(ClanPlayerInterface<Faction, FactionPlayerData> member) {
 		super.memberJoin(member);
@@ -143,19 +139,16 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		PvPFaction.getInstance().scoreboards.create((FactionPlayer) oplayer);
 	}
 
-	public void claim(Chunk chunk) throws SQLException {
-		claims.add(new FactionClaim(chunk));
-		updateClaims();
+	public void claim(FactionClaim factionClaim) throws SQLException {
+		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+		factionClaim.setFaction(this);
+		claimManager.updateClaim(factionClaim);
 	}
 
-	public boolean unclaim(Chunk chunk) throws SQLException {
-		boolean b = claims.removeIf(claim -> claim.isChunk(chunk));
-		updateClaims();
-		return b;
-	}
-
-	private void updateClaims() throws SQLException {
-		getFactionManager().claimsColumn.updateValue(this, new Gson().toJson(claims), Types.VARCHAR);
+	public void unclaim(FactionClaim factionClaim) throws SQLException {
+		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+		factionClaim.setFaction(null);
+		claimManager.updateClaim(factionClaim);
 	}
 
 	public void updateHome(Location home) throws SQLException {
@@ -201,6 +194,16 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public Faction clone() {
+		try {
+			return (Faction) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

@@ -2,17 +2,7 @@ package fr.olympa.pvpfac.faction;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.bukkit.Chunk;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
@@ -24,18 +14,13 @@ import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
-import fr.olympa.pvpfac.faction.claim.FactionClaim;
 import fr.olympa.pvpfac.faction.gui.FactionManagementGUI;
 
 public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
-	private Cache<FactionClaim, Faction> claimCache;
-
 	protected Column<FactionPlayerData> roleColumn;
 
 	protected Column<Faction> homeColumn;
-	protected Column<Faction> typeColumn;
-	protected Column<Faction> claimsColumn;
 	protected Column<Faction> enemyColumn;
 	protected Column<Faction> truceColumn;
 	protected Column<Faction> allyColumn;
@@ -45,7 +30,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions", 10);
 		new FactionCommand(this, "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
-		claimCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
 		//		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
 		//
 		//			PreparedStatement statement = createDefaultClanStatement.getStatement();
@@ -107,13 +91,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
 	@Override
 	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
-		String jsonClaims = resultSet.getString("claims");
-		Set<FactionClaim> claims = new HashSet<>();
-		if (jsonClaims != null && !jsonClaims.isBlank())
-			claims = new Gson().fromJson(jsonClaims, new TypeToken<Set<FactionClaim>>() {
-			}.getType());
-		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")), claims,
-				FactionType.get(resultSet.getInt("type")));
+		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")));
 	}
 
 	@Override
@@ -134,8 +112,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		columns.add(allyColumn = new Column<Faction>("ally", "TEXT(65535) NULL DEFAULT NULL").setUpdatable(true));
 		columns.add(truceColumn = new Column<Faction>("truce", "TEXT(65535) NULL DEFAULT NULL").setUpdatable(true));
 		columns.add(enemyColumn = new Column<Faction>("enemy", "TEXT(65535) NULL DEFAULT NULL").setUpdatable(true));
-		columns.add(claimsColumn = new Column<Faction>("claims", "TEXT(65535) NULL DEFAULT NULL").setUpdatable(true));
-		columns.add(typeColumn = new Column<Faction>("type", "TINYINT(1) NOT NULL DEFAULT '0'").setUpdatable(true));
 		columns.add(homeColumn = new Column<Faction>("home", "VARCHAR(15) NULL").setUpdatable(true));
 		return columns;
 	}
@@ -150,22 +126,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	@Override
 	public ClanManagementGUI<Faction, FactionPlayerData> provideManagementGUI(ClanPlayerInterface<Faction, FactionPlayerData> player) {
 		return new FactionManagementGUI(player, this);
-	}
-
-	public void removeCache(Chunk chunk) {
-		FactionClaim fc = claimCache.asMap().keySet().stream().filter(e -> e.isChunk(chunk)).findFirst().orElse(null);
-		if (fc != null)
-			claimCache.invalidate(fc);
-	}
-
-	public Faction getByChunk(Chunk chunk) {
-		Faction faction = claimCache.asMap().entrySet().stream().filter(e -> e.getKey().isChunk(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
-		if (faction == null) {
-			faction = getClans().stream().filter(c -> c.getValue().hasClaim(chunk)).map(e -> e.getValue()).findFirst().orElse(null);
-			if (faction != null)
-				claimCache.put(faction.getClaim(chunk), faction);
-		}
-		return faction;
 	}
 
 	public Faction getByName(String name) {
