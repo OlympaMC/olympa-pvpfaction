@@ -117,7 +117,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		}
 	}
 
-	@Cmd(player = true, min = 1, args = { "wilderness", "safezone", "warnzone", "ap", "spawn" })
+	@Cmd(player = true, min = 1, args = { "wilderness|safezone|warnzone|ap|spawn" })
 	public void forceclaim(CommandContext cmd) {
 		if (!PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player)) {
 			sendDoNotHavePermission();
@@ -252,7 +252,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		FactionMap.toggleAutoMap(player);
 	}
 
-	@Cmd(player = true, aliases = "c", args = { "Géneral", "Faction", "Allié" })
+	@Cmd(player = true, aliases = "c", args = { "Géneral|Faction|Allié" })
 	public void chat(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
