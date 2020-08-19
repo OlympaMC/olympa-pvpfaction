@@ -2,6 +2,7 @@ package fr.olympa.pvpfac;
 
 import org.bukkit.plugin.PluginManager;
 
+import fr.olympa.api.command.essentials.tp.TpaHandler;
 import fr.olympa.api.hook.IProtocolSupport;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.DynamicLine;
@@ -22,10 +23,6 @@ import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
-import fr.olympa.pvpfac.tpa.commands.TpaCommand;
-import fr.olympa.pvpfac.tpa.commands.TpaHereCommand;
-import fr.olympa.pvpfac.tpa.commands.TpnoCommand;
-import fr.olympa.pvpfac.tpa.commands.TpyesCommand;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -66,10 +63,6 @@ public class PvPFaction extends OlympaAPIPlugin {
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 		//new FactionCommand(this).register();
-		new TpaCommand(this).register();
-		new TpyesCommand(this).register();
-		new TpnoCommand(this).register();
-		new TpaHereCommand(this).register();
 
 		PluginManager pluginManager = getServer().getPluginManager();
 		//		pluginManager.registerEvents(new OreListener(), this);
@@ -82,6 +75,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new FactionClaimProtectionListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 			pluginManager.registerEvents(factionClaimsManager = new FactionClaimsManager(), this);
+			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			getLogger().severe("Une erreur est survenue lors de l'initialisation du système de faction.");
