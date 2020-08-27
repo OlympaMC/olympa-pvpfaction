@@ -10,17 +10,31 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+import fr.olympa.api.region.tracking.flags.DamageFlag;
+import fr.olympa.api.region.tracking.flags.PlayerBlockInteractFlag;
+import fr.olympa.api.region.tracking.flags.PlayerBlocksFlag;
 import fr.olympa.api.sql.OlympaStatement;
 import fr.olympa.api.sql.OlympaStatement.StatementType;
+import fr.olympa.api.utils.Prefix;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.pvpfac.faction.Faction;
+import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class FactionClaimsManager implements Listener {
 
@@ -33,16 +47,41 @@ public class FactionClaimsManager implements Listener {
 
 	private Cache<Chunk, FactionClaim> claims = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
 
+	public final DamageFlag damageFlag = new DamageFlag(false) {
+		@Override
+		public void damageEvent(EntityDamageEvent event) {
+			entityDamage(event);
+		}
+	};
+	
+	public final PlayerBlocksFlag playerBlocksFlag = new PlayerBlocksFlag(false) {
+		@Override
+		public <T extends Event & Cancellable> void blockEvent(T event, Player p, Block block) {
+			blockDamage(event, p, block.getLocation());
+		}
+		
+		public <T extends Event & Cancellable> void entityEvent(T event, Player p, Entity entity) {
+			blockDamage(event, p, entity.getLocation());
+		}
+	};
+	
+	public final PlayerBlockInteractFlag playerBlockInteractFlag = new PlayerBlockInteractFlag(false) {
+		@Override
+		public void interactEvent(PlayerInteractEvent event) {
+			blockInteract(event);
+		}
+	};
+	
 	public FactionClaimsManager() throws SQLException {
-		//		OlympaCore.getInstance().getDatabase().createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-		//				"  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT," +
-		//				"  `region` VARBINARY(8000) NOT NULL," +
-		//				"  `clan` INT NULL DEFAULT -1," +
-		//				"  `sign` VARCHAR(100) NOT NULL," +
-		//				"  `spawn` VARCHAR(100) NOT NULL," +
-		//				"  `price` INT NOT NULL," +
-		//				"  `next_payment` BIGINT NOT NULL DEFAULT -1," +
-		//				"  PRIMARY KEY (`id`))");
+		OlympaCore.getInstance().getDatabase().createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " (" +
+				"  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT," +
+				"  `world_id` INT NOT NULL," +
+				"  `x` INT NOT NULL," +
+				"  `z` INT NOT NULL," +
+				"  `type` TINYINT NOT NULL," +
+				"  `faction_id` INT NOT NULL," +
+				"  `owner_ids` VARCHAR(100) NOT NULL," +
+				"  PRIMARY KEY (`id`))");
 	}
 
 	public FactionClaim insertClaim(FactionClaim claim) throws SQLException {
@@ -162,7 +201,34 @@ public class FactionClaimsManager implements Listener {
 			return null;
 		}
 	}
+	
+	private void entityDamage(EntityDamageEvent e) {
+		FactionClaim claim = getByChunk(e.getEntity().getLocation().getChunk());
+		if (claim.getType() == FactionClaimType.SAFEZONE) e.setCancelled(true);
+	}
+	
+	private void blockDamage(Cancellable e, Player p, Location location) {
+		FactionClaim claim = getByChunk(p.getLocation().getChunk());
+		if (claim.getType() == FactionClaimType.WILDERNESS) {
+			if (claim.getFaction() == null) return;
+			Faction faction = FactionPlayer.get(p).getClan();
+			if (faction == claim.getFaction()) return; // TODO voir autorisations par joueur
+		}
+		e.setCancelled(true);
+		Prefix.FACTION.sendMessage(p, "&cImpossible de casser ou de poser un bloc dans ce claim !");
+	}
 
+	private void blockInteract(PlayerInteractEvent e) {
+		FactionClaim claim = getByChunk(e.getClickedBlock().getChunk());
+		if (claim.getType() == FactionClaimType.WILDERNESS) {
+			if (claim.getFaction() == null) return;
+			Faction faction = FactionPlayer.get(e.getPlayer()).getClan();
+			if (faction == claim.getFaction()) return; // TODO voir autorisations par joueur
+		}
+		e.setCancelled(true);
+		Prefix.FACTION.sendMessage(e.getPlayer(), "&cImpossible d'interagir avec les blocs dans ce claim !");
+	}
+	
 	@EventHandler
 	public void onChunkUnload(ChunkUnloadEvent event) {
 		Chunk chunk = event.getChunk();
