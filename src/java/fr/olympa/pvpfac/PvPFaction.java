@@ -1,8 +1,12 @@
 package fr.olympa.pvpfac;
 
+import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
 import org.bukkit.plugin.PluginManager;
 
+import fr.olympa.api.auctions.AuctionsManager;
 import fr.olympa.api.command.essentials.tp.TpaHandler;
+import fr.olympa.api.economy.tax.TaxManager;
 import fr.olympa.api.hook.IProtocolSupport;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.DynamicLine;
@@ -23,6 +27,7 @@ import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
+import fr.olympa.pvpfac.world.OreListener;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -35,6 +40,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public ScoreboardManager<FactionPlayer> scoreboards;
 	public FactionManager factionManager;
 	public FactionClaimsManager factionClaimsManager;
+	private TaxManager taxManager;
 
 	public FactionManager getFactionManager() {
 		return factionManager;
@@ -64,9 +70,17 @@ public class PvPFaction extends OlympaAPIPlugin {
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 		//new FactionCommand(this).register();
 
-		PluginManager pluginManager = getServer().getPluginManager();
-		//		pluginManager.registerEvents(new OreListener(), this);
 		try {
+			taxManager = new TaxManager(this, PvPFactionPermission.FACTION_TAX_COMMAND, "pvpfac_tax", 0);
+			new AuctionsManager(this, "pvpfac_auctions", taxManager);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		PluginManager pluginManager = getServer().getPluginManager();
+		try {
+			pluginManager.registerEvents(new OreListener(), this);
+			pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 			pluginManager.registerEvents(new FactionChatListener(), this);
 			pluginManager.registerEvents(new FactionPvPListener(), this);
 			pluginManager.registerEvents(new FactionClaimEnterListener(), this);
@@ -80,8 +94,9 @@ public class PvPFaction extends OlympaAPIPlugin {
 			ex.printStackTrace();
 			getLogger().severe("Une erreur est survenue lors de l'initialisation du système de faction.");
 		}
-		pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 
+		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
+		
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,
 				lineMoney,
