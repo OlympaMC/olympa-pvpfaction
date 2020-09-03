@@ -11,6 +11,7 @@ import fr.olympa.api.command.essentials.HealCommand;
 import fr.olympa.api.command.essentials.tp.TpaHandler;
 import fr.olympa.api.economy.MoneyCommand;
 import fr.olympa.api.economy.tax.TaxManager;
+import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.hook.IProtocolSupport;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.DynamicLine;
@@ -69,16 +70,20 @@ public class PvPFaction extends OlympaAPIPlugin {
 		instance = this;
 		super.onEnable();
 
+		OlympaPermission.permissions.get("GAMEMODE_COMMAND").setMinGroup(OlympaGroup.RESP_TECH);
+		OlympaPermission.permissions.get("GAMEMODE_COMMAND_CREATIVE").setMinGroup(OlympaGroup.MODP);
+		OlympaPermission.permissions.get("FLY_COMMAND").setMinGroup(OlympaGroup.RESP_TECH);
+
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 
 		try {
 			taxManager = new TaxManager(this, PvPFactionPermission.TAX_COMMAND, "pvpfac_tax", 0);
 			new AuctionsManager(this, "pvpfac_auctions", taxManager);
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
 		PluginManager pluginManager = getServer().getPluginManager();
 		try {
 			pluginManager.registerEvents(new OreListener(), this);
@@ -95,16 +100,16 @@ public class PvPFaction extends OlympaAPIPlugin {
 			ex.printStackTrace();
 			getLogger().severe("Une erreur est survenue lors de l'initialisation du système de faction.");
 		}
-		
+
 		new MoneyCommand<FactionPlayer>(this, "money", "Gérer son porte-monnaie.", PvPFactionPermission.MONEY_COMMAND, PvPFactionPermission.MONEY_COMMAND_OTHER, PvPFactionPermission.MONEY_COMMAND_MANAGE, "monnaie").register();
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new FeedCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new BackCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 
 		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
-		
+
 		OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
-		
+
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,
 				lineMoney,
