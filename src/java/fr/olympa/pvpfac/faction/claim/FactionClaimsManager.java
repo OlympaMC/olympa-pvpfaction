@@ -53,25 +53,26 @@ public class FactionClaimsManager implements Listener {
 			entityDamage(event);
 		}
 	};
-	
+
 	public final PlayerBlocksFlag playerBlocksFlag = new PlayerBlocksFlag(false) {
 		@Override
 		public <T extends Event & Cancellable> void blockEvent(T event, Player p, Block block) {
 			blockDamage(event, p, block.getLocation());
 		}
-		
+
+		@Override
 		public <T extends Event & Cancellable> void entityEvent(T event, Player p, Entity entity) {
 			blockDamage(event, p, entity.getLocation());
 		}
 	};
-	
+
 	public final PlayerBlockInteractFlag playerBlockInteractFlag = new PlayerBlockInteractFlag(false) {
 		@Override
 		public void interactEvent(PlayerInteractEvent event) {
 			blockInteract(event);
 		}
 	};
-	
+
 	public FactionClaimsManager() throws SQLException {
 		OlympaCore.getInstance().getDatabase().createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " (" +
 				"  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT," +
@@ -201,34 +202,42 @@ public class FactionClaimsManager implements Listener {
 			return null;
 		}
 	}
-	
+
 	private void entityDamage(EntityDamageEvent e) {
 		FactionClaim claim = getByChunk(e.getEntity().getLocation().getChunk());
-		if (claim.getType() == FactionClaimType.SAFEZONE) e.setCancelled(true);
+		if (claim.getType() == FactionClaimType.SAFEZONE)
+			e.setCancelled(true);
 	}
-	
+
 	private void blockDamage(Cancellable e, Player p, Location location) {
 		FactionClaim claim = getByChunk(p.getLocation().getChunk());
 		if (claim.getType() == FactionClaimType.WILDERNESS) {
-			if (claim.getFaction() == null) return;
+			if (claim.getFaction() == null)
+				return;
 			Faction faction = FactionPlayer.get(p).getClan();
-			if (faction == claim.getFaction()) return; // TODO voir autorisations par joueur
+			if (faction == claim.getFaction())
+				return; // TODO voir autorisations par joueur
 		}
 		e.setCancelled(true);
 		Prefix.FACTION.sendMessage(p, "&cImpossible de casser ou de poser un bloc dans ce claim !");
 	}
 
 	private void blockInteract(PlayerInteractEvent e) {
-		FactionClaim claim = getByChunk(e.getClickedBlock().getChunk());
+		Location location = e.getClickedBlock() != null ? e.getClickedBlock().getLocation() : null;
+		if (location == null)
+			location = e.getPlayer().getLocation();
+		FactionClaim claim = getByChunk(location.getChunk());
 		if (claim.getType() == FactionClaimType.WILDERNESS) {
-			if (claim.getFaction() == null) return;
+			if (claim.getFaction() == null)
+				return;
 			Faction faction = FactionPlayer.get(e.getPlayer()).getClan();
-			if (faction == claim.getFaction()) return; // TODO voir autorisations par joueur
+			if (faction == claim.getFaction())
+				return; // TODO voir autorisations par joueur
 		}
 		e.setCancelled(true);
 		Prefix.FACTION.sendMessage(e.getPlayer(), "&cImpossible d'interagir avec les blocs dans ce claim !");
 	}
-	
+
 	@EventHandler
 	public void onChunkUnload(ChunkUnloadEvent event) {
 		Chunk chunk = event.getChunk();
