@@ -30,7 +30,7 @@ import fr.olympa.api.region.tracking.flags.DamageFlag;
 import fr.olympa.api.region.tracking.flags.PlayerBlockInteractFlag;
 import fr.olympa.api.region.tracking.flags.PlayerBlocksFlag;
 import fr.olympa.api.sql.OlympaStatement;
-import fr.olympa.api.sql.OlympaStatement.StatementType;
+import fr.olympa.api.sql.StatementType;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.pvpfac.faction.Faction;
