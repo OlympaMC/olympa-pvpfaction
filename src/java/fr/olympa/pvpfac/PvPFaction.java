@@ -73,7 +73,6 @@ public class PvPFaction extends OlympaAPIPlugin {
 		OlympaPermission.permissions.get("GAMEMODE_COMMAND").setMinGroup(OlympaGroup.RESP_TECH);
 		OlympaPermission.permissions.get("GAMEMODE_COMMAND_CREATIVE").setMinGroup(OlympaGroup.MODP);
 		OlympaPermission.permissions.get("FLY_COMMAND").setMinGroup(OlympaGroup.RESP_TECH);
-
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 
