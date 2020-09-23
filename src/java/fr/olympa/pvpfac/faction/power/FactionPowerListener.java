@@ -1,6 +1,7 @@
 package fr.olympa.pvpfac.faction.power;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,7 +24,7 @@ public class FactionPowerListener implements Listener {
 		Player player = event.getPlayer();
 		UUID uuid = player.getUniqueId();
 		FactionPlayer fp = AccountProvider.get(uuid);
-		PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30 * 60 * 20, 60 * 60 * 20);
+		PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30, 60, TimeUnit.MINUTES);
 	}
 
 	@EventHandler
@@ -42,7 +43,7 @@ public class FactionPowerListener implements Listener {
 			return;
 		OlympaTask task = PvPFaction.getInstance().getTask();
 		if (!task.taskExist("pvpfac_power_" + uuid))
-			PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30 * 60 * 20, 60 * 60 * 20);
+			PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30, 60, TimeUnit.MINUTES);
 		Prefix.FACTION.sendMessage(fp.getPlayer(), "&c-2 powers (&4%s&c/%s)", fp.getPower(), FactionPlayer.POWER_MAX);
 	}
 }
