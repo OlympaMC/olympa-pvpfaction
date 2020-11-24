@@ -28,17 +28,16 @@ public enum FactionChat {
 	}
 
 	public FactionChat getOther() {
-		if (this == FactionChat.GENERAL) {
+		if (this == FactionChat.GENERAL)
 			return FactionChat.FACTION;
-		} else if (this == FactionChat.FACTION) {
+		else if (this == FactionChat.FACTION)
 			return FactionChat.ALLY;
-		} else if (this == ALLY) {
+		else if (this == ALLY)
 			return FactionChat.GENERAL;
-		}
 		return null;
 	}
 
 	public boolean hasSurname(String surname) {
-		return this.surname.stream().filter(sur -> Utils.equalsIgnoreAccents(surname, sur)).findFirst().isPresent();
+		return this.surname.stream().anyMatch(sur -> Utils.equalsIgnoreAccents(surname, sur));
 	}
 }

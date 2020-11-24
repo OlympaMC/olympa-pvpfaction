@@ -127,7 +127,6 @@ public class FactionMap {
 			autoMapPlayers.add(player);
 			Prefix.FACTION.sendMessage(player, "AutoMap activée.");
 		} else {
-
 			autoMapPlayers.remove(player);
 			Prefix.FACTION.sendMessage(player, "&cAutoMap désactivée.");
 		}

@@ -16,6 +16,7 @@ import fr.olympa.api.hook.IProtocolSupport;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.DynamicLine;
 import fr.olympa.api.lines.FixedLine;
+import fr.olympa.api.permission.OlympaAPIPermissions;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
@@ -69,10 +70,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public void onEnable() {
 		instance = this;
 		super.onEnable();
-
-		OlympaPermission.permissions.get("GAMEMODE_COMMAND").setMinGroup(OlympaGroup.RESP_TECH);
-		OlympaPermission.permissions.get("GAMEMODE_COMMAND_CREATIVE").setMinGroup(OlympaGroup.MODP);
-		OlympaPermission.permissions.get("FLY_COMMAND").setMinGroup(OlympaGroup.RESP_TECH);
+		OlympaAPIPermissions.TP_COMMAND.setMinGroup(OlympaGroup.RESP_TECH);
+		OlympaAPIPermissions.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.RESP_TECH);
+		OlympaAPIPermissions.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.RESP_TECH);
+		OlympaAPIPermissions.FLY_COMMAND.setMinGroup(OlympaGroup.RESP_TECH);
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 

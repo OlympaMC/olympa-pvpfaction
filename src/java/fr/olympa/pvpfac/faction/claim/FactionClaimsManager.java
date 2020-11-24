@@ -40,7 +40,7 @@ public class FactionClaimsManager implements Listener {
 
 	private static final String tableName = "`pvpfac_claims`";
 
-	private static final OlympaStatement createClaim = new OlympaStatement(StatementType.INSERT, tableName, "x", "z", "faction_id", "type", "world_id");
+	private static final OlympaStatement createClaim = new OlympaStatement(StatementType.INSERT, tableName, "x", "z", "faction_id", "type", "world_id").returnGeneratedKeys();
 	private static final OlympaStatement selectClaimByChunk = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "x", "z" }, new String[] {});
 	private static final OlympaStatement selectClaimByFaction = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "faction_id" }, new String[] {});
 	private static final OlympaStatement updateClaim = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "faction_id", "type", "owner_ids" }, "id");
