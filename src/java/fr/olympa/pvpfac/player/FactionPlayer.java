@@ -1,51 +1,54 @@
 package fr.olympa.pvpfac.player;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-
-import com.google.common.collect.ImmutableMap;
+import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.economy.OlympaMoney;
+import fr.olympa.api.enderchest.EnderChestPlayerInterface;
 import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.provider.OlympaPlayerObject;
+import fr.olympa.api.sql.SQLColumn;
+import fr.olympa.api.utils.observable.ObservableInt;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.FactionPlayerData;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 
-public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction, FactionPlayerData> {
+public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction, FactionPlayerData>, EnderChestPlayerInterface {
 
 	public static int POWER_MAX = 5;
 
-	public static final Map<String, String> COLUMNS = ImmutableMap.<String, String>builder()
-			.put("power", "TINYINT(3) NULL DEFAULT 9")
-			.put("ender_chest", "VARBINARY(8000) NULL")
-			.put("money", "DOUBLE NULL DEFAULT 0")
-			/*.put("inventory", "VARBINARY(8000) NULL").build();*/
-
-			.build();
-
+	private static final SQLColumn<FactionPlayer> COLUMN_POWER = new SQLColumn<FactionPlayer>("power", "TINYINT(3) NULL DEFAULT 9", Types.TINYINT).setUpdatable();
+	private static final SQLColumn<FactionPlayer> COLUMN_ENDER_CHEST = new SQLColumn<FactionPlayer>("ender_chest", "VARBINARY(8000) NULL", Types.VARBINARY).setUpdatable();
+	private static final SQLColumn<FactionPlayer> COLUMN_MONEY = new SQLColumn<FactionPlayer>("money", "DOUBLE NULL DEFAULT 0", Types.DOUBLE).setUpdatable();
+	
+	public static final List<SQLColumn<FactionPlayer>> COLUMNS = Arrays.asList(COLUMN_POWER, COLUMN_ENDER_CHEST, COLUMN_MONEY);
+	
 	public static FactionPlayer get(Player p) {
 		return AccountProvider.get(p.getUniqueId());
 	}
 
-	int power = 0;
-	private Inventory enderChest = Bukkit.createInventory(null, 9, "Enderchest de " + getName());
+	private ObservableInt power = new ObservableInt(0);
+	private ItemStack[] enderChestContents;
 	private OlympaMoney money = new OlympaMoney(0);
+	
 	private Faction faction;
 	FactionChat chat = FactionChat.GENERAL;
 
 	public FactionPlayer(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
+		
+		money.observe("datas", () -> COLUMN_MONEY.updateValue(this, money.get()));
+		power.observe("datas", () -> COLUMN_POWER.updateValue(this, power.get()));
 	}
 
 	public FactionChat getChat() {
@@ -57,37 +60,53 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 		return faction;
 	}
 
-	public Inventory getEnderChest() {
-		return enderChest;
-	}
-
 	@Override
 	public OlympaMoney getGameMoney() {
 		return money;
 	}
 
+	@Override
+	public ItemStack[] getEnderChestContents() {
+		return enderChestContents;
+	}
+	
+	@Override
+	public void setEnderChestContents(ItemStack[] contents) {
+		this.enderChestContents = contents;
+		try {
+			COLUMN_ENDER_CHEST.updateValue(this, ItemUtils.serializeItemsArray(enderChestContents));
+		}catch (SQLException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public int getEnderChestRows() {
+		return 1;
+	}
+	
 	public int getPower() {
-		return power;
+		return power.get();
 	}
 
-	public int setPower(int power) {
-		return this.power;
+	public void setPower(int power) {
+		this.power.set(power);
 	}
 
 	public boolean addPower() {
-		if (power + 1 > POWER_MAX)
+		if (power.get() >= POWER_MAX)
 			return false;
 		else {
-			power++;
+			power.increment();
 			return true;
 		}
 	}
 
 	public boolean removePower() {
-		if (power - 1 < -POWER_MAX)
+		if (power.get() <= -POWER_MAX)
 			return false;
 		else {
-			power--;
+			power.decrement();
 			return true;
 		}
 	}
@@ -99,8 +118,8 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	@Override
 	public void loadDatas(ResultSet resultSet) throws SQLException {
 		try {
-			power = resultSet.getInt("power");
-			enderChest.setContents(ItemUtils.deserializeItemsArray(resultSet.getBytes("ender_chest")));
+			power.set(resultSet.getInt("power"));
+			enderChestContents = ItemUtils.deserializeItemsArray(resultSet.getBytes("ender_chest"));
 			money.set(resultSet.getDouble("money"));
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
@@ -109,18 +128,6 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 
 	public void removeChat(FactionChat chat) {
 		this.chat = chat;
-	}
-
-	@Override
-	public void saveDatas(PreparedStatement statement) throws SQLException {
-		try {
-			int i = 1;
-			statement.setInt(i++, power);
-			statement.setBytes(i++, ItemUtils.serializeItemsArray(enderChest.getContents()));
-			statement.setDouble(i++, money.get());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void setChat(FactionChat chat) {

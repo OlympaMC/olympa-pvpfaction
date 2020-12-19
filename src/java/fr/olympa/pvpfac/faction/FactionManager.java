@@ -2,6 +2,7 @@ package fr.olympa.pvpfac.faction;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import fr.olympa.api.clans.ClanPlayerInterface;
@@ -9,7 +10,7 @@ import fr.olympa.api.clans.ClansManager;
 import fr.olympa.api.clans.gui.ClanManagementGUI;
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.sql.Column;
+import fr.olympa.api.sql.SQLColumn;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
@@ -18,14 +19,14 @@ import fr.olympa.pvpfac.faction.gui.FactionManagementGUI;
 
 public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
-	protected Column<FactionPlayerData> roleColumn;
+	protected SQLColumn<FactionPlayerData> roleColumn;
 
-	protected Column<Faction> homeColumn;
-	protected Column<Faction> enemyColumn;
-	protected Column<Faction> truceColumn;
-	protected Column<Faction> allyColumn;
-	protected Column<Faction> descriptionColumn;
-	protected Column<Faction> tagColumn;
+	protected SQLColumn<Faction> homeColumn;
+	protected SQLColumn<Faction> enemyColumn;
+	protected SQLColumn<Faction> truceColumn;
+	protected SQLColumn<Faction> allyColumn;
+	protected SQLColumn<Faction> descriptionColumn;
+	protected SQLColumn<Faction> tagColumn;
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions", 10);
@@ -105,21 +106,21 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	}
 
 	@Override
-	public List<Column<Faction>> addDBClansCollums(List<Column<Faction>> columns) {
+	public List<SQLColumn<Faction>> addDBClansCollums(List<SQLColumn<Faction>> columns) {
 		columns = super.addDBClansCollums(columns);
-		columns.add(tagColumn = new Column<Faction>("tag", "VARCHAR(6) NULL DEFAULT NULL").setUpdatable(true));
-		columns.add(descriptionColumn = new Column<Faction>("description", "VARCHAR(100) NULL DEFAULT NULL").setUpdatable(true));
-		columns.add(allyColumn = new Column<Faction>("ally", "TEXT(65535) NULL DEFAULT NULL").setUpdatable(true));
-		columns.add(truceColumn = new Column<Faction>("truce", "TEXT(65535) NULL DEFAULT NULL").setUpdatable(true));
-		columns.add(enemyColumn = new Column<Faction>("enemy", "TEXT(65535) NULL DEFAULT NULL").setUpdatable(true));
-		columns.add(homeColumn = new Column<Faction>("home", "VARCHAR(15) NULL").setUpdatable(true));
+		columns.add(tagColumn = new SQLColumn<Faction>("tag", "VARCHAR(6) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
+		columns.add(descriptionColumn = new SQLColumn<Faction>("description", "VARCHAR(100) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
+		columns.add(allyColumn = new SQLColumn<Faction>("ally", "TEXT(65535) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
+		columns.add(truceColumn = new SQLColumn<Faction>("truce", "TEXT(65535) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
+		columns.add(enemyColumn = new SQLColumn<Faction>("enemy", "TEXT(65535) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
+		columns.add(homeColumn = new SQLColumn<Faction>("home", "VARCHAR(15) NULL", Types.VARCHAR).setUpdatable());
 		return columns;
 	}
 
 	@Override
-	public List<Column<FactionPlayerData>> addDBPlayersCollums(List<Column<FactionPlayerData>> columns) {
+	public List<SQLColumn<FactionPlayerData>> addDBPlayersCollums(List<SQLColumn<FactionPlayerData>> columns) {
 		columns = super.addDBPlayersCollums(columns);
-		columns.add(roleColumn = new Column<FactionPlayerData>("role", "TINYINT NOT NULL DEFAULT " + FactionRole.RECRUT.ordinal()).setUpdatable(true));
+		columns.add(roleColumn = new SQLColumn<FactionPlayerData>("role", "TINYINT NOT NULL DEFAULT " + FactionRole.RECRUT.ordinal(), Types.TINYINT).setUpdatable());
 		return columns;
 	}
 

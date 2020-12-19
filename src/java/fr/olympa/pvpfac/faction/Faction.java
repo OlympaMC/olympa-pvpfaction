@@ -1,7 +1,6 @@
 package fr.olympa.pvpfac.faction;
 
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -152,7 +151,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	public void updateHome(Location home) throws SQLException {
-		getFactionManager().homeColumn.updateValue(this, SpigotUtils.convertLocationToString(home), Types.VARCHAR);
+		getFactionManager().homeColumn.updateValue(this, SpigotUtils.convertLocationToString(home));
 		this.home = home;
 	}
 
@@ -167,7 +166,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public boolean updateTag(String tag) throws SQLException {
 		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find())
 			return false;
-		getFactionManager().tagColumn.updateValue(this, tag, Types.VARCHAR);
+		getFactionManager().tagColumn.updateValue(this, tag);
 		this.tag = tag;
 		return true;
 	}
@@ -175,7 +174,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public boolean updateDescription(String description) throws SQLException {
 		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find())
 			return false;
-		getFactionManager().descriptionColumn.updateValue(this, description, Types.VARCHAR);
+		getFactionManager().descriptionColumn.updateValue(this, description);
 		this.description = description;
 		return true;
 	}

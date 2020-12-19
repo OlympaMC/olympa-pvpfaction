@@ -1,7 +1,6 @@
 package fr.olympa.pvpfac.faction;
 
 import java.sql.SQLException;
-import java.sql.Types;
 
 import fr.olympa.api.clans.ClanPlayerData;
 import fr.olympa.api.player.OlympaPlayerInformations;
@@ -21,7 +20,7 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 		this.role = new ObservableValue<>(role);
 		this.role.observe("updateSQL", () -> {
 			try {
-				PvPFaction.getInstance().factionManager.roleColumn.updateValue(this, this.role.get().ordinal(), Types.TINYINT);
+				PvPFaction.getInstance().factionManager.roleColumn.updateValue(this, this.role.get().ordinal());
 			}catch (SQLException e) {
 				e.printStackTrace();
 			}
