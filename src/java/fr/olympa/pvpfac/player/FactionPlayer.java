@@ -47,8 +47,8 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	public FactionPlayer(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
 		
-		money.observe("datas", () -> COLUMN_MONEY.updateValue(this, money.get()));
-		power.observe("datas", () -> COLUMN_POWER.updateValue(this, power.get()));
+		money.observe("datas", () -> COLUMN_MONEY.updateAsync(this, money.get(), null, null));
+		power.observe("datas", () -> COLUMN_POWER.updateAsync(this, power.get(), null, null));
 	}
 
 	public FactionChat getChat() {
@@ -74,8 +74,8 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	public void setEnderChestContents(ItemStack[] contents) {
 		this.enderChestContents = contents;
 		try {
-			COLUMN_ENDER_CHEST.updateValue(this, ItemUtils.serializeItemsArray(enderChestContents));
-		}catch (SQLException | IOException e) {
+			COLUMN_ENDER_CHEST.updateAsync(this, ItemUtils.serializeItemsArray(enderChestContents), null, null);
+		}catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

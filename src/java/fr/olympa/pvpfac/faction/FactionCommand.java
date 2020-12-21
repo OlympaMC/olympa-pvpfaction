@@ -43,21 +43,8 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
 			return;
 		}
-		//		if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
-		//			Set<FactionPlayer> can = faction.getOnlinePlayers(OlympaFactionRole.OFFICER);
-		//			StringBuilder sb = new StringBuilder();
-		//			if (!can.isEmpty())
-		//				sb.append(" Demande à &4" + can.stream().map(FactionPlayer::getName).collect(Collectors.joining("&c, &4")) + "&c.");
-		//			sendMessage(Prefix.FACTION, "&cTu n'a pas la permission." + sb.toString());
-		//			return;
-		//		}
-		try {
-			faction.updateDescription(Utils.capitalize(cmd.getFrom(1).toString().replace("\n", "")));
-			Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer la decription en &2%s&a.", player.getName(), faction.getDescription());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			sendError();
-		}
+		faction.updateDescription(Utils.capitalize(cmd.getFrom(1).toString().replace("\n", "")));
+		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer la decription en &2%s&a.", player.getName(), faction.getDescription());
 	}
 
 	@Cmd(player = true, aliases = { "settag", "addtag" }, args = { "6_lettres_max" }, min = 1)
@@ -67,21 +54,8 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
 			return;
 		}
-		//		if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
-		//			Set<FactionPlayer> can = faction.getOnlinePlayers(OlympaFactionRole.OFFICER);
-		//			StringBuilder sb = new StringBuilder();
-		//			if (!can.isEmpty())
-		//				sb.append(" Demande à &4" + can.stream().map(FactionPlayer::getName).collect(Collectors.joining("&c, &4")) + "&c.");
-		//			sendMessage(Prefix.FACTION, "&cTu n'a pas la permission." + sb.toString());
-		//			return;
-		//		}
-		try {
-			faction.updateTag(cmd.getArgument(0).toString().toUpperCase());
-			Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer le tag en &2%s&a.", player.getName(), faction.getTag());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			sendError();
-		}
+		faction.updateTag(cmd.getArgument(0).toString().toUpperCase());
+		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer le tag en &2%s&a.", player.getName(), faction.getTag());
 	}
 
 	@Cmd(player = true, aliases = { "p", "powers" }, args = { "PLAYERS" })

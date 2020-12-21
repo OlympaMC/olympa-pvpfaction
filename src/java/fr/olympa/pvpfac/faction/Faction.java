@@ -150,8 +150,8 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		claimManager.updateClaim(factionClaim);
 	}
 
-	public void updateHome(Location home) throws SQLException {
-		getFactionManager().homeColumn.updateValue(this, SpigotUtils.convertLocationToString(home));
+	public void updateHome(Location home) {
+		getFactionManager().homeColumn.updateAsync(this, SpigotUtils.convertLocationToString(home), null, null);
 		this.home = home;
 	}
 
@@ -163,18 +163,18 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return getClaims().size() + "/" + getPower() + "/" + getMaxPower();
 	}
 
-	public boolean updateTag(String tag) throws SQLException {
+	public boolean updateTag(String tag) {
 		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find())
 			return false;
-		getFactionManager().tagColumn.updateValue(this, tag);
+		getFactionManager().tagColumn.updateAsync(this, tag, null, null);
 		this.tag = tag;
 		return true;
 	}
 
-	public boolean updateDescription(String description) throws SQLException {
+	public boolean updateDescription(String description) {
 		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find())
 			return false;
-		getFactionManager().descriptionColumn.updateValue(this, description);
+		getFactionManager().descriptionColumn.updateAsync(this, description, null, null);
 		this.description = description;
 		return true;
 	}
