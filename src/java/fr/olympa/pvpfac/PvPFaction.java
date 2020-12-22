@@ -12,7 +12,6 @@ import fr.olympa.api.command.essentials.tp.TpaHandler;
 import fr.olympa.api.economy.MoneyCommand;
 import fr.olympa.api.economy.tax.TaxManager;
 import fr.olympa.api.groups.OlympaGroup;
-import fr.olympa.api.hook.IProtocolSupport;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.DynamicLine;
 import fr.olympa.api.lines.FixedLine;
@@ -32,7 +31,6 @@ import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
-import fr.olympa.pvpfac.world.OreListener;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -86,7 +84,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 		PluginManager pluginManager = getServer().getPluginManager();
 		try {
-			pluginManager.registerEvents(new OreListener(), this);
+			//pluginManager.registerEvents(new OreListener(), this);
 			pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 			pluginManager.registerEvents(new FactionChatListener(), this);
 			pluginManager.registerEvents(new FactionPvPListener(), this);
@@ -118,9 +116,9 @@ public class PvPFaction extends OlympaAPIPlugin {
 						FixedLine.EMPTY_LINE,
 						CyclingLine.olympaAnimation());
 
-		IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
+		/*IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)
-			protocolSupport.disable1_8();
+			protocolSupport.disable1_8();*/
 		sendMessage("§2" + getDescription().getName() + "§a (" + getDescription().getVersion() + ") est activé.");
 	}
 }
