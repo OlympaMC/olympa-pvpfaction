@@ -210,6 +210,7 @@ public class FactionClaimsManager implements Listener {
 	}
 
 	private void blockDamage(Cancellable e, Player p, Location location) {
+		if (p == null) return;
 		FactionClaim claim = getByChunk(p.getLocation().getChunk());
 		if (claim.getType() == FactionClaimType.WILDERNESS) {
 			if (claim.getFaction() == null)
