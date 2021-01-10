@@ -7,13 +7,12 @@ import java.util.stream.Collectors;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 
+import fr.olympa.api.chat.ColorUtils;
 import fr.olympa.api.clans.ClansCommand;
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.permission.OlympaPermission;
 import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.utils.ColorUtils;
-import fr.olympa.api.utils.Matcher;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.api.utils.Utils;
 import fr.olympa.pvpfac.PvPFaction;
@@ -58,13 +57,13 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer le tag en &2%s&a.", player.getName(), faction.getTag());
 	}
 
-	@Cmd(player = true, aliases = { "p", "powers" }, args = { "PLAYERS" })
+	@Cmd(player = true, aliases = { "p", "powers" }, args = { "PLAYERS", "INTEGER|" })
 	public void power(CommandContext cmd) {
 		FactionPlayer fp;
 		if (cmd.getArgumentsLength() != 0)
 			try {
 				fp = AccountProvider.get(cmd.getArgument(0, new String()));
-				if (cmd.getArgumentsLength() != 1 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player) && Matcher.isInt(cmd.getArgument(1))) {
+				if (cmd.getArgumentsLength() != 1 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player) && cmd.getArgument(1) instanceof Integer) {
 					fp.setPower(cmd.getArgument(1));
 					sendMessage(Prefix.FACTION, "&aLe power de &2" + fp.getName() + "&a est désormais de &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + ".");
 					return;
