@@ -11,7 +11,7 @@ import fr.olympa.api.chat.ColorUtils;
 import fr.olympa.api.clans.ClansCommand;
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
-import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.permission.OlympaSpigotPermission;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.api.utils.Utils;
@@ -31,7 +31,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
-	public FactionCommand(FactionManager manager, String description, OlympaPermission permission, String... aliases) {
+	public FactionCommand(FactionManager manager, String description, OlympaSpigotPermission permission, String... aliases) {
 		super(manager, description, permission, aliases);
 	}
 
