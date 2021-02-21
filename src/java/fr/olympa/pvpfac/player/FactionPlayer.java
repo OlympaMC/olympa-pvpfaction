@@ -46,7 +46,11 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 
 	public FactionPlayer(UUID uuid, String name, String ip) {
 		super(uuid, name, ip);
-		
+	}
+	
+	@Override
+	public void loaded() {
+		super.loaded();
 		money.observe("datas", () -> COLUMN_MONEY.updateAsync(this, money.get(), null, null));
 		power.observe("datas", () -> COLUMN_POWER.updateAsync(this, power.get(), null, null));
 	}
