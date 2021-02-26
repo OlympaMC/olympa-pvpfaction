@@ -93,6 +93,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new AutoMapListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 			pluginManager.registerEvents(claimsManager = new FactionClaimsManager(), this);
+			//			pluginManager.registerEvents(new Test(), this);
 			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
 		} catch (Exception ex) {
 			ex.printStackTrace();

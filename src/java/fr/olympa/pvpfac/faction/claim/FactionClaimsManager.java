@@ -86,61 +86,63 @@ public class FactionClaimsManager implements Listener {
 	}
 
 	public FactionClaim insertClaim(FactionClaim claim) throws SQLException {
-		PreparedStatement statement = createClaim.getStatement();
-		int i = 1;
-		statement.setLong(i++, claim.getX());
-		statement.setLong(i++, claim.getZ());
-		Faction faction = claim.getFaction();
-		if (faction == null)
-			statement.setObject(i++, null);
-		else
-			statement.setInt(i++, claim.getFaction().getID());
-		statement.setInt(i++, claim.getType().ordinal());
-		statement.setInt(i++, Bukkit.getWorlds().indexOf(claim.getWorld()));
-		statement.executeUpdate();
-		ResultSet resultSet = statement.getGeneratedKeys();
-		resultSet.next();
+		try (PreparedStatement statement = createClaim.createStatement()) {
+			int i = 1;
+			statement.setLong(i++, claim.getX());
+			statement.setLong(i++, claim.getZ());
+			Faction faction = claim.getFaction();
+			if (faction == null)
+				statement.setObject(i++, null);
+			else
+				statement.setInt(i++, claim.getFaction().getID());
+			statement.setInt(i++, claim.getType().ordinal());
+			statement.setInt(i++, Bukkit.getWorlds().indexOf(claim.getWorld()));
+			statement.executeUpdate();
+			ResultSet resultSet = statement.getGeneratedKeys();
+			resultSet.next();
 
-		claim.setId(resultSet.getInt(1));
-		resultSet.close();
-		return claim;
+			claim.setId(resultSet.getInt(1));
+			return claim;
+		}
 	}
 
 	public FactionClaim updateClaim(FactionClaim factionClaim) throws SQLException {
-		PreparedStatement statement = updateClaim.getStatement();
-		int i = 1;
-		statement.setLong(i++, factionClaim.getId());
-		Faction faction = factionClaim.getFaction();
-		if (faction == null)
-			statement.setObject(i++, null);
-		else
-			statement.setInt(i++, factionClaim.getFaction().getID());
-		statement.setInt(i++, factionClaim.getType().ordinal());
-		Set<Integer> ownerIds = factionClaim.getOwnerIds();
-		statement.setString(i++, ownerIds == null || ownerIds.isEmpty() ? null : ownerIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
-		statement.executeUpdate();
-		statement.close();
-		return factionClaim;
+		try (PreparedStatement statement = updateClaim.createStatement()) {
+			int i = 1;
+			statement.setLong(i++, factionClaim.getId());
+			Faction faction = factionClaim.getFaction();
+			if (faction == null)
+				statement.setObject(i++, null);
+			else
+				statement.setInt(i++, factionClaim.getFaction().getID());
+			statement.setInt(i++, factionClaim.getType().ordinal());
+			Set<Integer> ownerIds = factionClaim.getOwnerIds();
+			statement.setString(i++, ownerIds == null || ownerIds.isEmpty() ? null : ownerIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+			statement.executeUpdate();
+			return factionClaim;
+		}
 	}
 
 	private FactionClaim selectClaim(Chunk chunk) throws SQLException {
-		PreparedStatement statement = selectClaimByChunk.getStatement();
-		statement.setInt(1, chunk.getX());
-		statement.setInt(2, chunk.getZ());
-		ResultSet resultSet = statement.executeQuery();
-		if (resultSet.next())
-			return getFactionClaim(resultSet);
-		return null;
+		try (PreparedStatement statement = selectClaimByChunk.createStatement()) {
+			statement.setInt(1, chunk.getX());
+			statement.setInt(2, chunk.getZ());
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.next())
+				return getFactionClaim(resultSet);
+			return null;
+		}
 	}
 
 	private Set<FactionClaim> selectClaims(Faction faction) throws SQLException {
-		Set<FactionClaim> claims = new HashSet<>();
-		PreparedStatement statement = selectClaimByFaction.getStatement();
-		statement.setInt(1, faction.getID());
-		ResultSet resultSet = statement.executeQuery();
-		while (resultSet.next())
-			claims.add(getFactionClaim(resultSet));
-		return claims;
+		Set<FactionClaim> claims2 = new HashSet<>();
+		try (PreparedStatement statement = selectClaimByFaction.createStatement()) {
+			statement.setInt(1, faction.getID());
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next())
+				claims2.add(getFactionClaim(resultSet));
+			return claims2;
+		}
 	}
 
 	private FactionClaim getFactionClaim(ResultSet resultSet) throws SQLException {
@@ -210,7 +212,8 @@ public class FactionClaimsManager implements Listener {
 	}
 
 	private void blockDamage(Cancellable e, Player p, Location location) {
-		if (p == null) return;
+		if (p == null)
+			return;
 		FactionClaim claim = getByChunk(p.getLocation().getChunk());
 		if (claim.getType() == FactionClaimType.WILDERNESS) {
 			if (claim.getFaction() == null)
