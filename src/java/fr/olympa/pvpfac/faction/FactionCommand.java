@@ -20,7 +20,6 @@ import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
-import fr.olympa.pvpfac.faction.claim.FactionClaimType;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.faction.map.FactionMap;
 import fr.olympa.pvpfac.faction.utils.FactionMsg;
@@ -158,7 +157,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			if (!claim.isOverClaimable()) {
 				TextComponent text = new TextComponent(TextComponent.fromLegacyText("§cImpossible de &lsur&cclaim le chunk de la faction §4%s&c.".replace("%s", claim.getFactionNameColored())));
 				text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(
-						"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entourée de claims §nuniquement§e de la même faction.")));
+						"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entouré de claims §nuniquement§e de la même faction.")));
 				sendComponents(text);
 				return;
 			}

@@ -5,7 +5,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class FactionUtils {
 
-	public static TextComponent getFirstSep() {
+	public static TextComponent getHeader() {
 		TextComponent textComponent = new TextComponent();
 		TextComponent textComponent2 = new TextComponent("----------------");
 
@@ -34,7 +34,7 @@ public class FactionUtils {
 		return textComponent;
 	}
 
-	public static TextComponent getLastSep() {
+	public static TextComponent getFooter() {
 		TextComponent textComponent = new TextComponent();
 		TextComponent textComponent2 = new TextComponent("---------------------------------------");
 		textComponent2.setColor(ChatColor.GOLD);

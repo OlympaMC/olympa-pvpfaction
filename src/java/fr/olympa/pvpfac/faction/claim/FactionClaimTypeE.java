@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.bukkit.ChatColor;
 
-public enum FactionClaimType {
+public enum FactionClaimTypeE {
 
 	WILDERNESS("Zone Libre", "§aPvP ON, Pertes de Power ON, Mobs ON", ChatColor.DARK_GREEN),
 	SAFEZONE("Zone Sécurisée", "§aDégats OFF", ChatColor.GOLD),
@@ -12,7 +12,7 @@ public enum FactionClaimType {
 	AP("Avants-Postes", "§eIci les APs !", ChatColor.AQUA),
 	SPAWN("Spawn", "", ChatColor.YELLOW);
 
-	private FactionClaimType(String name, String description, ChatColor color) {
+	private FactionClaimTypeE(String name, String description, ChatColor color) {
 		this.name = name;
 		this.description = description;
 		this.color = color;
@@ -22,12 +22,12 @@ public enum FactionClaimType {
 	String description;
 	ChatColor color;
 
-	public static FactionClaimType get(String name) {
-		return Arrays.stream(FactionClaimType.values()).filter(f -> f.name().equals(name)).findFirst().orElse(null);
+	public static FactionClaimTypeE get(String name) {
+		return Arrays.stream(FactionClaimTypeE.values()).filter(f -> f.name().equals(name)).findFirst().orElse(null);
 	}
 
-	public static FactionClaimType get(int type) {
-		return Arrays.stream(FactionClaimType.values()).filter(f -> f.ordinal() == type).findFirst().orElse(null);
+	public static FactionClaimTypeE get(int type) {
+		return Arrays.stream(FactionClaimTypeE.values()).filter(f -> f.ordinal() == type).findFirst().orElse(null);
 	}
 
 	public String getName() {

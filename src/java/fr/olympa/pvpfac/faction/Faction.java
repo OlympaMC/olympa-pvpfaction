@@ -30,8 +30,8 @@ import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class Faction extends Clan<Faction, FactionPlayerData> {
-
-	private static DynamicLine<Scoreboard<FactionPlayer>> header = new DynamicLine<>(x -> "§7" + x.getOlympaPlayer().getClan().getName() + ":");
+	
+	private static DynamicLine<Scoreboard<FactionPlayer>> header = new DynamicLine<>(x -> "§7" + x.getOlympaPlayer().getClan().getName() + " :");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
 		Faction fac = x.getOlympaPlayer().getClan();
 		Player p = x.getOlympaPlayer().getPlayer();
@@ -99,11 +99,11 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	// TODO Optimize getByFaction
 	public Set<FactionClaim> getClaims() {
-		return PvPFaction.getInstance().getClaimsManager().getByFaction(this);
+		return PvPFaction.getInstance().getClaimsManager().ofFaction(this);
 	}
 
 	public boolean hasClaim(Chunk chunk) {
-		return hasClaim(PvPFaction.getInstance().getClaimsManager().getByChunk(chunk));
+		return hasClaim(PvPFaction.getInstance().getClaimsManager().ofChunk(chunk));
 	}
 
 	public boolean hasClaim(FactionClaim chunk) {
@@ -194,6 +194,15 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	/**
+	 * Return true if fac is an ally or if same fac as this instance is used as parameter
+	 * @param fac
+	 * @return
+	 */
+	public boolean isAlly(Faction fac) {
+		return false;//TODO
+	}
 
 	@Override
 	public Faction clone() {
@@ -203,6 +212,11 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof Faction && ((Faction)o).getID() == getID();
 	}
 
 }

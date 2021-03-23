@@ -4,6 +4,7 @@ import fr.olympa.api.clans.ClanPlayerData;
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.utils.observable.ObservableValue;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.faction.claim.ClaimPermLevel;
 
 public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData> {
 
@@ -29,19 +30,25 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 	
 	public enum FactionRole {
 		
-		LEADER(10, "Leader", "**"),
-		OFFICER(5, "Officier", "*"),
-		MEMBER(2, "Membre", "+"),
-		RECRUT(0, "Recrue", "-");
+		//NE PAS RAJOUTER DE VALEUR ICI SI LE SERVEUR EST EN PRODUCTION !!
+		//ou retravailler la classe FactionClaim pour prendre en compte les nouveaux rôles dans l'array de ClaimPermLevel concernant les factions membres du claim
+		LEADER(3, 10, "Leader", "**", ClaimPermLevel.LEVEL_4),
+		OFFICER(2, 5, "Officier", "*", ClaimPermLevel.LEVEL_4),
+		MEMBER(1, 2, "Membre", "+", ClaimPermLevel.LEVEL_3),
+		RECRUT(0, 0, "Recrue", "-", ClaimPermLevel.LEVEL_1);
 		
+		public final int weight;
 		public final int power;
 		public final String name;
 		public final String prefix;
+		public final ClaimPermLevel claimLevel;
 		
-		private FactionRole(int power, String name, String prefix) {
+		private FactionRole(int weight, int power, String name, String prefix, ClaimPermLevel level) {
+			this.weight = weight;
 			this.power = power;
 			this.name = name;
 			this.prefix = prefix;
+			this.claimLevel = level;
 		}
 		
 		public FactionRole getAbove() {
@@ -58,6 +65,10 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 			}catch (ArrayIndexOutOfBoundsException ex) {
 				return null;
 			}
+		}
+
+		public ClaimPermLevel getPlayerClaimLevel() {
+			return claimLevel;
 		}
 		
 	}

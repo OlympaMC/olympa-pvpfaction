@@ -9,7 +9,7 @@ public enum FactionChat {
 
 	GENERAL("Géneral", "normal", "reset"),
 	FACTION("Faction", "fac", "f"),
-	ALLY("Allié", "ally", "a", "allier", "alliée", "alliées");
+	ALLY("Allié", "ally", "a", "alliée", "alliés", "alliées");
 
 	public static FactionChat get(String name) {
 		return Arrays.stream(FactionChat.values()).filter(chat -> Utils.equalsIgnoreAccents(chat.getName(), name) || chat.hasSurname(name)).findFirst().orElse(null);

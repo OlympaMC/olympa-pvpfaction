@@ -52,15 +52,17 @@ public class FactionPvPListener implements Listener {
 			return;
 		if (!victimfaction.isSameClan(attackerfaction)) {
 			Chunk victimChunk = victim.getLocation().getChunk();
-			FactionClaim factionClaim = PvPFaction.getInstance().getClaimsManager().getByChunk(victimChunk);
+			FactionClaim factionClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(victimChunk);
 			if (factionClaim == null) {
 				Prefix.FACTION.sendMessage(attacker, "&4Impossible de charger le claim.");
 				event.setCancelled(false);
 				return;
-			} else if (factionClaim.canInteract(victimfaction)) {
+				
+				//Retiré car méthodes modifiées
+			}/* else if (factionClaim.getPlayerPerm(attackerfp).canInterract()) {
 				Prefix.FACTION.sendMessage(attacker, "&cImpossible d'attaquer &4%s&c dans son claim.", victim.getName());
 				event.setCancelled(false);
-			}
+			}*/
 		} else {
 			Prefix.FACTION.sendMessage(attacker, "&cAttaque pas le collègue &4%s&c !", victim.getName());
 			event.setCancelled(false);
@@ -77,7 +79,7 @@ public class FactionPvPListener implements Listener {
 		FactionPlayer attackerfp = AccountProvider.get(player.getUniqueId());
 		Faction faction = attackerfp.getClan();
 		if (faction.getOnlineFactionPlayers().stream().filter(p -> SpigotUtils.playerisIn(p.getPlayer(), location)).findFirst().isPresent()) {
-			player.sendMessage(ColorUtils.color(Prefix.FACTION + "Brûle pas le collègue !"));
+			Prefix.FACTION.sendMessage(player, "Brûle pas le collègue !");
 			event.setCancelled(true);
 			player.updateInventory();
 		}

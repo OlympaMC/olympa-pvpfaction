@@ -1,143 +1,236 @@
 package fr.olympa.pvpfac.faction.claim;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
+import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
+import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class FactionClaim {
+	
+	//public static final FactionClaim WILDERNESS = new FactionClaim(null, Integer.MAX_VALUE, Integer.MAX_VALUE, null, null, null);//new WildernessFactionClaim();
+	
+	private ChunkId chunkId;
+	private Faction faction;
+	private Map<Long, ClaimPermLevel> membersPlayers = new HashMap<Long, ClaimPermLevel>();
+	private Map<Integer, ClaimPermLevel[]> membersFactions = new HashMap<Integer, ClaimPermLevel[]>();
 
-	long id;
-	World world;
-	int x;
-	int z;
-	Faction faction;
-	Set<Integer> ownerIds = new HashSet<>();
-	FactionClaimType type;
-
-	public FactionClaim(int id, int world, int x, int z, Integer factionId, int type, String ownerIds) {
-		this.id = id;
-		this.world = Bukkit.getWorlds().get(world);
-		this.x = x;
-		this.z = z;
-		faction = factionId == null ? null : PvPFaction.getInstance().getFactionManager().getClan(id);
-		this.type = FactionClaimType.get(type);
-		this.ownerIds = ownerIds == null ? null : Arrays.stream(ownerIds.split(",")).map(Integer::parseInt).collect(Collectors.toSet());
+	public FactionClaim(World world, int x, int z, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
+		this.chunkId = /*x == null || z == null ? null :*/ new ChunkId(world, x, z);
+		
+		faction = factionId == null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
+		//this.type = FactionClaimType.get(type);
+		this.membersPlayers = playersMembersAsJson == null || playersMembersAsJson.length() <= 2? new HashMap<Long, ClaimPermLevel>() : 
+			((Map<Long, Integer>)new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Long, Integer>>(){}.getType())).entrySet()
+			.stream().map(e -> new AbstractMap.SimpleEntry<Long, ClaimPermLevel>(e.getKey(), ClaimPermLevel.fromLevel(e.getValue())))
+			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+		
+		this.membersFactions = factionsMembersAsJson == null || factionsMembersAsJson.length() <= 2 ? new HashMap<Integer, ClaimPermLevel[]>() : 
+			((Map<Integer, Integer[]>)new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Integer, Integer[]>>(){}.getType())).entrySet()
+			.stream().map(e -> new AbstractMap.SimpleEntry<Integer, ClaimPermLevel[]>(e.getKey(), 
+					(ClaimPermLevel[]) Stream.of(e.getValue()).map(perm -> ClaimPermLevel.fromLevel(perm)).toArray()))
+			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 
-	public FactionClaim(Chunk chunk, Faction faction) {
-		world = chunk.getWorld();
-		x = chunk.getX();
-		z = chunk.getZ();
-		this.faction = faction;
-		type = FactionClaimType.WILDERNESS;
+	public ChunkId getChunkId() {
+		return chunkId;
 	}
 
-	public FactionClaim(Chunk chunk, FactionClaimType type) {
-		world = chunk.getWorld();
-		x = chunk.getX();
-		z = chunk.getZ();
-		this.type = type;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public World getWorld() {
-		return world;
-	}
-
-	public String getWorldName() {
-		return getWorld().getName();
-	}
-
-	public boolean isDefaultWorld() {
-		return Bukkit.getWorlds().indexOf(world) == 0;
-	}
-
-	public long getX() {
-		return x;
-	}
-
-	public long getZ() {
-		return z;
-	}
-
+	@SuppressWarnings("unlikely-arg-type")
 	public boolean isChunk(Chunk chunk) {
-		return x == chunk.getX() && z == chunk.getZ() && chunk.getWorld().getName().equals(getWorldName());
+		return chunkId.equals(chunk);
 	}
 
+	public boolean isWilderness() {
+		return faction == null;
+	}
+	
 	public void setFaction(Faction faction) {
+		if (isWilderness())
+			return;
+		
+		if ((faction == null && getFaction() == null) || faction.equals(getFaction()))
+			return;
+		
 		this.faction = faction;
-	}
-
-	public FactionClaimType getType() {
-		return type;
-	}
-
-	public void setType(FactionClaimType type) {
-		this.type = type;
+		membersPlayers.clear();
+		membersFactions.clear();
+		
+		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
 	}
 
 	public Faction getFaction() {
 		return faction;
 	}
 
-	public Chunk getChunk() {
-		return world.getChunkAt(x, z);
-	}
-
-	public boolean canInteract(Faction faction) {
-		if (this.faction != null)
-			return this.faction.isSameClan(faction);
-		return type == FactionClaimType.WILDERNESS;
-	}
-
 	public boolean isOverClaimable() {
-		if (faction != null)
-			return faction.isOverClaimable() && PvPFaction.getInstance().getClaimsManager().getChunksAround(getChunk()).stream().anyMatch(c -> !faction.hasClaim(c));
-		return type == FactionClaimType.WILDERNESS;
+		if (isWilderness())
+			return true;
+		return faction.isOverClaimable();// && PvPFaction.getInstance().getClaimsManager().getChunksAround(chunkId.getChunk()).stream().anyMatch(c -> !faction.hasClaim(c));
 	}
 
 	public void sendTitle(Player player) {
 		if (faction != null)
 			player.sendTitle(faction.getNameColored(player.getUniqueId()), "§7" + faction.getDescription(), 0, 20, 20);
 		else
-			player.sendTitle(type.getNameColored(), type.getDescriptionColored(), 0, 20, 20);
+			player.sendTitle("§2Wilderness", "§aZone sans aucune restriction", 0, 20, 20);
 
-	}
-
-	public ChatColor getColor() {
-		return type.getColor();
-	}
-
-	public Set<Integer> getOwnerIds() {
-		return ownerIds;
 	}
 
 	public String getFactionNameColored() {
 		if (faction != null)
 			return ChatColor.DARK_RED + faction.getName();
-		return type.getNameColored();
+		return "§6Wilderness";
 	}
 
 	public boolean hasSameFaction(FactionClaim claim) {
-		if (faction != null)
+		return faction == null ?
+				claim.getFaction() == null :
+				faction.getID() == claim.getFaction().getID();
+		/*if (faction != null)
 			return claim.getFaction() != null && faction.isSameClan(claim.getFaction());
-		return claim.getFaction() == null && getType() == claim.getType();
+		return claim.getFaction() == null;// && getType() == claim.getType();*/
+	}
+	
+	//for database saving only
+	public String getPlayersMembersToJson() {
+		return new Gson().toJson(membersPlayers.entrySet().stream()
+				.map(e -> new AbstractMap.SimpleEntry<Long, Integer>(e.getKey(), e.getValue().getLevel()))
+				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())), new TypeToken<Map<Long, Integer>>(){}.getType());
+	}
+	
+	//for database saving only
+	public String getFactionMembersToJson() {
+		return new Gson().toJson(membersFactions.entrySet().stream()
+				.map(e -> new AbstractMap.SimpleEntry<Integer, Integer[]>(e.getKey(), (Integer[]) Stream.of(e.getValue()).map(perm -> perm.getLevel()).toArray()))
+				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())), new TypeToken<Map<Integer, Integer[]>>(){}.getType());
+	}
+	
+	public boolean setPlayerLevel(FactionPlayer pf, ClaimPermLevel level) {
+		if (membersPlayers.containsKey(pf.getId()) && membersPlayers.get(pf.getId()) == level)
+			return false;
+		
+		/*if (level == ClaimPermLevel.LEVEL_NONE)
+			claimMembersPlayers.remove(pf.getId());
+		else*/
+			membersPlayers.put(pf.getId(), level);
+			
+		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
+		return true;
+	}
+	
+	public boolean setFactionLevel(Faction f, FactionRole role, ClaimPermLevel level) {
+		if ((membersFactions.containsKey(f.getID()) && level == ClaimPermLevel.LEVEL_NONE) || (membersFactions.containsKey(f.getID()) && membersFactions.get(f.getID())[role.weight] == level))
+			return false;
+
+		//on ajoute les permissions par défaut à tous les grades de la faction elle n'est pas encore dans la liste
+		if (!membersFactions.containsKey(f.getID())) {
+			membersFactions.put(f.getID(), new ClaimPermLevel[FactionRole.LEADER.weight + 1]);
+			for (int i = 0 ; i <= FactionRole.LEADER.weight ; i++)
+				membersFactions.get(f.getID())[i] = ClaimPermLevel.LEVEL_NONE;
+		}
+		
+		ClaimPermLevel[] perms = membersFactions.get(f.getID());
+		perms[role.weight] = level;
+		
+		//fais en sorte que les roles inférieurs n'ai pas plus de permission que le role en cours d'édition, et vice versa
+		for (int i = 0 ; i <= FactionRole.RECRUT.weight ; i++)
+			if ((perms[i].getLevel() > level.getLevel() && i < role.weight) || (perms[i].getLevel() < level.getLevel() && i > role.weight))
+				perms[i] = level;
+		
+		//si aucun grade dans la fac n'a de permission, on retire la fac de la liste
+		if (Stream.of(membersFactions.get(f.getID())).filter(perm -> perm != ClaimPermLevel.LEVEL_NONE).findFirst().isEmpty())
+			membersFactions.remove(f.getID());
+		
+		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
+		return true;
+	}
+	
+	
+	public ClaimPermLevel getPlayerPerm(FactionPlayer pf) {
+		if (isWilderness())
+			return ClaimPermLevel.LEVEL_4;
+		else
+			return membersPlayers.size() > 0 ? 
+					membersPlayers.containsKey(pf.getId()) ?
+							membersPlayers.get(pf.getId()) :
+							ClaimPermLevel.LEVEL_NONE :
+					pf.getClan() == null ?
+							ClaimPermLevel.LEVEL_NONE :
+							pf.getClan().equals(faction) ?
+									faction.getMember(pf.getInformation()).getRole().getPlayerClaimLevel() :
+									membersFactions.containsKey(pf.getClan().getID()) ?
+											membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
+											ClaimPermLevel.LEVEL_NONE;
+	}
+	
+	/*private static class WildernessFactionClaim extends FactionClaim {
+
+		public WildernessFactionClaim() {
+			super(null, Integer.MAX_VALUE, Integer.MAX_VALUE, null, null);
+		}	
+	}*/
+	
+	public static final class ChunkId {
+
+		private World w;
+		private int x;
+		private int z;
+		
+		public ChunkId(World w, int x, int z) {
+			this.w = w;
+			this.x = x;
+			this.z = z;
+		}
+		
+		public ChunkId(Chunk ch) {
+			this(ch.getWorld(), ch.getX(), ch.getZ());
+		}
+		
+		public World getWorld() {
+			return w;
+		}
+		
+		public int getX() {
+			return x;
+		}
+		
+		public int getZ() {
+			return z;
+		}
+
+		/**
+		 * Get chunk of this FactionChunk. Avoid usnig this method since it might load chunk synchronously to the main thread.
+		 * @return
+		 */
+		@Deprecated
+		public Chunk getChunk() {
+			return w.getChunkAt(x, z);
+		}
+		
+		public void getChunk(Consumer<Chunk> callback) {
+			w.getChunkAtAsync(x, z, callback);
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			return o instanceof ChunkId ? ((ChunkId)o).w.getName().equals(this.w.getName()) && ((ChunkId)o).x == this.x && ((ChunkId)o).z == this.z :
+				o instanceof Chunk ? ((Chunk)o).getWorld().getName().equals(this.w.getName()) && ((Chunk)o).getX() == this.x && ((Chunk)o).getZ() == this.z :
+					false;
+		}
 	}
 }

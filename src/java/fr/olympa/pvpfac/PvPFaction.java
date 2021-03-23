@@ -25,7 +25,7 @@ import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.pvpfac.armorstand.ArmorStandWithHandListener;
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
-import fr.olympa.pvpfac.faction.claim.FactionClaimEnterListener;
+import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
@@ -88,7 +88,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 			pluginManager.registerEvents(new FactionChatListener(), this);
 			pluginManager.registerEvents(new FactionPvPListener(), this);
-			pluginManager.registerEvents(new FactionClaimEnterListener(), this);
+			pluginManager.registerEvents(new FactionClaimListener(), this);
 			pluginManager.registerEvents(new FactionPowerListener(), this);
 			pluginManager.registerEvents(new AutoMapListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
