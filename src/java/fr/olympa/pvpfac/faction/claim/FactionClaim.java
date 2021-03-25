@@ -54,23 +54,18 @@ public class FactionClaim {
 	public boolean isChunk(Chunk chunk) {
 		return chunkId.equals(chunk);
 	}
-
-	public boolean isWilderness() {
-		return faction == null;
-	}
 	
-	public void setFaction(Faction faction) {
-		if (isWilderness())
-			return;
-		
+	public boolean setFaction(Faction faction) {		
 		if ((faction == null && getFaction() == null) || faction.equals(getFaction()))
-			return;
+			return false;
 		
 		this.faction = faction;
 		membersPlayers.clear();
 		membersFactions.clear();
 		
 		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
+		
+		return true;
 	}
 
 	public Faction getFaction() {
@@ -78,7 +73,7 @@ public class FactionClaim {
 	}
 
 	public boolean isOverClaimable() {
-		if (isWilderness())
+		if (faction == null)
 			return true;
 		return faction.isOverClaimable();// && PvPFaction.getInstance().getClaimsManager().getChunksAround(chunkId.getChunk()).stream().anyMatch(c -> !faction.hasClaim(c));
 	}
@@ -133,18 +128,26 @@ public class FactionClaim {
 		return true;
 	}
 	
+	public boolean setAllyFactionLevel(FactionRole role, ClaimPermLevel level) {
+		return setFactionLevel(null, role, level);
+	}
+	
 	public boolean setFactionLevel(Faction f, FactionRole role, ClaimPermLevel level) {
-		if ((membersFactions.containsKey(f.getID()) && level == ClaimPermLevel.LEVEL_NONE) || (membersFactions.containsKey(f.getID()) && membersFactions.get(f.getID())[role.weight] == level))
+		//faction index -1 is used for allied factions
+		int factionId = f == null ? -1 : f.getID();
+		
+		if ((!membersFactions.containsKey(factionId) && level == ClaimPermLevel.LEVEL_NONE) || 
+				(membersFactions.containsKey(factionId) && membersFactions.get(f.getID())[role.weight] == level))
 			return false;
 
 		//on ajoute les permissions par défaut à tous les grades de la faction elle n'est pas encore dans la liste
-		if (!membersFactions.containsKey(f.getID())) {
-			membersFactions.put(f.getID(), new ClaimPermLevel[FactionRole.LEADER.weight + 1]);
+		if (!membersFactions.containsKey(factionId)) {
+			membersFactions.put(factionId, new ClaimPermLevel[FactionRole.LEADER.weight + 1]);
 			for (int i = 0 ; i <= FactionRole.LEADER.weight ; i++)
-				membersFactions.get(f.getID())[i] = ClaimPermLevel.LEVEL_NONE;
+				membersFactions.get(factionId)[i] = ClaimPermLevel.LEVEL_NONE;
 		}
 		
-		ClaimPermLevel[] perms = membersFactions.get(f.getID());
+		ClaimPermLevel[] perms = membersFactions.get(factionId);
 		perms[role.weight] = level;
 		
 		//fais en sorte que les roles inférieurs n'ai pas plus de permission que le role en cours d'édition, et vice versa
@@ -153,8 +156,8 @@ public class FactionClaim {
 				perms[i] = level;
 		
 		//si aucun grade dans la fac n'a de permission, on retire la fac de la liste
-		if (Stream.of(membersFactions.get(f.getID())).filter(perm -> perm != ClaimPermLevel.LEVEL_NONE).findFirst().isEmpty())
-			membersFactions.remove(f.getID());
+		if (Stream.of(membersFactions.get(factionId)).filter(perm -> perm != ClaimPermLevel.LEVEL_NONE).findFirst().isEmpty())
+			membersFactions.remove(factionId);
 		
 		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
 		return true;
@@ -162,7 +165,7 @@ public class FactionClaim {
 	
 	
 	public ClaimPermLevel getPlayerPerm(FactionPlayer pf) {
-		if (isWilderness())
+		if (faction == null)
 			return ClaimPermLevel.LEVEL_4;
 		else
 			return membersPlayers.size() > 0 ? 
@@ -173,9 +176,11 @@ public class FactionClaim {
 							ClaimPermLevel.LEVEL_NONE :
 							pf.getClan().equals(faction) ?
 									faction.getMember(pf.getInformation()).getRole().getPlayerClaimLevel() :
-									membersFactions.containsKey(pf.getClan().getID()) ?
-											membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
-											ClaimPermLevel.LEVEL_NONE;
+									membersFactions.containsKey(-1) && pf.getClan().isAlly(faction) ? 
+											membersFactions.get(-1)[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
+											membersFactions.containsKey(pf.getClan().getID()) ?
+													membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
+													ClaimPermLevel.LEVEL_NONE;
 	}
 	
 	/*private static class WildernessFactionClaim extends FactionClaim {

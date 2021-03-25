@@ -99,11 +99,11 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	// TODO Optimize getByFaction
 	public Set<FactionClaim> getClaims() {
-		return PvPFaction.getInstance().getClaimsManager().ofFaction(this);
+		return PvPFaction.getInstance().getClaimsManager().fromFaction(this);
 	}
 
 	public boolean hasClaim(Chunk chunk) {
-		return hasClaim(PvPFaction.getInstance().getClaimsManager().ofChunk(chunk));
+		return hasClaim(PvPFaction.getInstance().getClaimsManager().fromChunk(chunk));
 	}
 
 	public boolean hasClaim(FactionClaim chunk) {

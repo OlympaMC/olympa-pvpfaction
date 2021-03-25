@@ -36,7 +36,7 @@ public class FactionClaimListener implements Listener {
 		FactionClaimsManager manager = PvPFaction.getInstance().getClaimsManager();
 		FactionClaim factionClaim;
 		try {
-			factionClaim = manager.ofChunk(to);
+			factionClaim = manager.fromChunk(to);
 			if (factionClaim != null)
 				factionClaim.sendTitle(player);
 		} catch (Exception e) {
@@ -55,8 +55,8 @@ public class FactionClaimListener implements Listener {
 		FactionClaimsManager manager = PvPFaction.getInstance().getClaimsManager();
 		FactionClaim factionClaim;
 		try {
-			FactionClaim oldFactionClaim = manager.ofChunk(from);
-			factionClaim = manager.ofChunk(to);
+			FactionClaim oldFactionClaim = manager.fromChunk(from);
+			factionClaim = manager.fromChunk(to);
 			if (oldFactionClaim.hasSameFaction(factionClaim))
 				return;
 			factionClaim.sendTitle(player);
@@ -82,7 +82,7 @@ public class FactionClaimListener implements Listener {
 			return;
 
 		FactionPlayer damagerFp = AccountProvider.get(damager.getUniqueId());
-		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(e.getEntity().getLocation().getChunk());
+		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().fromChunk(e.getEntity().getLocation().getChunk());
 		
 		if (target.getType() == EntityType.PLAYER) {
 			FactionPlayer targetFp = AccountProvider.get(target.getUniqueId());
@@ -116,11 +116,11 @@ public class FactionClaimListener implements Listener {
 			return;
 		
 		Location location = event.getBlockClicked().getLocation();
-		FactionPlayer attackerfp = AccountProvider.get(p.getUniqueId());
-		Faction faction = attackerfp.getClan();
+		Faction faction = ((FactionPlayer)AccountProvider.get(p.getUniqueId())).getClan();
 		
 		//if (faction != null && faction.getOnlineFactionPlayers().stream().filter(player -> SpigotUtils.playerisIn(player.getPlayer(), location)).findFirst().isPresent()) {
-		if (faction != null && Bukkit.getOnlinePlayers().stream().filter(pl -> SpigotUtils.playerisIn(pl, location) && ((FactionPlayer)AccountProvider.get(pl.getUniqueId())).getClan().isAlly(faction)).findFirst().isPresent()) {
+		if (faction != null && Bukkit.getOnlinePlayers().stream().filter(pl -> SpigotUtils.playerisIn(pl, location) && 
+				faction.isAlly(((FactionPlayer)AccountProvider.get(pl.getUniqueId())).getClan())).findFirst().isPresent()) {
 			Prefix.FACTION.sendMessage(p, "Eh, brûle pas le collègue !");
 			event.setCancelled(true);
 			p.updateInventory();

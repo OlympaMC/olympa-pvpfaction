@@ -59,7 +59,7 @@ public class FactionMap {
 			endZ = chunkZ + mapRaduisSize;
 			for (int iZ = startZ; endZ > iZ; iZ++) {
 				for (int iX = startX; endX > iX; iX++)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.fromChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;
@@ -71,7 +71,7 @@ public class FactionMap {
 			endZ = chunkZ + mapRaduisSize * sidesCoeff;
 			for (int iX = startX; endX < iX; iX--) {
 				for (int iZ = startZ; endZ > iZ; iZ++)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.fromChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;
@@ -83,7 +83,7 @@ public class FactionMap {
 			endZ = chunkZ - mapRaduisSize * sidesCoeff;
 			for (int iX = startX; endX > iX; iX++) {
 				for (int iZ = startZ; endZ < iZ; iZ--)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.fromChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;
@@ -95,7 +95,7 @@ public class FactionMap {
 			endZ = chunkZ - mapRaduisSize;
 			for (int iZ = startZ; endZ < iZ; iZ--) {
 				for (int iX = startX; endX < iX; iX--)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.fromChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;

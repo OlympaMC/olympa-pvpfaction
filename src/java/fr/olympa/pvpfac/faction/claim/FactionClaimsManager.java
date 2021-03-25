@@ -28,6 +28,8 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.region.tracking.flags.DamageFlag;
@@ -62,9 +64,14 @@ public class FactionClaimsManager implements Listener {
 					" members_players = VALUES(members_players)," +
 					" members_factions = VALUES(members_factions);");
 	
-	
-	private Cache<ChunkId, FactionClaim> claims = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
-
+	private Set<Faction> fullyLoadedFactionsClaims = new HashSet<Faction>();
+	private Cache<ChunkId, FactionClaim> claims = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS)
+			.removalListener(new RemovalListener<ChunkId, FactionClaim>() {
+				@Override
+				public void onRemoval(RemovalNotification<ChunkId, FactionClaim> notification) {
+					fullyLoadedFactionsClaims.remove(notification.getValue().getFaction());
+				}
+			}).build();
 	
 
 	public FactionClaimsManager() {
@@ -105,7 +112,7 @@ public class FactionClaimsManager implements Listener {
 		}
 	}*/
 
-	public void deleteClaim(FactionClaim claim) {
+	private void deleteClaim(FactionClaim claim) {
 		try(PreparedStatement statement = deleteClaimOfChunk.createStatement()) {
 			int i = 1;
 			statement.setLong(i++, claim.getChunkId().getX());
@@ -118,6 +125,10 @@ public class FactionClaimsManager implements Listener {
 			e.printStackTrace();
 		}
 	}
+	/*
+	public void deleteClaims(Faction faction) {
+		fromFaction(faction).forEach(claim -> claim.setFaction(null));
+	}*/
 	
 	public void updateClaim(FactionClaim claim) {
 		if (claim.getFaction() == null)
@@ -157,8 +168,8 @@ public class FactionClaimsManager implements Listener {
 	}*/
 	
 	
-	public FactionClaim ofChunk(Chunk chunk) {
-		FactionClaim claim = claims.getIfPresent(chunk);
+	public FactionClaim fromChunk(Chunk chunk) {
+		FactionClaim claim = claims.getIfPresent(chunk);//TODO vérifier que ChunkId#equals(Chunk) fonctionne bien !!
 		if (claim != null)
 			return claim;
 		
@@ -170,7 +181,7 @@ public class FactionClaimsManager implements Listener {
 			ResultSet resultSet = statement.executeQuery();
 			
 			if (resultSet.next())
-				claim = getFactionClaim(resultSet);
+				claim = toFactionClaim(resultSet);
 			else
 				claim = new FactionClaim(chunk.getWorld(), chunk.getX(), chunk.getZ(), null, null, null);
 			return claim;
@@ -182,14 +193,19 @@ public class FactionClaimsManager implements Listener {
 		}
 	}
 
-	public Set<FactionClaim> ofFaction(Faction faction) {
+	public Set<FactionClaim> fromFaction(Faction faction) {
+		if (fullyLoadedFactionsClaims.contains(faction))
+			return claims.asMap().values().stream().filter(claim -> faction.equals(claim.getFaction())).collect(Collectors.toSet());
+		
 		try (PreparedStatement statement = selectClaimsByFaction.createStatement()) {
 			statement.setInt(1, faction.getID());
 			ResultSet resultSet = statement.executeQuery();
 
 			Set<FactionClaim> factionClaims = new HashSet<>();
 			while (resultSet.next())
-				factionClaims.add(getFactionClaim(resultSet));
+				factionClaims.add(toFactionClaim(resultSet));
+			
+			fullyLoadedFactionsClaims.add(faction);
 			return factionClaims;
 			
 		} catch (SQLException e) {
@@ -200,7 +216,7 @@ public class FactionClaimsManager implements Listener {
 	}
 
 	
-	private FactionClaim getFactionClaim(ResultSet resultSet) throws SQLException {
+	private FactionClaim toFactionClaim(ResultSet resultSet) throws SQLException {
 		FactionClaim claim = new FactionClaim(
 				Bukkit.getWorld(resultSet.getString("world_name")),
 				resultSet.getInt("x"),
