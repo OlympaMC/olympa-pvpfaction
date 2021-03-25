@@ -1,19 +1,38 @@
 package fr.olympa.pvpfac.faction.claim;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.function.Function;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Container;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.olympa.api.provider.AccountProvider;
@@ -22,6 +41,7 @@ import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.player.FactionPlayer;
+import net.citizensnpcs.api.npc.BlockBreaker;
 
 public class FactionClaimListener implements Listener {
 
@@ -108,7 +128,7 @@ public class FactionClaimListener implements Listener {
 		}	
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
 		Player p = event.getPlayer();
 		Material material = event.getBucket();
@@ -126,10 +146,85 @@ public class FactionClaimListener implements Listener {
 			p.updateInventory();
 		}
 	}
+
+
+	/////////////////////////////////////////////////////////////
+	//                      BUILD EVENTS                       //
+	/////////////////////////////////////////////////////////////
+	
+	
+	@EventHandler
+	public void onBlockPlace(BlockPlaceEvent e) {
+		manageClaimAction(e.getBlock().getLocation(), e.getPlayer(), e, 
+				ClaimPermLevel::canBuild, 
+				"§cTu ne peux pas construire ici.");
+	}
+	
+	@EventHandler
+	public void onBlockBreak(BlockBreakEvent e) {
+		manageClaimAction(e.getBlock().getLocation(), e.getPlayer(), e, 
+				ClaimPermLevel::canBuild, 
+				"§cTu ne peux pas construire ici.");
+	}
+	
+
+
+	/////////////////////////////////////////////////////////////
+	//                    INTERRACT EVENTS                     //
+	/////////////////////////////////////////////////////////////
+	
+
+	@EventHandler(ignoreCancelled = true)
+	public void onUseBucket(PlayerBucketEvent e) {
+		manageClaimAction(e.getBlock().getLocation(), e.getPlayer(), e, 
+				ClaimPermLevel::canBuild, 
+				"§cNon, tu ne feras pas ça ici !");
+	}
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onInterractBlock(PlayerInteractEvent e) {		
+		if (e.getClickedBlock() != null && e.getClickedBlock() instanceof Container && 
+				e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.getPlayer().isSneaking())
+
+		manageClaimAction(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
+				ClaimPermLevel::canInterractContainers, 
+				"§cpas touche à ce qui ne t'appartient pas !");
+	}
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onInterractArmorstand(PlayerArmorStandManipulateEvent e) {
+		manageClaimAction(e.getRightClicked().getLocation(), e.getPlayer(), e, 
+				ClaimPermLevel::canInterractContainers, 
+				"§cpas touche à ce qui ne t'appartient pas !");
+	}
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onBreakItemframe(HangingBreakByEntityEvent e) {
+		if (e.getRemover() instanceof Player)
+			manageClaimAction(e.getEntity().getLocation(), (Player) e.getRemover(), e, 
+					ClaimPermLevel::canBuild, 
+					"§cTu ne peux pas prendre cet item.");
+	}
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onInterractItemframe(HangingPlaceEvent e) {
+		manageClaimAction(e.getEntity().getLocation(), e.getPlayer(), e, 
+				ClaimPermLevel::canBuild, 
+				"§cTu ne peux pas placer cet item ici.");
+	}
 	
 	
 	
 	
+	
+	
+	
+	private void manageClaimAction(Location loc, Player p, Cancellable event, Function<ClaimPermLevel, Boolean> method, String denyMessage, Object...args) {
+		if (!method.apply(PvPFaction.getInstance().getClaimsManager().fromChunk(loc.getChunk()).getPlayerPerm(AccountProvider.get(p.getUniqueId())))) {
+			Prefix.FACTION.sendMessage(p, denyMessage, args);
+			event.setCancelled(true);
+		}
+	}
 	
 	
 	

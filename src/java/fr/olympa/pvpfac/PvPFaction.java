@@ -92,7 +92,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new FactionPowerListener(), this);
 			pluginManager.registerEvents(new AutoMapListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
-			pluginManager.registerEvents(claimsManager = new FactionClaimsManager(), this);
+			claimsManager = new FactionClaimsManager();
 			//			pluginManager.registerEvents(new Test(), this);
 			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
 		} catch (Exception ex) {
@@ -107,7 +107,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
 
-		OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
+		//OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
 
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,

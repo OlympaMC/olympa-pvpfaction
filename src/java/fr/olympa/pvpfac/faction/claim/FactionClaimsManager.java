@@ -44,7 +44,7 @@ import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.claim.FactionClaim.ChunkId;
 import fr.olympa.pvpfac.player.FactionPlayer;
 
-public class FactionClaimsManager implements Listener {
+public class FactionClaimsManager {
 
 	private static final String tableName = "`pvpfac_claims`";
 
@@ -52,8 +52,8 @@ public class FactionClaimsManager implements Listener {
 	private static final OlympaStatement selectClaimByChunk = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "x", "z" }, new String[] {});
 	private static final OlympaStatement selectClaimsByFaction = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "faction_id" }, new String[] {});
 	//private static final OlympaStatement updateClaim = new OlympaStatement(StatementType.UPDATE, tableName, new String[] { "faction_id", "members" }, "id");
-	private static final OlympaStatement deleteClaimsOfFaction = new OlympaStatement("DELETE FROM " + tableName + " WHERE `faction_id`= ?;");
-	private static final OlympaStatement deleteClaimOfChunk = new OlympaStatement("DELETE FROM " + tableName + " WHERE `x`= ? AND `z`= ?;");
+	//private static final OlympaStatement deleteClaimsOfFaction = new OlympaStatement("DELETE FROM " + tableName + " WHERE `faction_id`= ?;");
+	private static final OlympaStatement deleteClaimOfChunk = new OlympaStatement("DELETE FROM " + tableName + " WHERE `world_name`= ? AND `x`= ? AND `z`= ?;");
 
 	private static final OlympaStatement updateClaim2 = new OlympaStatement(
 			"INSERT INTO " + tableName + 
@@ -65,7 +65,7 @@ public class FactionClaimsManager implements Listener {
 					" members_factions = VALUES(members_factions);");
 	
 	private Set<Faction> fullyLoadedFactionsClaims = new HashSet<Faction>();
-	private Cache<ChunkId, FactionClaim> claims = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.HOURS)
+	private Cache<ChunkId, FactionClaim> claims = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES)
 			.removalListener(new RemovalListener<ChunkId, FactionClaim>() {
 				@Override
 				public void onRemoval(RemovalNotification<ChunkId, FactionClaim> notification) {
@@ -115,6 +115,7 @@ public class FactionClaimsManager implements Listener {
 	private void deleteClaim(FactionClaim claim) {
 		try(PreparedStatement statement = deleteClaimOfChunk.createStatement()) {
 			int i = 1;
+			statement.setString(i++, claim.getChunkId().getWorld().getName());
 			statement.setLong(i++, claim.getChunkId().getX());
 			statement.setLong(i++, claim.getChunkId().getZ());
 			statement.executeUpdate();
@@ -125,11 +126,21 @@ public class FactionClaimsManager implements Listener {
 			e.printStackTrace();
 		}
 	}
-	/*
+
+	/**
+	 * Detete all claims of a faction. Should be used for faction disband for example.
+	 * @param faction
+	 */
 	public void deleteClaims(Faction faction) {
 		fromFaction(faction).forEach(claim -> claim.setFaction(null));
-	}*/
+		fullyLoadedFactionsClaims.remove(faction);
+	}
 	
+	/**
+	 * Update claim in database for any reason. Direct modification of FactionClaims execute update automatically. 
+	 * <br>For removing all claims of a faction prefer usage of deleteClaims(Faction).
+	 * @param claim
+	 */
 	public void updateClaim(FactionClaim claim) {
 		if (claim.getFaction() == null)
 			deleteClaim(claim);
@@ -167,7 +178,11 @@ public class FactionClaimsManager implements Listener {
 		}
 	}*/
 	
-	
+	/**
+	 * Get FactionClaim for corresponding chunk.
+	 * @param chunk
+	 * @return
+	 */
 	public FactionClaim fromChunk(Chunk chunk) {
 		FactionClaim claim = claims.getIfPresent(chunk);//TODO vérifier que ChunkId#equals(Chunk) fonctionne bien !!
 		if (claim != null)
@@ -193,6 +208,11 @@ public class FactionClaimsManager implements Listener {
 		}
 	}
 
+	/**
+	 * Get all claims for specified faction.
+	 * @param faction
+	 * @return
+	 */
 	public Set<FactionClaim> fromFaction(Faction faction) {
 		if (fullyLoadedFactionsClaims.contains(faction))
 			return claims.asMap().values().stream().filter(claim -> faction.equals(claim.getFaction())).collect(Collectors.toSet());
@@ -309,9 +329,10 @@ public class FactionClaimsManager implements Listener {
 		Prefix.FACTION.sendMessage(e.getPlayer(), "&cImpossible d'interagir avec les blocs dans ce claim !");
 	}*/
 
+	/*
 	@EventHandler
 	public void onChunkUnload(ChunkUnloadEvent event) {
 		claims.invalidate(event.getChunk());
-	}
+	}*/
 
 }
