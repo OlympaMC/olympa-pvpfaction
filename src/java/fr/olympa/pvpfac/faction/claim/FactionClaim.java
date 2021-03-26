@@ -24,13 +24,14 @@ public class FactionClaim {
 	
 	//public static final FactionClaim WILDERNESS = new FactionClaim(null, Integer.MAX_VALUE, Integer.MAX_VALUE, null, null, null);//new WildernessFactionClaim();
 	
-	private ChunkId chunkId;
+	//private ChunkId chunkId;
+	private int id;
 	private Faction faction;
 	private Map<Long, ClaimPermLevel> membersPlayers = new HashMap<Long, ClaimPermLevel>();
 	private Map<Integer, ClaimPermLevel[]> membersFactions = new HashMap<Integer, ClaimPermLevel[]>();
 
-	public FactionClaim(World world, int x, int z, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
-		this.chunkId = /*x == null || z == null ? null :*/ new ChunkId(world, x, z);
+	public FactionClaim(int id, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
+		this.id = id;
 		
 		faction = factionId == null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
 		//this.type = FactionClaimType.get(type);
@@ -46,6 +47,7 @@ public class FactionClaim {
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 
+	/*
 	public ChunkId getChunkId() {
 		return chunkId;
 	}
@@ -53,6 +55,10 @@ public class FactionClaim {
 	@SuppressWarnings("unlikely-arg-type")
 	public boolean isChunk(Chunk chunk) {
 		return chunkId.equals(chunk);
+	}*/
+	
+	public int getId() {
+		return id;
 	}
 	
 	public boolean setFaction(Faction faction) {		
@@ -102,15 +108,15 @@ public class FactionClaim {
 	}
 	
 	//for database saving only
-	public String getPlayersMembersToJson() {
-		return new Gson().toJson(membersPlayers.entrySet().stream()
+	public String getPlayersMembersToJson() {PvPFaction.getInstance().getFactionManager().getClan(1);
+		return membersPlayers.size() == 0 ? null : new Gson().toJson(membersPlayers.entrySet().stream()
 				.map(e -> new AbstractMap.SimpleEntry<Long, Integer>(e.getKey(), e.getValue().getLevel()))
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())), new TypeToken<Map<Long, Integer>>(){}.getType());
 	}
 	
 	//for database saving only
 	public String getFactionMembersToJson() {
-		return new Gson().toJson(membersFactions.entrySet().stream()
+		return membersFactions.size() == 0 ? null : new Gson().toJson(membersFactions.entrySet().stream()
 				.map(e -> new AbstractMap.SimpleEntry<Integer, Integer[]>(e.getKey(), (Integer[]) Stream.of(e.getValue()).map(perm -> perm.getLevel()).toArray()))
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())), new TypeToken<Map<Integer, Integer[]>>(){}.getType());
 	}
@@ -118,7 +124,7 @@ public class FactionClaim {
 	public boolean setPlayerLevel(FactionPlayer pf, ClaimPermLevel level) {
 		if (membersPlayers.containsKey(pf.getId()) && membersPlayers.get(pf.getId()) == level)
 			return false;
-		
+
 		/*if (level == ClaimPermLevel.LEVEL_NONE)
 			claimMembersPlayers.remove(pf.getId());
 		else*/
@@ -192,23 +198,24 @@ public class FactionClaim {
 	
 	public static final class ChunkId {
 
-		private World w;
+		//private World w;
 		private int x;
 		private int z;
 		
-		public ChunkId(World w, int x, int z) {
-			this.w = w;
+		public ChunkId(int x, int z) {
+			//this.w = w;
 			this.x = x;
 			this.z = z;
 		}
 		
 		public ChunkId(Chunk ch) {
-			this(ch.getWorld(), ch.getX(), ch.getZ());
+			this(ch.getX(), ch.getZ());
 		}
 		
+		/*
 		public World getWorld() {
 			return w;
-		}
+		}*/
 		
 		public int getX() {
 			return x;
@@ -222,6 +229,7 @@ public class FactionClaim {
 		 * Get chunk of this FactionChunk. Avoid usnig this method since it might load chunk synchronously to the main thread.
 		 * @return
 		 */
+		/*
 		@Deprecated
 		public Chunk getChunk() {
 			return w.getChunkAt(x, z);
@@ -229,12 +237,12 @@ public class FactionClaim {
 		
 		public void getChunk(Consumer<Chunk> callback) {
 			w.getChunkAtAsync(x, z, callback);
-		}
+		}*/
 		
 		@Override
 		public boolean equals(Object o) {
-			return o instanceof ChunkId ? ((ChunkId)o).w.getName().equals(this.w.getName()) && ((ChunkId)o).x == this.x && ((ChunkId)o).z == this.z :
-				o instanceof Chunk ? ((Chunk)o).getWorld().getName().equals(this.w.getName()) && ((Chunk)o).getX() == this.x && ((Chunk)o).getZ() == this.z :
+			return o instanceof ChunkId ? ((ChunkId)o).x == this.x && ((ChunkId)o).z == this.z :
+				o instanceof Chunk ? ((Chunk)o).getX() == this.x && ((Chunk)o).getZ() == this.z :
 					false;
 		}
 	}

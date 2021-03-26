@@ -9,6 +9,8 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.Powerable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -95,7 +97,7 @@ public class FactionClaimListener implements Listener {
 		Entity target = e.getEntity();
 		Entity damager = e.getDamager();
 		
-		if (damager instanceof Projectile && ((Projectile)damager).getShooter() instanceof Player)
+		if (damager instanceof Projectile)
 			damager = (Entity) ((Projectile)damager).getShooter();
 		
 		if (damager.getType() != EntityType.PLAYER)
@@ -110,21 +112,16 @@ public class FactionClaimListener implements Listener {
 			if (targetFp.getClan() != null && (targetFp.getClan().equals(damagerFp.getClan()) || targetFp.getClan().isAlly(damagerFp.getClan()))) {
 				Prefix.FACTION.sendMessage(damager, "§7On attaque pas le copain !");
 				e.setCancelled(true);
-				return;
 			}
 		}else if (claim != null) {
-			if (target.getType() == EntityType.ARMOR_STAND || target.getType() == EntityType.ITEM_FRAME || target.getType() == EntityType.PAINTING) {
-				if (!claim.getPlayerPerm(damagerFp).canBuild()) {
-					Prefix.FACTION.sendMessage(damager, "§7Tu ne peux pas détruire de porte armure, de cadre ou de tableau dans ce claim.");
-					e.setCancelled(true);
-					return;
-				}
-			}else
-				if (!claim.getPlayerPerm(damagerFp).canDamageEntities()) {
-					Prefix.FACTION.sendMessage(damager, "§7Tu ne peux pas attaquer d'entités dans ce claim.");
-					e.setCancelled(true);
-					return;
-				}
+			if (target.getType() == EntityType.ARMOR_STAND || target.getType() == EntityType.ITEM_FRAME || target.getType() == EntityType.PAINTING) 
+				manageClaimAction(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
+						ClaimPermLevel::canInterractContainers, 
+						"§cpas touche à ce qui ne t'appartient pas !");
+			else
+				manageClaimAction(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
+						ClaimPermLevel::canDamageEntities, 
+						"§7Tu ne peux pas attaquer d'entités dans ce claim.");
 		}	
 	}
 
@@ -183,12 +180,24 @@ public class FactionClaimListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onInterractBlock(PlayerInteractEvent e) {		
-		if (e.getClickedBlock() != null && e.getClickedBlock() instanceof Container && 
-				e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.getPlayer().isSneaking())
-
-		manageClaimAction(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
-				ClaimPermLevel::canInterractContainers, 
-				"§cpas touche à ce qui ne t'appartient pas !");
+		if (e.getClickedBlock() == null || 
+				e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getPlayer().isSneaking())
+			return;
+		
+		if (e.getClickedBlock() instanceof Container)
+			manageClaimAction(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
+					ClaimPermLevel::canInterractContainers, 
+					"§cPas touche à ce qui ne t'appartient pas !");
+		
+		if (e.getClickedBlock() instanceof Openable)
+			manageClaimAction(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
+					ClaimPermLevel::canInterractDoors, 
+					"§cTu ne peux pas passer par ici.");
+		
+		if (e.getClickedBlock() instanceof Powerable)
+			manageClaimAction(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
+					ClaimPermLevel::canInterractDoors, 
+					"§cTu ne peux pas activer de redstone dans ce claim.");
 	}
 	
 	@EventHandler(ignoreCancelled = true)
@@ -200,7 +209,10 @@ public class FactionClaimListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBreakItemframe(HangingBreakByEntityEvent e) {
-		if (e.getRemover() instanceof Player)
+		if (e.getRemover().getType() == EntityType.ARROW)
+			e.setCancelled(true);
+		
+		else if (e.getRemover() instanceof Player)
 			manageClaimAction(e.getEntity().getLocation(), (Player) e.getRemover(), e, 
 					ClaimPermLevel::canBuild, 
 					"§cTu ne peux pas prendre cet item.");
@@ -210,7 +222,7 @@ public class FactionClaimListener implements Listener {
 	public void onInterractItemframe(HangingPlaceEvent e) {
 		manageClaimAction(e.getEntity().getLocation(), e.getPlayer(), e, 
 				ClaimPermLevel::canBuild, 
-				"§cTu ne peux pas placer cet item ici.");
+				"§cTu ne peux pas placer ça ici.");
 	}
 	
 	
