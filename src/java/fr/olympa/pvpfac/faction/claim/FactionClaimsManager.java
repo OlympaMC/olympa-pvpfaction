@@ -55,7 +55,7 @@ public class FactionClaimsManager {
 	private static final OlympaStatement selectClaimsByFaction = new OlympaStatement(StatementType.SELECT, claimsTableName, new String[] { "faction_id" }, new String[] {});
 	//private static final OlympaStatement deleteClaimOfChunk = new OlympaStatement("DELETE FROM " + claimsTableName + " WHERE `id`= ?;");
 
-	private static final OlympaStatement createClaim = new OlympaStatement("INSERT INTO " + claimsTableName + " (`x`, `z`) VALUES (?, ?);").returnGeneratedKeys();
+	private static final OlympaStatement createClaim = new OlympaStatement("INSERT INTO " + claimsTableName + " (`x`, `z`, `faction_id`) VALUES (?, ?, ?);").returnGeneratedKeys();
 	private static final OlympaStatement updateClaim = new OlympaStatement("UPDATE " + claimsTableName + " SET `faction_id` = ?, `members_players` = ?, `members_factions` = ? WHERE `id` = ?;");
 	
 	private Set<Faction> fullyLoadedFactionsClaims = new HashSet<Faction>();
@@ -72,12 +72,12 @@ public class FactionClaimsManager {
 		try {
 			OlympaCore.getInstance().getDatabase().createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + claimsTableName + " (" +
 					//"  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT," +
-					"  `id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT," +
+					"  `id` INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT," +
 					"  `x` INT NOT NULL," +
 					"  `z` INT NOT NULL," +
-					"  `faction_id` INT," +
+					"  `faction_id` INT NOT NULL," +
 					"  `members_players` VARCHAR(255)," +
-					"  `faction_id` VARCHAR(255));");
+					"  `members_factions` VARCHAR(255));");
 		} catch (SQLException e) {
 			PvPFaction.getInstance().getLogger().severe("Unable to create " + claimsTableName + "table!!");
 			e.printStackTrace();
@@ -141,16 +141,16 @@ public class FactionClaimsManager {
 			//statement.setString(i++, claim.getChunkId().getWorld().toString());
 			//statement.setLong(i++, claim.getChunkId().getX());
 			//statement.setLong(i++, claim.getChunkId().getZ());
-			statement.setInt(i++, claim.getFaction().getID());
+			statement.setInt(i++, claim.getOwnerId());
 			statement.setString(i++, claim.getPlayersMembersToJson());
 			statement.setString(i++, claim.getFactionMembersToJson());
 			
-			statement.setInt(i++, claim.getId());
+			statement.setInt(i++, claim.getClaimId());
 			//statement.setString(i++, claim.getPlayersMembersToJson());
 			//statement.setString(i++, claim.getFactionMembersToJson());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			PvPFaction.getInstance().getLogger().warning("Failed to SAVE chunk " + claim.getId() + " as claim of " + claim.getFaction() == null ? "§4NONE" : claim.getFaction().getName());
+			PvPFaction.getInstance().getLogger().warning("Failed to SAVE chunk " + claim.getClaimId() + " as claim of " + claim.getFaction() == null ? "§4NONE" : claim.getFaction().getName());
 			e.printStackTrace();
 		}
 	}
@@ -196,6 +196,7 @@ public class FactionClaimsManager {
 				PreparedStatement create = createClaim.createStatement();
 				create.setInt(1, chunk.getX());
 				create.setInt(2, chunk.getZ());
+				create.setInt(3, FactionClaimType.WILDERNESS.getFakeFactionId());
 				
 				create.executeUpdate();
 				

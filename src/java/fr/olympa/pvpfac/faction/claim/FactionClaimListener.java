@@ -104,6 +104,12 @@ public class FactionClaimListener implements Listener {
 			return;
 
 		FactionPlayer damagerFp = AccountProvider.get(damager.getUniqueId());
+		FactionClaim damagerClaim = PvPFaction.getInstance().getClaimsManager().fromChunk(damager.getLocation().getChunk());
+		if (damagerClaim.getType() != null && !damagerClaim.getType().canPvp()) {
+			e.setCancelled(true);
+			return;
+		}
+		
 		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().fromChunk(e.getEntity().getLocation().getChunk());
 		
 		if (target.getType() == EntityType.PLAYER) {
@@ -117,7 +123,7 @@ public class FactionClaimListener implements Listener {
 			if (target.getType() == EntityType.ARMOR_STAND || target.getType() == EntityType.ITEM_FRAME || target.getType() == EntityType.PAINTING) 
 				manageClaimAction(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
 						ClaimPermLevel::canInterractContainers, 
-						"§cpas touche à ce qui ne t'appartient pas !");
+						"§cPas touche à ce qui ne t'appartient pas !");
 			else
 				manageClaimAction(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
 						ClaimPermLevel::canDamageEntities, 
@@ -128,10 +134,7 @@ public class FactionClaimListener implements Listener {
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
 		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().fromChunk(e.getEntity().getLocation().getChunk());
-		if (claim.getType() == null)
-			return;
-		
-		if (!claim.getType().canPvp())
+		if (claim.getType() != null && !claim.getType().canPvp())
 			e.setCancelled(true);
 	}
 	
@@ -146,8 +149,8 @@ public class FactionClaimListener implements Listener {
 		Faction faction = ((FactionPlayer)AccountProvider.get(p.getUniqueId())).getClan();
 		
 		//if (faction != null && faction.getOnlineFactionPlayers().stream().filter(player -> SpigotUtils.playerisIn(player.getPlayer(), location)).findFirst().isPresent()) {
-		if (faction != null && Bukkit.getOnlinePlayers().stream().filter(pl -> SpigotUtils.playerisIn(pl, location) && 
-				faction.isAlly(((FactionPlayer)AccountProvider.get(pl.getUniqueId())).getClan())).findFirst().isPresent()) {
+		if (faction != null && Bukkit.getOnlinePlayers().stream().anyMatch(pl -> SpigotUtils.playerisIn(pl, location) && 
+				faction.isAlly(((FactionPlayer)AccountProvider.get(pl.getUniqueId())).getClan()))) {
 			Prefix.FACTION.sendMessage(p, "Eh, brûle pas le collègue !");
 			event.setCancelled(true);
 			p.updateInventory();
@@ -189,7 +192,15 @@ public class FactionClaimListener implements Listener {
 	}
 	
 	@EventHandler(ignoreCancelled = true)
-	public void onInterractBlock(PlayerInteractEvent e) {		
+	public void onInterractBlock(PlayerInteractEvent e) {
+		if (e.getInteractionPoint() != null) {
+			FactionClaim claim = PvPFaction.getInstance().getClaimsManager().fromChunk(e.getInteractionPoint().getChunk());
+			if (claim.getType() != null && claim.getType().isProtected()) {
+				e.setCancelled(true);
+				return;
+			}
+		}
+		
 		if (e.getClickedBlock() == null || 
 				e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getPlayer().isSneaking())
 			return;

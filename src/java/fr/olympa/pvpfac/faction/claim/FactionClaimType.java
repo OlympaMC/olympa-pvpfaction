@@ -9,13 +9,13 @@ import fr.olympa.pvpfac.faction.Faction;
 
 public enum FactionClaimType {
 
-	WILDERNESS(null, "Zone Libre", "§aPvP ON, Pertes de Power ON, Mobs ON", ChatColor.DARK_GREEN, ClaimPermLevel.LEVEL_4, true, false),
+	WILDERNESS(0, "Zone Libre", "§aPvP ON, Pertes de Power ON, Mobs ON", ChatColor.DARK_GREEN, ClaimPermLevel.LEVEL_4, true, false),
 	SAFEZONE(-2, "Zone Sécurisée", "§aDégats OFF", ChatColor.GOLD, ClaimPermLevel.LEVEL_1, false, true),
 	WARNZONE(-3, "Zone PvP", "§cPvP ON, Pertes de Power OFF, Mobs OFF.", ChatColor.DARK_RED, ClaimPermLevel.LEVEL_1, true, true),
 	AP(-4, "Avants-Postes", "§eIci les APs !", ChatColor.AQUA, ClaimPermLevel.LEVEL_1, true, true),
 	SPAWN(-1, "Spawn", "", ChatColor.YELLOW, ClaimPermLevel.LEVEL_1, false, true);
 
-	private FactionClaimType(Integer fakeFactionId, String name, String description, ChatColor color, ClaimPermLevel defaultPermLevel, 
+	private FactionClaimType(int fakeFactionId, String name, String description, ChatColor color, ClaimPermLevel defaultPermLevel, 
 			boolean canPvp, boolean isProtected) {
 		this.fakeFactionId = fakeFactionId;
 		this.name = name;
@@ -26,7 +26,7 @@ public enum FactionClaimType {
 		this.isProtected = isProtected;
 	}
 
-	private Integer fakeFactionId;
+	private int fakeFactionId;
 	private String name;
 	private String description;
 	private ChatColor color;
@@ -42,7 +42,7 @@ public enum FactionClaimType {
 		return Arrays.stream(FactionClaimType.values()).filter(f -> f.getFakeFactionId() == id).findFirst().orElse(null);
 	}
 
-	public Integer getFakeFactionId() {
+	public int getFakeFactionId() {
 		return fakeFactionId;
 	}
 	

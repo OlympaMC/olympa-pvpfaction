@@ -22,21 +22,20 @@ import fr.olympa.pvpfac.player.FactionPlayer;
 
 public class FactionClaim {
 	
-	//public static final FactionClaim WILDERNESS = new FactionClaim(null, Integer.MAX_VALUE, Integer.MAX_VALUE, null, null, null);//new WildernessFactionClaim();
-	
-	//private ChunkId chunkId;
-	private int id;
-	private Integer factionId;
+	private int claimId;
+	private Faction faction;
 	private FactionClaimType type;
 	
-	private Map<Long, ClaimPermLevel> membersPlayers = new HashMap<Long, ClaimPermLevel>();
-	private Map<Integer, ClaimPermLevel[]> membersFactions = new HashMap<Integer, ClaimPermLevel[]>();
+	private Map<Long, ClaimPermLevel> membersPlayers;
+	private Map<Integer, ClaimPermLevel[]> membersFactions;
 
-	public FactionClaim(int id, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
-		this.id = id;
-		this.type = FactionClaimType.getFromFakeId(factionId); 
+	public FactionClaim(int claimId, int factionId, String playersMembersAsJson, String factionsMembersAsJson) {
+		this.claimId = claimId;
+		this.type = factionId <= 0 ? FactionClaimType.getFromFakeId(factionId) : null;
+		this.faction = type == null ? PvPFaction.getInstance().getFactionManager().getClan(factionId) : null;
 				
-		this.factionId = factionId; //== null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
+		//this.factionId = factionId == null || factionId < 0 ? FactionClaimType.getFromFakeId(factionId) : PvPFaction.getInstance().getFactionManager().getClan(factionId); //== null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
+		
 		//this.type = FactionClaimType.get(type);
 		this.membersPlayers = playersMembersAsJson == null || playersMembersAsJson.length() <= 2? new HashMap<Long, ClaimPermLevel>() : 
 			((Map<Long, Integer>)new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Long, Integer>>(){}.getType())).entrySet()
@@ -60,29 +59,37 @@ public class FactionClaim {
 		return chunkId.equals(chunk);
 	}*/
 	
-	public int getId() {
-		return id;
+	public int getClaimId() {
+		return claimId;
 	}
 	
-	public Integer getOwnerId() {
-		return factionId;
+	public int getOwnerId() {
+		return type == null ? faction.getID() : type.getFakeFactionId();
 	}
 	
-	public void setType(FactionClaimType type) {
-		factionId = type == null ? null : type.getFakeFactionId();
+	public boolean setType(FactionClaimType type) {
+		if (this.type == type)
+			return false;
+		
+		faction = null;
+		this.type = type; 
 		membersFactions.clear();
 		membersPlayers.clear();
 
 		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
+		
+		return true;
 	}
 	
 	public boolean setFaction(Faction faction) {
-		if (faction == null && getFaction() != null) {
-			setType(FactionClaimType.WILDERNESS);
-			return true;
-		}
-			
-		this.factionId = faction.getID();
+		if (faction == null) 
+			return setType(FactionClaimType.WILDERNESS);
+		
+		if (this.faction.equals(faction))
+			return false;
+		
+		type = null;
+		this.faction = faction;
 		membersPlayers.clear();
 		membersFactions.clear();
 		
@@ -92,37 +99,26 @@ public class FactionClaim {
 	}
 
 	public Faction getFaction() {
-		return factionId == null || factionId < 0 ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
+		return faction;
 	}
 	
 	public FactionClaimType getType() {
-		return FactionClaimType.getFromFakeId(factionId);
+		return type;
 	}
 
 	public boolean isOverClaimable() {
-		if (FactionClaimType.getFromFakeId(factionId) != null)
-			return !FactionClaimType.getFromFakeId(factionId).isProtected();
-		else
-			return PvPFaction.getInstance().getFactionManager().getClan(factionId).isOverClaimable();// && PvPFaction.getInstance().getClaimsManager().getChunksAround(chunkId.getChunk()).stream().anyMatch(c -> !faction.hasClaim(c));
+			return faction == null ? !type.isProtected() : faction.isOverClaimable();// && PvPFaction.getInstance().getClaimsManager().getChunksAround(chunkId.getChunk()).stream().anyMatch(c -> !faction.hasClaim(c));
 	}
 
 	public void sendTitle(Player player) {
-		Faction faction = PvPFaction.getInstance().getFactionManager().getClan(factionId);
-		
 		if (faction != null)
 			player.sendTitle(faction.getNameColored(player.getUniqueId()), "§7" + faction.getDescription(), 0, 20, 20);
-		else if (FactionClaimType.getFromFakeId(factionId) != null)
-			FactionClaimType.getFromFakeId(factionId).sendTitle(player);
-		else
-			player.sendTitle("§2Wilderness", "§aZone sans aucune restriction", 0, 20, 20);
-
+		else 
+			type.sendTitle(player);
 	}
 
 	public boolean hasSameFaction(FactionClaim claim) {
 		return claim.getOwnerId() == getOwnerId();
-		/*if (faction != null)
-			return claim.getFaction() != null && faction.isSameClan(claim.getFaction());
-		return claim.getFaction() == null;// && getType() == claim.getType();*/
 	}
 	
 	//for database saving only
@@ -189,11 +185,8 @@ public class FactionClaim {
 	
 	
 	public ClaimPermLevel getPlayerPerm(FactionPlayer pf) {
-		FactionClaimType type = FactionClaimType.getFromFakeId(factionId);
 		if (type != null)
 			return type.getDefaultPermLevel();
-
-		Faction faction = PvPFaction.getInstance().getFactionManager().getClan(factionId);
 		
 		return membersPlayers.size() > 0 ? 
 				membersPlayers.containsKey(pf.getId()) ?
