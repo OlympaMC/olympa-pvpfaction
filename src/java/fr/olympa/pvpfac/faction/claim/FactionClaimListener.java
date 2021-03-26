@@ -1,7 +1,5 @@
 package fr.olympa.pvpfac.faction.claim;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.function.Function;
 
 import org.bukkit.Bukkit;
@@ -16,24 +14,27 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.CauldronLevelChangeEvent;
+import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.hanging.HangingEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketEvent;
-import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -43,7 +44,6 @@ import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.player.FactionPlayer;
-import net.citizensnpcs.api.npc.BlockBreaker;
 
 public class FactionClaimListener implements Listener {
 
@@ -92,7 +92,7 @@ public class FactionClaimListener implements Listener {
 	//                     DAMAGE EVENTS                       //
 	/////////////////////////////////////////////////////////////
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onDamageByEntity(EntityDamageByEntityEvent e) {		
 		Entity target = e.getEntity();
 		Entity damager = e.getDamager();
@@ -125,6 +125,16 @@ public class FactionClaimListener implements Listener {
 		}	
 	}
 
+	@EventHandler
+	public void onDamage(EntityDamageEvent e) {
+		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().fromChunk(e.getEntity().getLocation().getChunk());
+		if (claim.getType() == null)
+			return;
+		
+		if (!claim.getType().canPvp())
+			e.setCancelled(true);
+	}
+	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
 		Player p = event.getPlayer();
@@ -197,7 +207,7 @@ public class FactionClaimListener implements Listener {
 		if (e.getClickedBlock() instanceof Powerable)
 			manageClaimAction(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
 					ClaimPermLevel::canInterractDoors, 
-					"§cTu ne peux pas activer de redstone dans ce claim.");
+					"§cTu ne peux pas activer de redstone dans cette zone.");
 	}
 	
 	@EventHandler(ignoreCancelled = true)
@@ -226,10 +236,56 @@ public class FactionClaimListener implements Listener {
 	}
 	
 	
+
+
+	/////////////////////////////////////////////////////////////
+	//                 PROTECTED CHUNK EVENTS                  //
+	/////////////////////////////////////////////////////////////
+
+	@EventHandler
+	public void onBlockFade(BlockFadeEvent e) {
+		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+	}
+	
+	@EventHandler
+	public void onBlockExplode(BlockExplodeEvent e) {
+		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+	}
+
+	@EventHandler
+	public void onBlockFade(BlockBurnEvent e) {
+		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+	}
+
+	@EventHandler
+	public void onBlockFade(CauldronLevelChangeEvent e) {
+		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+	}
+
+	@EventHandler
+	public void onBlockFade(LeavesDecayEvent e) {
+		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+	}
+	
+	@EventHandler
+	public void onEntitySpawn(CreatureSpawnEvent e) {
+		if (e.getSpawnReason() == SpawnReason.CUSTOM)
+			return;
+		
+		cancelIfChunkProtected(e.getLocation(), e);
+	}
 	
 	
 	
 	
+	private void cancelIfChunkProtected(Location loc, Cancellable e) {
+		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().fromChunk(loc.getChunk());
+		if (claim.getType() == null)
+			return;
+		
+		if (claim.getType().isProtected())
+			e.setCancelled(true);
+	}
 	
 	private void manageClaimAction(Location loc, Player p, Cancellable event, Function<ClaimPermLevel, Boolean> method, String denyMessage, Object...args) {
 		if (!method.apply(PvPFaction.getInstance().getClaimsManager().fromChunk(loc.getChunk()).getPlayerPerm(AccountProvider.get(p.getUniqueId())))) {

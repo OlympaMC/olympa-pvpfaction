@@ -124,11 +124,11 @@ public class FactionClaimsManager {
 	/**
 	 * Detete all claims of a faction. Should be used for faction disband for example.
 	 * @param faction
-	 
+	 */
 	public void deleteClaims(Faction faction) {
-		fromFaction(faction).forEach(claim -> claim.setFaction(null));
+		fromFaction(faction).forEach(claim -> claim.setType(FactionClaimType.WILDERNESS));
 		fullyLoadedFactionsClaims.remove(faction);
-	}*/
+	}
 	
 	/**
 	 * Update claim in database for any reason. Direct modification of FactionClaims execute update automatically. 
@@ -206,7 +206,7 @@ public class FactionClaimsManager {
 				
 				try(ResultSet result = create.getGeneratedKeys()){
 					if (result.next())
-						claims.put(new ChunkId(chunk), claim = new FactionClaim(result.getInt(1), null, null, null));
+						claims.put(new ChunkId(chunk), claim = new FactionClaim(result.getInt(1), FactionClaimType.WILDERNESS.getFakeFactionId(), null, null));
 				}
 			}
 			return claim;

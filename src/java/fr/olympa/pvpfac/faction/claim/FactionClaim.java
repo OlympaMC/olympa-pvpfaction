@@ -26,14 +26,17 @@ public class FactionClaim {
 	
 	//private ChunkId chunkId;
 	private int id;
-	private Faction faction;
+	private Integer factionId;
+	private FactionClaimType type;
+	
 	private Map<Long, ClaimPermLevel> membersPlayers = new HashMap<Long, ClaimPermLevel>();
 	private Map<Integer, ClaimPermLevel[]> membersFactions = new HashMap<Integer, ClaimPermLevel[]>();
 
 	public FactionClaim(int id, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
 		this.id = id;
-		
-		faction = factionId == null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
+		this.type = FactionClaimType.getFromFakeId(factionId); 
+				
+		this.factionId = factionId; //== null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
 		//this.type = FactionClaimType.get(type);
 		this.membersPlayers = playersMembersAsJson == null || playersMembersAsJson.length() <= 2? new HashMap<Long, ClaimPermLevel>() : 
 			((Map<Long, Integer>)new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Long, Integer>>(){}.getType())).entrySet()
@@ -61,11 +64,25 @@ public class FactionClaim {
 		return id;
 	}
 	
-	public boolean setFaction(Faction faction) {		
-		if ((faction == null && getFaction() == null) || faction.equals(getFaction()))
-			return false;
-		
-		this.faction = faction;
+	public Integer getOwnerId() {
+		return factionId;
+	}
+	
+	public void setType(FactionClaimType type) {
+		factionId = type == null ? null : type.getFakeFactionId();
+		membersFactions.clear();
+		membersPlayers.clear();
+
+		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
+	}
+	
+	public boolean setFaction(Faction faction) {
+		if (faction == null && getFaction() != null) {
+			setType(FactionClaimType.WILDERNESS);
+			return true;
+		}
+			
+		this.factionId = faction.getID();
 		membersPlayers.clear();
 		membersFactions.clear();
 		
@@ -75,33 +92,34 @@ public class FactionClaim {
 	}
 
 	public Faction getFaction() {
-		return faction;
+		return factionId == null || factionId < 0 ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
+	}
+	
+	public FactionClaimType getType() {
+		return FactionClaimType.getFromFakeId(factionId);
 	}
 
 	public boolean isOverClaimable() {
-		if (faction == null)
-			return true;
-		return faction.isOverClaimable();// && PvPFaction.getInstance().getClaimsManager().getChunksAround(chunkId.getChunk()).stream().anyMatch(c -> !faction.hasClaim(c));
+		if (FactionClaimType.getFromFakeId(factionId) != null)
+			return !FactionClaimType.getFromFakeId(factionId).isProtected();
+		else
+			return PvPFaction.getInstance().getFactionManager().getClan(factionId).isOverClaimable();// && PvPFaction.getInstance().getClaimsManager().getChunksAround(chunkId.getChunk()).stream().anyMatch(c -> !faction.hasClaim(c));
 	}
 
 	public void sendTitle(Player player) {
+		Faction faction = PvPFaction.getInstance().getFactionManager().getClan(factionId);
+		
 		if (faction != null)
 			player.sendTitle(faction.getNameColored(player.getUniqueId()), "§7" + faction.getDescription(), 0, 20, 20);
+		else if (FactionClaimType.getFromFakeId(factionId) != null)
+			FactionClaimType.getFromFakeId(factionId).sendTitle(player);
 		else
 			player.sendTitle("§2Wilderness", "§aZone sans aucune restriction", 0, 20, 20);
 
 	}
 
-	public String getFactionNameColored() {
-		if (faction != null)
-			return ChatColor.DARK_RED + faction.getName();
-		return "§6Wilderness";
-	}
-
 	public boolean hasSameFaction(FactionClaim claim) {
-		return faction == null ?
-				claim.getFaction() == null :
-				faction.getID() == claim.getFaction().getID();
+		return claim.getOwnerId() == getOwnerId();
 		/*if (faction != null)
 			return claim.getFaction() != null && faction.isSameClan(claim.getFaction());
 		return claim.getFaction() == null;// && getType() == claim.getType();*/
@@ -162,7 +180,7 @@ public class FactionClaim {
 				perms[i] = level;
 		
 		//si aucun grade dans la fac n'a de permission, on retire la fac de la liste
-		if (Stream.of(membersFactions.get(factionId)).filter(perm -> perm != ClaimPermLevel.LEVEL_NONE).findFirst().isEmpty())
+		if (Stream.of(membersFactions.get(factionId)).anyMatch(perm -> perm != ClaimPermLevel.LEVEL_NONE))
 			membersFactions.remove(factionId);
 		
 		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
@@ -171,22 +189,25 @@ public class FactionClaim {
 	
 	
 	public ClaimPermLevel getPlayerPerm(FactionPlayer pf) {
-		if (faction == null)
-			return ClaimPermLevel.LEVEL_4;
-		else
-			return membersPlayers.size() > 0 ? 
-					membersPlayers.containsKey(pf.getId()) ?
-							membersPlayers.get(pf.getId()) :
-							ClaimPermLevel.LEVEL_NONE :
-					pf.getClan() == null ?
-							ClaimPermLevel.LEVEL_NONE :
-							pf.getClan().equals(faction) ?
-									faction.getMember(pf.getInformation()).getRole().getPlayerClaimLevel() :
-									membersFactions.containsKey(-1) && pf.getClan().isAlly(faction) ? 
-											membersFactions.get(-1)[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
-											membersFactions.containsKey(pf.getClan().getID()) ?
-													membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
-													ClaimPermLevel.LEVEL_NONE;
+		FactionClaimType type = FactionClaimType.getFromFakeId(factionId);
+		if (type != null)
+			return type.getDefaultPermLevel();
+
+		Faction faction = PvPFaction.getInstance().getFactionManager().getClan(factionId);
+		
+		return membersPlayers.size() > 0 ? 
+				membersPlayers.containsKey(pf.getId()) ?
+						membersPlayers.get(pf.getId()) :
+						ClaimPermLevel.LEVEL_NONE :
+				pf.getClan() == null ?
+						ClaimPermLevel.LEVEL_NONE :
+						membersFactions.containsKey(-1) && pf.getClan().isAlly(faction) ? 
+								membersFactions.get(-1)[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
+								membersFactions.containsKey(pf.getClan().getID()) ?
+										membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
+										pf.getClan().equals(faction) ?
+												faction.getMember(pf.getInformation()).getRole().getPlayerClaimLevel() :
+												ClaimPermLevel.LEVEL_NONE;
 	}
 	
 	/*private static class WildernessFactionClaim extends FactionClaim {
