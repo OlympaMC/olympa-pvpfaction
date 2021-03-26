@@ -185,22 +185,19 @@ public class FactionClaim {
 	
 	
 	public ClaimPermLevel getPlayerPerm(FactionPlayer pf) {
-		if (type != null)
-			return type.getDefaultPermLevel();
-		
-		return membersPlayers.size() > 0 ? 
-				membersPlayers.containsKey(pf.getId()) ?
+		return type != null ?
+				type.getDefaultPermLevel() : 
+				membersPlayers.containsKey(pf.getId()) ? 
 						membersPlayers.get(pf.getId()) :
-						ClaimPermLevel.LEVEL_NONE :
-				pf.getClan() == null ?
-						ClaimPermLevel.LEVEL_NONE :
-						membersFactions.containsKey(-1) && pf.getClan().isAlly(faction) ? 
-								membersFactions.get(-1)[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
-								membersFactions.containsKey(pf.getClan().getID()) ?
-										membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
-										pf.getClan().equals(faction) ?
-												faction.getMember(pf.getInformation()).getRole().getPlayerClaimLevel() :
-												ClaimPermLevel.LEVEL_NONE;
+						pf.getClan() == null ?
+								ClaimPermLevel.LEVEL_NONE :
+								membersFactions.containsKey(-1) && pf.getClan().isAlly(faction) ? 
+										membersFactions.get(-1)[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
+										membersFactions.containsKey(pf.getClan().getID()) ?
+												membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight] :
+												pf.getClan().equals(faction) ?
+														faction.getMember(pf.getInformation()).getRole().getPlayerClaimLevel() :
+														ClaimPermLevel.LEVEL_NONE;
 	}
 	
 	/*private static class WildernessFactionClaim extends FactionClaim {
