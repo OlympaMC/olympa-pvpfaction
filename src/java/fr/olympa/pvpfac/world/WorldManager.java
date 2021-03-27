@@ -141,7 +141,7 @@ public class WorldManager {
 		
 		public void tpPlayerRandom(Player p, int minRadius, int radius) {
 			ThreadLocalRandom r = ThreadLocalRandom.current();
-			
+			 
 			world.getChunkAtAsync(
 					r.nextBoolean() ? r.nextInt(minRadius, radius + 1) : -r.nextInt(minRadius, radius + 1), 
 					r.nextBoolean() ? r.nextInt(minRadius, radius + 1) : -r.nextInt(minRadius, radius + 1), 
