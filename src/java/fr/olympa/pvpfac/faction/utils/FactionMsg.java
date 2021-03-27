@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 import fr.olympa.api.chat.ColorUtils;
 import fr.olympa.api.utils.Prefix;
-import fr.olympa.pvpfac.faction.Faction;
 
 public class FactionMsg {
 
@@ -28,12 +27,4 @@ public class FactionMsg {
 	//	public static boolean youHaveNoFaction(Player player) {
 	//		return youHaveNoFaction(player, ((FactionPlayer) AccountProvider.get(player.getUniqueId())).getFaction());
 	//	}
-
-	public static boolean youHaveNoFaction(Player player, Faction faction) {
-		if (faction == null) {
-			player.sendMessage(ColorUtils.color(Prefix.DEFAULT_BAD + "Tu n'as pas de faction."));
-			return true;
-		}
-		return false;
-	}
 }
