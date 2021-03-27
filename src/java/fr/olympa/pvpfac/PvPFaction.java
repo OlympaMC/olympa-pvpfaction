@@ -31,6 +31,7 @@ import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
+import fr.olympa.pvpfac.world.WorldManager;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -41,9 +42,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 	}
 
 	public ScoreboardManager<FactionPlayer> scoreboards;
-	public FactionManager factionManager;
-	public FactionClaimsManager claimsManager;
+	private FactionManager factionManager;
+	private FactionClaimsManager claimsManager;
 	private TaxManager taxManager;
+	private WorldManager worldManager;
 
 	public FactionManager getFactionManager() {
 		return factionManager;
@@ -51,6 +53,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 	public FactionClaimsManager getClaimsManager() {
 		return claimsManager;
+	}
+
+	public WorldManager getWorldManager() {
+		return worldManager;
 	}
 
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
@@ -93,6 +99,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new AutoMapListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 			claimsManager = new FactionClaimsManager();
+			worldManager = new WorldManager(this);
+			
 			//			pluginManager.registerEvents(new Test(), this);
 			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
 		} catch (Exception ex) {

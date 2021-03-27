@@ -17,7 +17,7 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 	public FactionPlayerData(OlympaPlayerInformations informations, FactionRole role) {
 		super(informations);
 		this.role = new ObservableValue<>(role);
-		this.role.observe("updateSQL", () -> PvPFaction.getInstance().factionManager.roleColumn.updateAsync(this, this.role.get().ordinal(), null, null));
+		this.role.observe("updateSQL", () -> PvPFaction.getInstance().getFactionManager().roleColumn.updateAsync(this, this.role.get().ordinal(), null, null));
 	}
 
 	public FactionRole getRole() {

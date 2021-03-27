@@ -5,9 +5,16 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.ChunkPopulateEvent;
 
-public class OreListener implements Listener {
+import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.world.WorldManager.WorldType;
+
+public class WorldsListener implements Listener {
 	
 	@EventHandler
 	public void onChunkPopulate(ChunkPopulateEvent event) {
@@ -30,4 +37,25 @@ public class OreListener implements Listener {
 			System.out.println(i + " ores in chunk X: " + chunk.getX() + " Z: " + chunk.getZ() + " (" + (System.currentTimeMillis() - time) + "ms)");
 			//});
 	}
+	
+	@EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent e) {
+		e.setRespawnLocation(WorldType.OVERWORLD.getWorld().getSpawnLocation());
+	}
+	
+	@EventHandler
+	public void onPortalEnterEntity(EntityPortalEvent e) {
+		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPortalEnterPlayer(PlayerPortalEvent e) {
+		e.setCancelled(true);
+	}
 }
+
+
+
+
+
+
