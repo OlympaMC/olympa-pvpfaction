@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -64,6 +65,9 @@ public class WorldManager {
 			type.setWorld(new WorldCreator(type.getWorldName()).environment(type.getType()).createWorld());
 			type.getWorld().setPVP(type.canPvp());
 			type.getWorld().setDifficulty(Difficulty.NORMAL);
+			type.getWorld().setGameRule(GameRule.DISABLE_RAIDS, false);
+			type.getWorld().setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+			type.getWorld().setGameRule(GameRule.DO_TRADER_SPAWNING, false);
 			
 			//preload chunks in min radius
 			for (int x = -loadChunks ; x <= loadChunks ; x++)
