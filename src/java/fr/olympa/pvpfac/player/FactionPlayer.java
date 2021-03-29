@@ -20,7 +20,6 @@ import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.api.sql.SQLColumn;
 import fr.olympa.api.utils.observable.ObservableInt;
 import fr.olympa.pvpfac.faction.Faction;
-import fr.olympa.pvpfac.faction.FactionPlayerData;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 
 public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction, FactionPlayerData>, EnderChestPlayerInterface {

@@ -1,9 +1,10 @@
-package fr.olympa.pvpfac.faction;
+package fr.olympa.pvpfac.player;
 
 import fr.olympa.api.clans.ClanPlayerData;
 import fr.olympa.api.player.OlympaPlayerInformations;
 import fr.olympa.api.utils.observable.ObservableValue;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.claim.ClaimPermLevel;
 
 public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData> {

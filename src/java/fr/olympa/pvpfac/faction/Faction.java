@@ -28,6 +28,7 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.player.FactionPlayer;
+import fr.olympa.pvpfac.player.FactionPlayerData;
 
 public class Faction extends Clan<Faction, FactionPlayerData> {
 	

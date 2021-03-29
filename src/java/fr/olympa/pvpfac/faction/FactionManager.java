@@ -14,8 +14,9 @@ import fr.olympa.api.sql.SQLColumn;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
-import fr.olympa.pvpfac.faction.FactionPlayerData.FactionRole;
 import fr.olympa.pvpfac.faction.gui.FactionManagementGUI;
+import fr.olympa.pvpfac.player.FactionPlayerData;
+import fr.olympa.pvpfac.player.FactionPlayerData.FactionRole;
 
 public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 

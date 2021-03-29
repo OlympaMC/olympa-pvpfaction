@@ -4,7 +4,7 @@ import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
 import fr.olympa.api.clans.gui.ClanManagementGUI;
 import fr.olympa.pvpfac.faction.Faction;
-import fr.olympa.pvpfac.faction.FactionPlayerData;
+import fr.olympa.pvpfac.player.FactionPlayerData;
 
 public class FactionManagementGUI extends ClanManagementGUI<Faction, FactionPlayerData> {
 
