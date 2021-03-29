@@ -54,19 +54,24 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	String description;
 	Location home;
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String tag, OlympaPlayerInformations chief, int maxSize) {
-		super(manager, id, name, tag, chief, maxSize);
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
+		super(manager, id, name, chief, maxSize);
 	}
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String tag, String description, OlympaPlayerInformations chief) {
-		super(manager, id, name, tag, chief, manager.defaultMaxSize);
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String description, OlympaPlayerInformations chief) {
+		super(manager, id, name, chief, manager.defaultMaxSize);
 		this.description = description;
 	}
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String tag, OlympaPlayerInformations chief, int maxSize, double money, long created, String description, Location home) {
-		super(manager, id, name, tag, chief, maxSize, money, created);
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home) {
+		super(manager, id, name, chief, maxSize, money, created);
+		this.tag = tag;
 		this.description = description;
 		this.home = home;
+	}
+
+	public String getTag() {
+		return tag;
 	}
 
 	public String getDescription() {
@@ -94,11 +99,11 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	// TODO Optimize getByFaction
 	public Set<FactionClaim> getClaims() {
-		return PvPFaction.getInstance().getClaimsManager().fromFaction(this);
+		return PvPFaction.getInstance().getClaimsManager().ofFaction(this);
 	}
 
 	public boolean hasClaim(Chunk chunk) {
-		return hasClaim(PvPFaction.getInstance().getClaimsManager().fromChunk(chunk));
+		return hasClaim(PvPFaction.getInstance().getClaimsManager().ofChunk(chunk));
 	}
 
 	public boolean hasClaim(FactionClaim chunk) {
@@ -158,6 +163,14 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return getClaims().size() + "/" + getPower() + "/" + getMaxPower();
 	}
 
+	public boolean updateTag(String tag) {
+		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find())
+			return false;
+		getFactionManager().tagColumn.updateAsync(this, tag, null, null);
+		this.tag = tag;
+		return true;
+	}
+
 	public boolean updateDescription(String description) {
 		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find())
 			return false;
@@ -172,6 +185,10 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	public String getNameColored(Faction clan) {
 		return (clan != null && clan.getID() == id ? ChatColor.GREEN : ChatColor.RED) + getName();
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	public void setDescription(String description) {

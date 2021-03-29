@@ -26,6 +26,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected SQLColumn<Faction> truceColumn;
 	protected SQLColumn<Faction> allyColumn;
 	protected SQLColumn<Faction> descriptionColumn;
+	protected SQLColumn<Faction> tagColumn;
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions", 10);
@@ -64,7 +65,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringPlayerLeave = "Le joueur %s a quitté la faction.";
 		stringPlayerJoin = "Le joueur %s rejoint la faction.";
 		stringNameChange = "La faction a changé de nom pour s'appeler %s.";
-		stringTagChange = "La faction a changé de tag et devient [%s] !";
 		stringSureDisband = "§7Veux-tu vraiment supprimer la faction ?";
 		stringSureChief = "§7Veux-tu vraiment donner la direction au joueur %s ?";
 		stringSureKick = "§7Veux-tu vraiment éjecter le joueur %s ?";
@@ -77,8 +77,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringAddedMoney = "Tu viens d'ajouter %s à la cagnotte de la faction !";
 		stringItemLeaveChiefLore = new String[] { "§7§oPour pouvoir quitter votre faction,", "§7§ovous devez tout d'abord", "§7§otransmettre la direction de celle-ci", "§7§oà un autre membre." };
 		stringClanNameTooLong = "Le nom d'une faction ne peut pas excéder %d caractères !";
-		stringClanNameTooShort = "Le nom d'une faction ne peut pas faire moins de %d caractères !";
-		stringClanNameInvalid = "Le nom de la faction est invalide...";
 		stringItemDisband = "§cDémenteler la faction";
 	}
 
@@ -88,13 +86,13 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	}
 
 	@Override
-	protected Faction createClan(int id, String name, String tag, OlympaPlayerInformations chief, int maxSize) {
-		return new Faction(this, id, name, tag, chief, maxSize);
+	protected Faction createClan(int id, String name, OlympaPlayerInformations chief, int maxSize) {
+		return new Faction(this, id, name, chief, maxSize);
 	}
 
 	@Override
-	protected Faction provideClan(int id, String name, String tag, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
-		return new Faction(this, id, name, tag, chief, maxSize, money, created, resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")));
+	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
+		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")));
 	}
 
 	@Override
@@ -110,6 +108,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	@Override
 	public List<SQLColumn<Faction>> addDBClansCollums(List<SQLColumn<Faction>> columns) {
 		columns = super.addDBClansCollums(columns);
+		columns.add(tagColumn = new SQLColumn<Faction>("tag", "VARCHAR(6) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
 		columns.add(descriptionColumn = new SQLColumn<Faction>("description", "VARCHAR(100) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
 		columns.add(allyColumn = new SQLColumn<Faction>("ally", "TEXT(65535) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());
 		columns.add(truceColumn = new SQLColumn<Faction>("truce", "TEXT(65535) NULL DEFAULT NULL", Types.VARCHAR).setUpdatable());

@@ -21,7 +21,6 @@ import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
-import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.pvpfac.armorstand.ArmorStandWithHandListener;
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
@@ -31,7 +30,6 @@ import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
-import fr.olympa.pvpfac.world.WorldManager;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -42,10 +40,9 @@ public class PvPFaction extends OlympaAPIPlugin {
 	}
 
 	public ScoreboardManager<FactionPlayer> scoreboards;
-	private FactionManager factionManager;
-	private FactionClaimsManager claimsManager;
+	public FactionManager factionManager;
+	public FactionClaimsManager claimsManager;
 	private TaxManager taxManager;
-	private WorldManager worldManager;
 
 	public FactionManager getFactionManager() {
 		return factionManager;
@@ -53,10 +50,6 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 	public FactionClaimsManager getClaimsManager() {
 		return claimsManager;
-	}
-
-	public WorldManager getWorldManager() {
-		return worldManager;
 	}
 
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
@@ -98,9 +91,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new FactionPowerListener(), this);
 			pluginManager.registerEvents(new AutoMapListener(), this);
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
-			claimsManager = new FactionClaimsManager();
-			worldManager = new WorldManager(this);
-			
+			pluginManager.registerEvents(claimsManager = new FactionClaimsManager(), this);
 			//			pluginManager.registerEvents(new Test(), this);
 			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
 		} catch (Exception ex) {
@@ -115,8 +106,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
 
-		//OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
-
+		// Not needed now ? OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,
 				lineMoney,

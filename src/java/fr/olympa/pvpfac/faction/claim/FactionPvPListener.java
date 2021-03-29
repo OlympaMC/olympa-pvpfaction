@@ -52,7 +52,7 @@ public class FactionPvPListener implements Listener {
 			return;
 		if (!victimfaction.isSameClan(attackerfaction)) {
 			Chunk victimChunk = victim.getLocation().getChunk();
-			FactionClaim factionClaim = PvPFaction.getInstance().getClaimsManager().fromChunk(victimChunk);
+			FactionClaim factionClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(victimChunk);
 			if (factionClaim == null) {
 				Prefix.FACTION.sendMessage(attacker, "&4Impossible de charger le claim.");
 				event.setCancelled(false);

@@ -37,7 +37,7 @@ public class FactionChatListener implements Listener {
 			break;
 		case GENERAL:
 			if (factionPlayer.getClan() != null)
-				event.setFormat("§7[" + factionPlayer.getClan().getTag() + "] §r" + factionPlayer.getGroupNameColored() + " %s §r§7: %s");
+				event.setFormat("§7[" + factionPlayer.getClan().getName() + "] §r" + factionPlayer.getGroupNameColored() + " %s §r§7: %s");
 		default:
 			return;
 		}
