@@ -27,6 +27,7 @@ import fr.olympa.pvpfac.player.FactionPlayer;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
@@ -156,8 +157,8 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		try {
 			if (!claim.isOverClaimable()) {
 				TextComponent text = new TextComponent(TextComponent.fromLegacyText("§cImpossible de &lsur&cclaim le chunk de la faction §4%s&c.".replace("%s", claim.getFactionNameColored())));
-				text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(
-						"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entouré de claims §nuniquement§e de la même faction.")));
+				text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(
+						"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entouré de claims §nuniquement§e de la même faction."))));
 				sendComponents(text);
 				return;
 			}
