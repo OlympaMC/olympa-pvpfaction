@@ -29,6 +29,14 @@ public class FactionClaimsManager implements Listener {
 
 	private static final String tableName = "`pvpfac_claims`";
 
+	private static final SQLColumn<FactionClaim> COLUMN_ID = new SQLColumn<FactionClaim>("id", "INT(20) unsigned NOT NULL AUTO_INCREMENT", Types.INTEGER).setPrimaryKey(FactionClaim::getClaimId);
+	private static final SQLColumn<FactionClaim> COLUMN_X = new SQLColumn<>("x", "INT(20) NULL DEFAULT NULL", Types.INTEGER);
+	private static final SQLColumn<FactionClaim> COLUMN_Z = new SQLColumn<>("z", "INT(20) NULL DEFAULT NULL", Types.INTEGER);
+	private static final SQLColumn<FactionClaim> COLUMN_FACTION_ID = new SQLColumn<>("faction_id", "INT(10) UNSIGNED NULL DEFAULT NULL", Types.INTEGER);
+	private static final SQLColumn<FactionClaim> COLUMN_OWNER_IDS = new SQLColumn<>("owner_ids", "TINYTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci'", Types.VARCHAR);
+	private static final SQLColumn<FactionClaim> COLUMN_TYPE = new SQLColumn<>("owner_ids", "TINYINT(1) NULL DEFAULT NULL", Types.INTEGER);
+	private static final SQLColumn<FactionClaim> COLUMN_WORLD_ID = new SQLColumn<>("world_id", "TINYINT(1) NULL DEFAULT NULL", Types.INTEGER);
+
 	//private static final OlympaStatement createClaim = new OlympaStatement(StatementType.INSERT, tableName, "world_name", "x", "z", "faction_id", "members").returnGeneratedKeys();
 	private static final OlympaStatement selectClaimByChunk = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "x", "z" }, new String[] {});
 	private static final OlympaStatement selectClaimsByFaction = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "faction_id" }, new String[] {});

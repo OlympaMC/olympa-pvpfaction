@@ -39,11 +39,11 @@ public class FactionPowerListener implements Listener {
 		Player player = event.getEntity();
 		UUID uuid = player.getUniqueId();
 		FactionPlayer fp = AccountProvider.get(uuid);
-		if (!fp.removePower() || !fp.removePower())
+		if (!fp.removePower())
 			return;
 		OlympaTask task = PvPFaction.getInstance().getTask();
 		if (!task.taskExist("pvpfac_power_" + uuid))
 			PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30, 60, TimeUnit.MINUTES);
-		Prefix.FACTION.sendMessage(fp.getPlayer(), "&c-2 powers (&4%s&c/%s)", fp.getPower(), FactionPlayer.POWER_MAX);
+		Prefix.FACTION.sendMessage(fp.getPlayer(), "&c-2 powers (&4%s&c/%s)", fp.getPower(), FactionPlayer.POWER_MAX); // TODO Vérifier, il me semble qu'avec le code actuel, on perds 1 de power
 	}
 }

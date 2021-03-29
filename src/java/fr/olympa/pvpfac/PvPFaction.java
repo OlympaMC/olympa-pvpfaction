@@ -21,7 +21,6 @@ import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
-import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.pvpfac.armorstand.ArmorStandWithHandListener;
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
@@ -107,8 +106,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
 
-		OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
-
+		// Not needed now ? OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
 				FixedLine.EMPTY_LINE,
 				lineMoney,
