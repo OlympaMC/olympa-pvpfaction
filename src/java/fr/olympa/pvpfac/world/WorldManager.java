@@ -3,6 +3,8 @@ package fr.olympa.pvpfac.world;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -27,8 +29,9 @@ import net.minecraft.server.v1_16_R3.HeightMap.Type;
 public class WorldManager {
 	
 	private static final int loadChunks = 15;
+	public static final WorldType CLAIM_WORLD = WorldType.OVERWORLD;
 	
-	//private Map<WorldType, World> worlds = new HashMap<WorldType, World>();
+	private final Map<World, WorldType> worlds = new HashMap<World, WorldManager.WorldType>();
 	
 	private PvPFaction plugin;
 	private YamlConfiguration config = new YamlConfiguration();
@@ -69,13 +72,21 @@ public class WorldManager {
 			type.getWorld().setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
 			type.getWorld().setGameRule(GameRule.DO_TRADER_SPAWNING, false);
 			
+			worlds.put(type.getWorld(), type);
+			
 			//preload chunks in min radius
 			for (int x = -loadChunks ; x <= loadChunks ; x++)
 				for (int z = -loadChunks ; z <= loadChunks ; z++)
 					type.getWorld().getChunkAt(x, z);
-		}
-		
-		
+		}	
+	}
+	
+	public boolean isClaimWorld(World w) {
+		return worlds.get(w) == CLAIM_WORLD;
+	}
+	
+	public WorldType getWorldType(World w) {
+		return worlds.get(w);
 	}
 	
 	public static enum WorldType {

@@ -20,7 +20,7 @@ import fr.olympa.pvpfac.player.FactionPlayerData.FactionRole;
 
 public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
-	protected SQLColumn<FactionPlayerData> roleColumn;
+	public SQLColumn<FactionPlayerData> roleColumn;
 
 	protected SQLColumn<Faction> homeColumn;
 	protected SQLColumn<Faction> enemyColumn;

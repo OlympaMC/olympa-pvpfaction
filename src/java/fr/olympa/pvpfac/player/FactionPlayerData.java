@@ -68,7 +68,7 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 			}
 		}
 
-		public ClaimPermLevel getPlayerClaimLevel() {
+		public ClaimPermLevel getDefaultClaimLevel() {
 			return claimLevel;
 		}
 		
