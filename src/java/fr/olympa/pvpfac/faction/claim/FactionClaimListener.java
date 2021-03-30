@@ -1,11 +1,14 @@
 package fr.olympa.pvpfac.faction.claim;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.Powerable;
@@ -22,6 +25,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
@@ -29,6 +34,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -45,7 +51,6 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import fr.olympa.pvpfac.world.WorldManager;
-import fr.olympa.pvpfac.world.WorldManager.WorldType;
 
 public class FactionClaimListener implements Listener {
 
@@ -174,7 +179,7 @@ public class FactionClaimListener implements Listener {
 					"§cTu ne peux pas construire ici.") && e.getBlock() instanceof Container) {
 			
 				FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(e.getBlock().getLocation().getChunk());
-				if (!claim.getType().canUseContainers()) {
+				if (!claim.getType().canPlaceContainers()) {
 					e.setCancelled(true);
 					Prefix.FACTION.sendMessage(e.getPlayer(), "§cTu peux peux pas utiliser de coffre dans les AP. §7Utilise des portes-armure à la place !");
 				}
@@ -266,6 +271,43 @@ public class FactionClaimListener implements Listener {
 	/////////////////////////////////////////////////////////////
 	//                 PROTECTED CHUNK EVENTS                  //
 	/////////////////////////////////////////////////////////////
+	
+	
+	
+	@EventHandler
+	public void onBlockExplode(BlockExplodeEvent e) {
+		if (!isModificationAllowed(e.blockList()))
+			e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onEntityExplode(EntityExplodeEvent e) {
+		if (!isModificationAllowed(e.blockList()))
+			e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPistonExtend(BlockPistonExtendEvent e) {
+		if (!isModificationAllowed(e.getBlocks()))
+			e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPistonRetract(BlockPistonRetractEvent e) {
+		if (!isModificationAllowed(e.getBlocks()))
+			e.setCancelled(true);
+	}
+	
+	
+	private boolean isModificationAllowed(List<Block> blocks) {
+		for (Chunk ch : blocks.stream().map(b -> b.getChunk()).collect(Collectors.toSet()))
+			if (PvPFaction.getInstance().getClaimsManager().ofChunk(ch).getType().isProtected())
+				return false;
+		
+		return true;
+	}
+
+
 
 	@EventHandler
 	public void onBlockFade(BlockFadeEvent e) {
@@ -273,22 +315,17 @@ public class FactionClaimListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onBlockExplode(BlockExplodeEvent e) {
+	public void onBlockBurn(BlockBurnEvent e) {
 		cancelIfChunkProtected(e.getBlock().getLocation(), e);
 	}
 
 	@EventHandler
-	public void onBlockFade(BlockBurnEvent e) {
+	public void onBlockCauldron(CauldronLevelChangeEvent e) {
 		cancelIfChunkProtected(e.getBlock().getLocation(), e);
 	}
 
 	@EventHandler
-	public void onBlockFade(CauldronLevelChangeEvent e) {
-		cancelIfChunkProtected(e.getBlock().getLocation(), e);
-	}
-
-	@EventHandler
-	public void onBlockFade(LeavesDecayEvent e) {
+	public void onBlockLeaves(LeavesDecayEvent e) {
 		cancelIfChunkProtected(e.getBlock().getLocation(), e);
 	}
 	
@@ -310,13 +347,6 @@ public class FactionClaimListener implements Listener {
 	
 	/**
 	 * Return true if event was cancelled, false otherwise
-	 * @param loc
-	 * @param p
-	 * @param event
-	 * @param method
-	 * @param denyMessage
-	 * @param args
-	 * @return
 	 */
 	private boolean manageClaimAction(Location loc, Player p, Cancellable event, Function<ClaimPermLevel, Boolean> method, String denyMessage, Object...args) {
 		if (!method.apply(PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getPlayerPerm(AccountProvider.get(p.getUniqueId())))) {

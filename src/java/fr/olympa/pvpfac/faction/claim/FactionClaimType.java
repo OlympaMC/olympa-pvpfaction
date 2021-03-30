@@ -4,20 +4,26 @@ import org.bukkit.entity.Player;
 
 public enum FactionClaimType {
 
-	NORMAL,
-	WARZONE,
-	AP,
-	SPAWN,
+	NORMAL(true, true, false, true),
+	WARZONE(false, true, true, false),
+	AP(true, true, false, false),
+	SPAWN(false, false, true, false),
 	;
 	
 	private boolean isClaimable;
 	private boolean canPvp;
 	
 	private boolean isProtected; //used for build, explosion and mob spawning (except CUSTOM)
-	private boolean canUseContainers;
+	private boolean canPlaceContainers;
 	
+	
+	private FactionClaimType(boolean isClaimable, boolean canPvp, boolean isProtected, boolean canPlaceContainers) {
+		this.isClaimable = isClaimable;
+		this.canPvp = canPvp;
+		this.isProtected = isProtected;
+		this.canPlaceContainers = canPlaceContainers;
+	}
 
-	
 	public boolean isClaimable() {
 		return isClaimable;
 	}
@@ -31,8 +37,8 @@ public enum FactionClaimType {
 		return isProtected;
 	}
 
-	public boolean canUseContainers() {
-		return canUseContainers;
+	public boolean canPlaceContainers() {
+		return canPlaceContainers;
 	}
 
 	
