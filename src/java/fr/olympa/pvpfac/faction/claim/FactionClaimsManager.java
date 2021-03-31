@@ -3,13 +3,10 @@ package fr.olympa.pvpfac.faction.claim;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
-import java.sql.Types;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +15,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import fr.olympa.api.sql.SQLColumn;
 import fr.olympa.api.sql.statement.OlympaStatement;
 import fr.olympa.api.sql.statement.StatementType;
 import fr.olympa.core.spigot.OlympaCore;
@@ -39,8 +35,7 @@ public class FactionClaimsManager implements Listener {
 	private static final SQLColumn<FactionClaim> COLUMN_WORLD_ID = new SQLColumn<>("world_id", "TINYINT(1) NULL DEFAULT NULL", Types.INTEGER);*/
 
 	//private static final OlympaStatement createClaim = new OlympaStatement(StatementType.INSERT, tableName, "world_name", "x", "z", "faction_id", "members").returnGeneratedKeys();
-	
-	
+
 	private static final OlympaStatement selectClaimByChunk = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "x", "z" }, new String[] {});
 	private static final OlympaStatement selectClaimsByFaction = new OlympaStatement(StatementType.SELECT, tableName, new String[] { "faction_id" }, new String[] {});
 
@@ -48,18 +43,17 @@ public class FactionClaimsManager implements Listener {
 			"INSERT INTO " + tableName +
 					" (`x`, `z`, `claim_type`, `faction_id`, `members_factions`, `members_factions`)" +
 					" VALUES (?, ?, ?, ?, ?, ?);").returnGeneratedKeys();
-	
+
 	private static final OlympaStatement updateClaim = new OlympaStatement(
-			"UPDATE " + tableName + 
-			" SET `claim_type` = ?, `faction_id` = ?, `members_players` = ?, `members_factions` = ? WHERE `claim_id` = ?;"
-			);
+			"UPDATE " + tableName +
+					" SET `claim_type` = ?, `faction_id` = ?, `members_players` = ?, `members_factions` = ? WHERE `claim_id` = ?;");
 
 	private Cache<ClaimId, FactionClaim> claims = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES).build();
 
 	public FactionClaimsManager() {
 		try {
 			OlympaCore.getInstance().getDatabase().createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-			"  `claim_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT," +
+					"  `claim_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT," +
 					"  `x` INT NOT NULL," +
 					"  `z` INT NOT NULL," +
 					"  `claim_type` INT NOT NULL," +
@@ -72,8 +66,7 @@ public class FactionClaimsManager implements Listener {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	public void updateClaim(FactionClaim claim) {
 		try (PreparedStatement statement = updateClaim.createStatement()) {
 			int i = 1;
@@ -81,11 +74,11 @@ public class FactionClaimsManager implements Listener {
 			statement.setObject(i++, claim.getFaction() == null ? null : claim.getFaction().getID());
 			statement.setString(i++, claim.getPlayersMembersToJson());
 			statement.setString(i++, claim.getFactionMembersToJson());
-			
+
 			statement.setLong(i++, claim.getClaimId().getId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			PvPFaction.getInstance().getLogger().warning("§cFailed to SAVE chunk " + claim.getClaimId() + "as claim of " + claim.getFaction() == null ? "§4NONE" : claim.getFaction().getName());
+			e.addSuppressed(new Throwable("§cFailed to SAVE chunk " + claim.getClaimId() + "as claim of " + (claim.getFaction() == null ? "§4NONE" : claim.getFaction().getName())));
 			e.printStackTrace();
 		}
 	}
@@ -104,7 +97,7 @@ public class FactionClaimsManager implements Listener {
 
 			if (resultSet.next())
 				return getFactionClaim(resultSet);
-			else {				
+			else {
 				PreparedStatement insert = createClaim.createStatement();
 				int j = 1;
 
@@ -114,18 +107,17 @@ public class FactionClaimsManager implements Listener {
 				insert.setObject(j++, null);
 				insert.setObject(j++, null);
 				insert.setObject(j++, null);
-				
+
 				insert.executeUpdate();
-				
+
 				if (insert.getGeneratedKeys().next()) {
 					claim = new FactionClaim(new ClaimId(insert.getGeneratedKeys().getLong(1), chunk), FactionClaimType.NORMAL, null, null, null);
 					claims.put(claim.getClaimId(), claim);
 					return claim;
-					
-				}else
+
+				} else
 					throw new SQLException("Impossible to create claim at " + chunk.getX() + ", " + chunk.getZ());
 			}
-				
 
 		} catch (SQLException e) {
 			PvPFaction.getInstance().getLogger().warning("Failed to LOAD claim at " + chunk.getX() + ", " + chunk.getZ());
@@ -162,7 +154,6 @@ public class FactionClaimsManager implements Listener {
 		claims.put(claim.getClaimId(), claim);
 		return claim;
 	}
-
 
 	@EventHandler
 	public void onChunkUnload(ChunkUnloadEvent event) {

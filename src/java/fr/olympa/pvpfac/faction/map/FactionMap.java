@@ -59,7 +59,7 @@ public class FactionMap {
 			endZ = chunkZ + mapRaduisSize;
 			for (int iZ = startZ; endZ > iZ; iZ++) {
 				for (int iX = startX; endX > iX; iX++)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;
@@ -71,7 +71,7 @@ public class FactionMap {
 			endZ = chunkZ + mapRaduisSize * sidesCoeff;
 			for (int iX = startX; endX < iX; iX--) {
 				for (int iZ = startZ; endZ > iZ; iZ++)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;
@@ -83,7 +83,7 @@ public class FactionMap {
 			endZ = chunkZ - mapRaduisSize * sidesCoeff;
 			for (int iX = startX; endX > iX; iX++) {
 				for (int iZ = startZ; endZ < iZ; iZ--)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;
@@ -95,7 +95,7 @@ public class FactionMap {
 			endZ = chunkZ - mapRaduisSize;
 			for (int iZ = startZ; endZ < iZ; iZ--) {
 				for (int iX = startX; endX < iX; iX--)
-					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole, playerFaction, iZ == chunkZ && iX == chunkX));
+					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
 				sb.append("\n");
 			}
 			break;
@@ -113,7 +113,7 @@ public class FactionMap {
 			return /*factionClaim.getColor() + */(isCenter ? "§m" : "") + "-";
 		String symb = factions.get(claimFaction);
 		if (symb == null) {
-			symb = symboles.get(indexSymbole++);
+			symb = symboles.get(indexSymbole);
 			factions.put(claimFaction, symb);
 		}
 		ChatColor color = ChatColor.RED;
@@ -123,7 +123,7 @@ public class FactionMap {
 	}
 
 	public static void toggleAutoMap(Player player) {
-		if (autoMapPlayers.contains(player)) {
+		if (!autoMapPlayers.contains(player)) {
 			autoMapPlayers.add(player);
 			Prefix.FACTION.sendMessage(player, "AutoMap activée.");
 		} else {

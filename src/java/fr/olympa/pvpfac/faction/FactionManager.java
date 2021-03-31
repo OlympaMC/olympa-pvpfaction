@@ -87,12 +87,12 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	}
 
 	@Override
-	protected Faction createClan(int id, String name, OlympaPlayerInformations chief, int maxSize) {
-		return new Faction(this, id, name, chief, maxSize);
+	protected Faction createClan(int id, String name, String tag, OlympaPlayerInformations chief, int maxSize) {
+		return new Faction(this, id, name, tag, chief, maxSize);
 	}
 
 	@Override
-	protected Faction provideClan(int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
+	protected Faction provideClan(int id, String name, String tag, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
 		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")));
 	}
 

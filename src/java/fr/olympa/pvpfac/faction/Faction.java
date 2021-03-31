@@ -31,7 +31,7 @@ import fr.olympa.pvpfac.player.FactionPlayer;
 import fr.olympa.pvpfac.player.FactionPlayerData;
 
 public class Faction extends Clan<Faction, FactionPlayerData> {
-	
+
 	private static DynamicLine<Scoreboard<FactionPlayer>> header = new DynamicLine<>(x -> "§7" + x.getOlympaPlayer().getClan().getName() + " :");
 	private static TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
 		Faction fac = x.getOlympaPlayer().getClan();
@@ -55,22 +55,23 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	String description;
 	Location home;
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize) {
-		super(manager, id, name, chief, maxSize);
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String tag, OlympaPlayerInformations chief, int maxSize) {
+		super(manager, id, name, tag, chief, maxSize);
 	}
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String description, OlympaPlayerInformations chief) {
-		super(manager, id, name, chief, manager.defaultMaxSize);
+	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String tag, String description, OlympaPlayerInformations chief) {
+		super(manager, id, name, tag, chief, manager.defaultMaxSize);
 		this.description = description;
 	}
 
 	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home) {
-		super(manager, id, name, chief, maxSize, money, created);
+		super(manager, id, name, tag, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
 		this.home = home;
 	}
 
+	@Override
 	public String getTag() {
 		return tag;
 	}
@@ -188,6 +189,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return (clan != null && clan.getID() == id ? ChatColor.GREEN : ChatColor.RED) + getName();
 	}
 
+	@Override
 	public void setTag(String tag) {
 		this.tag = tag;
 	}
@@ -195,7 +197,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	/**
 	 * Return true if fac is an ally or if same fac as this instance is used as parameter
 	 * @param fac
@@ -214,10 +216,10 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
-		return o instanceof Faction && ((Faction)o).getID() == getID();
+		return o instanceof Faction && ((Faction) o).getID() == getID();
 	}
 
 }

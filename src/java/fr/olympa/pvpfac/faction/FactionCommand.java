@@ -19,6 +19,7 @@ import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
+import fr.olympa.pvpfac.faction.claim.FactionClaimType;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.faction.map.FactionMap;
 import fr.olympa.pvpfac.faction.utils.FactionMsg;
@@ -34,6 +35,11 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
 	public FactionCommand(FactionManager manager, String description, OlympaSpigotPermission permission, String... aliases) {
 		super(manager, description, permission, aliases);
+		this.addArgumentParser("FACTIONS", (player, arg) -> manager.getClans().stream().map(e -> e.getValue().getName()).collect(Collectors.toSet()),
+				arg -> manager.getByName(arg),
+				x -> String.format("&cLa faction &4%s&c n'existe pas.", x));
+		this.addArgumentParser("FACTION_ROLE", FactionRole.class);
+		this.addArgumentParser("FACTION_CLAIM_TYPE", FactionClaimType.class);
 	}
 
 	@Cmd(player = true, aliases = { "setdesc", "adddesc", "setdescription", "adddescription" }, args = { "100_lettres_max" }, min = 1)
@@ -47,6 +53,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer la decription en &2%s&a.", player.getName(), faction.getDescription());
 	}
 
+	@Override
 	@Cmd(player = true, aliases = { "settag", "addtag" }, args = { "6_lettres_max" }, min = 1)
 	public void tag(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
@@ -91,35 +98,31 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		}
 	}
 
-	@Cmd(player = true, min = 1, args = { "wilderness|safezone|warnzone|ap|spawn" })
+	@Cmd(player = true, min = 1, args = { "FACTIONS|FACTION_CLAIM_TYPE" })
 	public void forceclaim(CommandContext cmd) {
 		if (!PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player)) {
 			sendDoNotHavePermission();
 			return;
 		}
-		Faction faction = null;
-		try {
-			faction = PvPFaction.getInstance().getFactionManager().getByName(cmd.getArgument(0));
-			FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
-			Chunk chunk = player.getLocation().getChunk();
-			FactionClaim claim = claimManager.getByChunk(chunk);
-			if (faction != null) {
-				claim.setFaction(faction);
-				claimManager.updateClaim(claim);
-				sendMessage(Prefix.FACTION, "Tu as claim pour &2%s&a.", faction.getName());
-			} else {
-				FactionClaimType type = FactionClaimType.get(cmd.getArgument(0, new String()));
-				if (type == null) {
-					sendMessage(Prefix.FACTION, "&cFaction &4%s%c inconnu.", cmd.getArgument(0, new String()));
-					return;
-				}
-				claim.setType(type);
-				claimManager.updateClaim(claim);
-				sendMessage(Prefix.FACTION, "Tu as claim pour &2%s&a.", type.getName());
+
+		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+		Chunk chunk = player.getLocation().getChunk();
+		FactionClaim claim = claimManager.ofChunk(chunk);
+		if (cmd.getArgument(0) instanceof Faction) {
+			Faction faction = cmd.getArgument(0);
+			claim.setFaction(faction);
+			claimManager.updateClaim(claim);
+			sendMessage(Prefix.FACTION, "Tu as claim pour &2%s&a.", faction.getName());
+		} else if (cmd.getArgument(0) instanceof FactionClaimType) {
+			FactionClaimType type = cmd.getArgument(0);
+			if (type == null) {
+				sendMessage(Prefix.FACTION, "&cFaction &4%s%c inconnu.", cmd.getArgument(0, new String()));
+				return;
 			}
-		} catch (SQLException e) {
-			sendError();
-			e.printStackTrace();
+			sendMessage(Prefix.FACTION, "TODO > Claim &2%s&a.", type.name());
+			//claim.setType(type);
+			//claimManager.updateClaim(claim);
+			//sendMessage(Prefix.FACTION, "Tu définis le claim comme &2%s&a.", type.name());
 		}
 	}
 
@@ -138,8 +141,8 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
 			return;
 		}
-		//		if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
-		//			Set<FactionPlayer> can = faction.getOnlinePlayers(OlympaFactionRole.OFFICER);
+		//		if (!FactionRole.OFFICER.hasPermission(faction.getRole(player))) {
+		//			Set<FactionPlayer> can = faction.getOnlinePlayers(FactionRole.OFFICER);
 		//			StringBuilder sb = new StringBuilder();
 		//			if (!can.isEmpty())
 		//				sb.append(" Demande à &4" + can.stream().map(FactionPlayer::getName).collect(Collectors.joining("&c, &4")) + "&c.");
@@ -152,28 +155,23 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			return;
 		}
 		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
-		FactionClaim claim = claimManager.getByChunk(chunk);
+		FactionClaim claim = claimManager.ofChunk(chunk);
 		Faction claimOldFaction = (claimOldFaction = claim.getFaction()) != null ? claimOldFaction.clone() : null;
 
-		try {
-			if (!claim.isOverClaimable()) {
-				TextComponent text = new TextComponent(TextComponent.fromLegacyText("§cImpossible de &lsur&cclaim le chunk de la faction §4%s&c.".replace("%s", claim.getFactionNameColored())));
-				text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(
-						"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entouré de claims §nuniquement§e de la même faction."))));
-				sendComponents(text);
-				return;
-			}
-			claim.setFaction(faction);
-			claimManager.updateClaim(claim);
-			if (claimOldFaction != null) {
-				sendMessage(claimOldFaction.getPlayers(), Prefix.FACTION, "&4Vous avez perdu un claim, une autre faction vous a &lsur&4claim.");
-				sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lsur&aclaim un chunk de &c%s&a.", player.getName(), claimOldFaction.getName());
-			} else
-				sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a claim un chunk.", player.getName());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			sendError();
+		if (!claim.isOverClaimable()) {
+			TextComponent text = new TextComponent(TextComponent.fromLegacyText("§cImpossible de &lsur&cclaim le chunk de la faction §4%s&c.".replace("%s", claim.getFaction().getNameColored(faction))));
+			text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(
+					"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entouré de claims §nuniquement§e de la même faction."))));
+			sendComponents(text);
+			return;
 		}
+		claim.setFaction(faction);
+		claimManager.updateClaim(claim);
+		if (claimOldFaction != null) {
+			sendMessage(claimOldFaction.getPlayers(), Prefix.FACTION, "&4Vous avez perdu un claim, une autre faction vous a &lsur&4claim.");
+			sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lsur&aclaim un chunk de &c%s&a.", player.getName(), claimOldFaction.getName());
+		} else
+			sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a claim un chunk.", player.getName());
 	}
 
 	@Cmd(player = true, aliases = "ucl")
@@ -191,6 +189,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
 			return;
 		}
+
 		//		if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
 		//			Set<FactionPlayer> can = faction.getOnlinePlayers(OlympaFactionRole.OFFICER);
 		//			StringBuilder sb = new StringBuilder();
@@ -201,19 +200,14 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		//		}
 		Chunk chunk = player.getLocation().getChunk();
 		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
-		FactionClaim claim = claimManager.getByChunk(chunk);
+		FactionClaim claim = claimManager.ofChunk(chunk);
 		if (!faction.hasClaim(chunk)) {
 			sendMessage(Prefix.FACTION, "&cCe claim n'appartient pas à ta faction.");
 			return;
 		}
-		try {
-			claim.setFaction(null);
-			claimManager.updateClaim(claim);
-			sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lun&aclaim un chunk.", player.getName());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			sendError();
-		}
+		claim.setFaction(null);
+		claimManager.updateClaim(claim);
+		sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lun&aclaim un chunk.", player.getName());
 	}
 
 	@Cmd(player = true, aliases = "m")
