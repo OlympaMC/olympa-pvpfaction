@@ -54,7 +54,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	}
 
 	@Override
-	@Cmd(player = true, aliases = { "settag", "addtag" }, args = { "6_lettres_max" }, min = 1)
+	@Cmd(player = true, aliases = { "settag", "addtag" }, args = { "6 lettres max" }, min = 1)
 	public void tag(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
@@ -65,7 +65,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer le tag en &2%s&a.", player.getName(), faction.getTag());
 	}
 
-	@Cmd(player = true, aliases = { "p", "powers" }, args = { "PLAYERS", "INTEGER|" })
+	@Cmd(player = true, aliases = { "p", "powers" }, args = { "PLAYERS", "INTEGER" })
 	public void power(CommandContext cmd) {
 		FactionPlayer fp;
 		if (cmd.getArgumentsLength() != 0)
