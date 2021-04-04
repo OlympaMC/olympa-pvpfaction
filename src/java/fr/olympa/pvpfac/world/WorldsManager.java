@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -37,8 +38,13 @@ public class WorldsManager {
 	private YamlConfiguration config = new YamlConfiguration();
 	private File configFile;
 	
+	private WorldCommand worldCmd;
+	
 	public WorldsManager(PvPFaction plugin) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.plugin = plugin;
+		
+		worldCmd = new WorldCommand(plugin);
+		worldCmd.register();
 		
 		configFile = new File(plugin.getDataFolder() + "/worlds.yml");
 		plugin.getDataFolder().mkdirs();
@@ -143,14 +149,14 @@ public class WorldsManager {
 			return world;
 		}
 		
-		public void tpPlayer(Player p) {
+		public void teleport(Player p) {
 			if (useRandomTp)
-				tpPlayerRandom(p, 0, 10);
+				teleportRandom(p, 0, 10);
 			else
-				tpPlayerSpawn(p);
+				teleportSpawn(p);
 		}
 		
-		public void tpPlayerSpawn(Player p) {			
+		public void teleportSpawn(Player p) {			
 			world.getChunkAtAsync(world.getSpawnLocation(), new Consumer<Chunk>(){
 				@Override
 				public void accept(Chunk ch) {
@@ -159,12 +165,12 @@ public class WorldsManager {
 			});
 		}
 		
-		public void tpPlayerRandom(Player p, int minRadius, int radius) {
+		public void teleportRandom(Player p, int minRadiusChunk, int radiusChunk) {
 			ThreadLocalRandom r = ThreadLocalRandom.current();
-			 
+			
 			world.getChunkAtAsync(
-					r.nextBoolean() ? r.nextInt(minRadius, radius + 1) : -r.nextInt(minRadius, radius + 1), 
-					r.nextBoolean() ? r.nextInt(minRadius, radius + 1) : -r.nextInt(minRadius, radius + 1), 
+					r.nextBoolean() ? r.nextInt(minRadiusChunk, radiusChunk + 1) : -r.nextInt(minRadiusChunk, radiusChunk + 1), 
+					r.nextBoolean() ? r.nextInt(minRadiusChunk, radiusChunk + 1) : -r.nextInt(minRadiusChunk, radiusChunk + 1), 
 					new Consumer<Chunk>(){
 				@Override
 				public void accept(Chunk ch) {
@@ -173,13 +179,21 @@ public class WorldsManager {
 					int y = ((CraftChunk)ch).getHandle().heightMap.get(Type.MOTION_BLOCKING).a(x & 0xF, z & 0xF);
 					
 					if (y > 100 || y < 30)
-						tpPlayerRandom(p, minRadius, radius);
+						teleportRandom(p, minRadiusChunk, radiusChunk);
 					else {
 						p.teleport(new Location(world, x + 0.5, y + 1, z + 0.5));
 						p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100, 1, true, false, false));
 					}
 				}
 			});
+		}
+		
+		
+		public static WorldType fromString(String s) {
+			for (WorldType w : WorldType.values())
+				if (w.getWorldName().equals(s))
+					return w;
+			return null;
 		}
 	}
 }
