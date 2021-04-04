@@ -40,6 +40,15 @@ public enum FactionClaimType {
 	public boolean canPlaceContainers() {
 		return canPlaceContainers;
 	}
+	
+	public static FactionClaimType fromString(String s) {
+		FactionClaimType obj = null;
+		for (FactionClaimType t : FactionClaimType.values())
+			if (t.toString().equals(s))
+				return t;
+		
+		return NORMAL;
+	}
 
 	
 	

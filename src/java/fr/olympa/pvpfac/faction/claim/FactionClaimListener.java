@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.Powerable;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -51,7 +52,7 @@ import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.player.FactionPlayer;
-import fr.olympa.pvpfac.world.WorldManager;
+import fr.olympa.pvpfac.world.WorldsManager;
 
 public class FactionClaimListener implements Listener {
 
@@ -64,7 +65,7 @@ public class FactionClaimListener implements Listener {
 		Player player = event.getPlayer();
 		Chunk to = player.getLocation().getChunk();
 		
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(to.getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(to.getWorld().getUID()))
 			return;
 		
 		FactionClaimsManager manager = PvPFaction.getInstance().getClaimsManager();
@@ -80,28 +81,28 @@ public class FactionClaimListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerMove(PlayerMoveEvent event) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(event.getPlayer().getLocation().getWorld().getUID()))
+	public void onPlayerMove(PlayerMoveEvent e) {
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getPlayer().getLocation().getWorld().getUID()))
 			return;
 		
-		Chunk from = event.getFrom().getChunk();
-		Chunk to = event.getTo().getChunk();
+		Chunk from = e.getFrom().getChunk();
+		Chunk to = e.getTo().getChunk();
 		
 		if (SpigotUtils.isSameChunk(from, to))
 			return;
-		
-		Player player = event.getPlayer();
-		FactionClaimsManager manager = PvPFaction.getInstance().getClaimsManager();
-		FactionClaim claim;
+	
 		try {
-			FactionClaim oldFactionClaim = manager.ofChunk(from);
-			claim = manager.ofChunk(to);
-			if (oldFactionClaim.hasSameFaction(claim))
+			FactionClaim oldClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(from);
+			FactionClaim newClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(to);
+			//System.out.println(oldClaim);
+			//System.out.println(newClaim);
+			if (oldClaim.hasSameFaction(newClaim))
 				return;
-			claim.sendTitle(player);
-		} catch (Exception e) {
-			e.printStackTrace();
-			player.sendTitle("§4Erreur", "§cImpossible de charger ce claim", 0, 20, 20);
+			
+			newClaim.sendTitle(e.getPlayer());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			e.getPlayer().sendTitle("§4Erreur", "§cImpossible de charger ce claim", 0, 20, 20);
 		}
 	}
 
@@ -111,7 +112,7 @@ public class FactionClaimListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onDamageByEntity(EntityDamageByEntityEvent e) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(e.getEntity().getLocation().getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getEntity().getLocation().getWorld().getUID()))
 			return;
 		
 		Entity target = e.getEntity();
@@ -153,7 +154,7 @@ public class FactionClaimListener implements Listener {
 
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(e.getEntity().getLocation().getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getEntity().getLocation().getWorld().getUID()))
 			return;
 		
 		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(e.getEntity().getLocation().getChunk());
@@ -163,7 +164,7 @@ public class FactionClaimListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent e) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(e.getBlock().getLocation().getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getBlock().getLocation().getWorld().getUID()))
 			return;
 		
 		Player p = e.getPlayer();
@@ -191,7 +192,7 @@ public class FactionClaimListener implements Listener {
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(e.getBlock().getLocation().getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getBlock().getLocation().getWorld().getUID()))
 			return;
 			
 		if (!isActionCancelled(e.getBlock().getLocation(), e.getPlayer(), e, 
@@ -239,7 +240,7 @@ public class FactionClaimListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onInterractBlock(PlayerInteractEvent e) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(e.getPlayer().getLocation().getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getPlayer().getLocation().getWorld().getUID()))
 			return;
 		
 		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(
@@ -279,7 +280,7 @@ public class FactionClaimListener implements Listener {
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBreakItemframe(HangingBreakByEntityEvent e) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(e.getEntity().getLocation().getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getEntity().getLocation().getWorld().getUID()))
 			return;
 		
 		if (e.getRemover().getType() == EntityType.ARROW)
@@ -344,22 +345,22 @@ public class FactionClaimListener implements Listener {
 
 	@EventHandler
 	public void onBlockFade(BlockFadeEvent e) {
-		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+		isClaimProtected(e.getBlock().getLocation(), e);
 	}
 	
 	@EventHandler
 	public void onBlockBurn(BlockBurnEvent e) {
-		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+		isClaimProtected(e.getBlock().getLocation(), e);
 	}
 
 	@EventHandler
 	public void onBlockCauldron(CauldronLevelChangeEvent e) {
-		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+		isClaimProtected(e.getBlock().getLocation(), e);
 	}
 
 	@EventHandler
 	public void onBlockLeaves(LeavesDecayEvent e) {
-		cancelIfChunkProtected(e.getBlock().getLocation(), e);
+		isClaimProtected(e.getBlock().getLocation(), e);
 	}
 	
 	@EventHandler
@@ -367,25 +368,34 @@ public class FactionClaimListener implements Listener {
 		if (e.getSpawnReason() == SpawnReason.CUSTOM)
 			return;
 		
-		cancelIfChunkProtected(e.getLocation(), e);
+		if (!isClaimProtected(e.getLocation(), e)) {
+			if (e.getEntityType() != EntityType.ARMOR_STAND)
+				return;
+			ArmorStand armorStand = (ArmorStand) e.getEntity();
+			armorStand.setArms(true);
+		}
 	}
 	
 	
 	
 	
-	private void cancelIfChunkProtected(Location loc, Cancellable e) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID()))
-			return;
+	private boolean isClaimProtected(Location loc, Cancellable e) {
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID()))
+			return false;
 		
-		if (!PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getType().isProtected())
+		if (!PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getType().isProtected()) {
 			e.setCancelled(true);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
 	 * Return true if event was cancelled, false otherwise
 	 */
 	private boolean isActionCancelled(Location loc, Player p, Cancellable event, Function<ClaimPermLevel, Boolean> method, String denyMessage, Object...args) {
-		if (!WorldManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID()))
+		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID()))
 			return false;
 		
 		if (!method.apply(PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getPlayerPerm(AccountProvider.get(p.getUniqueId())))) {

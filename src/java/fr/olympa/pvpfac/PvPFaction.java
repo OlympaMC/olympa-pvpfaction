@@ -30,6 +30,7 @@ import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
+import fr.olympa.pvpfac.world.WorldsManager;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -42,6 +43,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public ScoreboardManager<FactionPlayer> scoreboards;
 	public FactionManager factionManager;
 	public FactionClaimsManager claimsManager;
+	private WorldsManager worldsManager;
 	private TaxManager taxManager;
 
 	public FactionManager getFactionManager() {
@@ -84,9 +86,9 @@ public class PvPFaction extends OlympaAPIPlugin {
 		PluginManager pluginManager = getServer().getPluginManager();
 		try {
 			//pluginManager.registerEvents(new OreListener(), this);
-			pluginManager.registerEvents(new ArmorStandWithHandListener(), this);
 			pluginManager.registerEvents(new FactionChatListener(), this);
-			pluginManager.registerEvents(new FactionPvPListener(), this);
+			//pluginManager.registerEvents(new FactionPvPListener(), this); remplacé par FactionClaimListener
+			//pluginManager.registerEvents(new ArmorStandWithHandListener(), this); intégré à FactionClaimListener
 			pluginManager.registerEvents(new FactionClaimListener(), this);
 			pluginManager.registerEvents(new FactionPowerListener(), this);
 			pluginManager.registerEvents(new AutoMapListener(), this);
@@ -94,6 +96,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(claimsManager = new FactionClaimsManager(), this);
 			//			pluginManager.registerEvents(new Test(), this);
 			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
+			
+			worldsManager = new WorldsManager(this);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			getLogger().severe("Une erreur est survenue lors de l'initialisation du système de faction.");

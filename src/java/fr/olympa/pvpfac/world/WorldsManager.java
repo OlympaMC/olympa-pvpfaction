@@ -26,22 +26,23 @@ import org.bukkit.potion.PotionEffectType;
 import fr.olympa.pvpfac.PvPFaction;
 import net.minecraft.server.v1_16_R3.HeightMap.Type;
 
-public class WorldManager {
+public class WorldsManager {
 	
 	private static final int loadChunks = 15;
 	public static final WorldType CLAIM_WORLD = WorldType.OVERWORLD;
 	
-	private final Map<World, WorldType> worlds = new HashMap<World, WorldManager.WorldType>();
+	private final Map<World, WorldType> worlds = new HashMap<World, WorldsManager.WorldType>();
 	
 	private PvPFaction plugin;
 	private YamlConfiguration config = new YamlConfiguration();
 	private File configFile;
 	
-	public WorldManager(PvPFaction plugin) throws FileNotFoundException, IOException, InvalidConfigurationException {
+	public WorldsManager(PvPFaction plugin) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.plugin = plugin;
 		
-		configFile = new File(plugin.getDataFolder() + "worlds.yml");
-		if (!configFile.mkdirs())
+		configFile = new File(plugin.getDataFolder() + "/worlds.yml");
+		plugin.getDataFolder().mkdirs();
+		if (!configFile.createNewFile())
 			config.load(configFile);
 		else {
 			for (WorldType type : WorldType.values()) {
@@ -54,9 +55,13 @@ public class WorldManager {
 		
 		
 		for (WorldType type : WorldType.values()) {
-			File worldFile = new File(plugin.getDataFolder().getParentFile().getParentFile().getPath() + type.getWorldName());
+			File worldFile = new File(plugin.getServer().getWorldContainer().getAbsolutePath() + "/" + type.getWorldName());
+			
 			if (System.currentTimeMillis() > config.getLong(type.toString() + ".next_reset") && config.getInt(type.toString() + ".reset_interval") > 0) {
-				Stream.of(worldFile.listFiles()).forEach(f -> f.delete());
+				
+				if (worldFile.exists())
+					Stream.of(worldFile.listFiles()).forEach(f -> f.delete());
+				
 				worldFile.delete();
 				config.set(type.toString() + ".next_reset", System.currentTimeMillis() + config.getLong(type.toString() + ".reset_interval") * 24 * 3600 * 1000 - 2 * 3600 * 1000);
 				config.save(configFile);
@@ -93,7 +98,7 @@ public class WorldManager {
 		OVERWORLD("world", -1, Environment.NORMAL, false, true),
 		NETHER("nether", 7, Environment.NETHER, true, false),
 		END("end", 7, Environment.THE_END, true, false),
-		MINE("mine", 7, Environment.NORMAL, true, false),
+		MINING("mining", 7, Environment.NORMAL, true, false),
 		;
 		
 		

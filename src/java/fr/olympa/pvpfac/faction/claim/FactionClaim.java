@@ -165,6 +165,12 @@ public class FactionClaim {
 		else
 			return ClaimPermLevel.LEVEL_NONE;
 	}
+	
+	
+	@Override
+	public String toString() {
+		return claimId.toString();
+	}
 
 
 	
@@ -176,6 +182,7 @@ public class FactionClaim {
 		private int z;
 		
 		public ClaimId(long id, int x, int z) {
+			this.id = id;
 			this.x = x;
 			this.z = z;
 		}
@@ -201,6 +208,11 @@ public class FactionClaim {
 			return o instanceof ClaimId ? ((ClaimId)o).id == this.id :
 				o instanceof Chunk ? ((Chunk)o).getX() == this.x && ((Chunk)o).getZ() == this.z :
 				false;
+		}
+		
+		@Override
+		public String toString() {
+			return "[claim " + id + ": x=" + x + ", z=" + z + "]";
 		}
 	}
 }
