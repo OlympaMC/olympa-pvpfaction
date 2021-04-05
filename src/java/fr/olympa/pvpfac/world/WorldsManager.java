@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -21,9 +22,18 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.region.Region;
+import fr.olympa.api.region.shapes.Cuboid;
+import fr.olympa.api.region.tracking.ActionResult;
+import fr.olympa.api.region.tracking.TrackedRegion;
+import fr.olympa.api.region.tracking.flags.Flag;
+import fr.olympa.api.utils.Prefix;
+import fr.olympa.core.spigot.OlympaCore;
 import fr.olympa.pvpfac.PvPFaction;
 import net.minecraft.server.v1_16_R3.HeightMap.Type;
 
@@ -35,6 +45,7 @@ public class WorldsManager {
 	private final Map<World, WorldType> worlds = new HashMap<World, WorldsManager.WorldType>();
 	
 	private PvPFaction plugin;
+	
 	private YamlConfiguration config = new YamlConfiguration();
 	private File configFile;
 	
@@ -52,8 +63,9 @@ public class WorldsManager {
 			config.load(configFile);
 		else {
 			for (WorldType type : WorldType.values()) {
-				config.set(type.toString() + ".reset_interval", type.getDefaultResetDays());
-				config.set(type.toString() + ".next_reset", 0);	
+				config.set(type + ".reset_interval", type.getDefaultResetDays());
+				config.set(type + ".next_reset", 0);	
+				config.set(type + ".portal", null);	
 			}
 
 			config.save(configFile);
@@ -63,6 +75,7 @@ public class WorldsManager {
 		for (WorldType type : WorldType.values()) {
 			File worldFile = new File(plugin.getServer().getWorldContainer().getAbsolutePath() + "/" + type.getWorldName());
 			
+			//reset worlds if needed
 			if (System.currentTimeMillis() > config.getLong(type.toString() + ".next_reset") && config.getInt(type.toString() + ".reset_interval") > 0) {
 				
 				if (worldFile.exists())
@@ -76,6 +89,7 @@ public class WorldsManager {
 			}else
 				plugin.getLogger().info("§aWorld " + type + " is loading...");
 			
+			//set world parameters
 			type.setWorld(new WorldCreator(type.getWorldName()).environment(type.getType()).createWorld());
 			type.getWorld().setPVP(type.canPvp());
 			type.getWorld().setDifficulty(Difficulty.NORMAL);
@@ -89,6 +103,19 @@ public class WorldsManager {
 			for (int x = -loadChunks ; x <= loadChunks ; x++)
 				for (int z = -loadChunks ; z <= loadChunks ; z++)
 					type.getWorld().getChunkAt(x, z);
+			
+			//manage portals
+			if (config.get(type + ".portal", null) != null)
+				OlympaCore.getInstance().getRegionManager().registerRegion((Cuboid) config.get(type + ".portal"), "portal_world_" + type.toString().toLowerCase(), EventPriority.HIGHEST,
+					new Flag() {
+						@Override
+						public ActionResult enters(Player p, Set<TrackedRegion> to) {
+							super.enters(p, to);
+							type.teleport(p);
+							Prefix.FACTION.sendMessage(p, "§aTu vas être téléporté vers le monde " + type.getWorldName() + "...");
+							return ActionResult.TELEPORT_ELSEWHERE;
+						}
+					});
 		}	
 	}
 	
@@ -98,6 +125,17 @@ public class WorldsManager {
 	
 	public WorldType getWorldType(World w) {
 		return worlds.get(w);
+	}
+
+	public void setPortal(WorldType world, Cuboid region) {
+		config.set(world + ".portal", region);
+		
+		try {
+			config.save(configFile);
+		} catch (IOException e) {
+			plugin.getLogger().warning("§cFailed to save new portal loc for world " + world);
+			e.printStackTrace();
+		}
 	}
 	
 	public static enum WorldType {

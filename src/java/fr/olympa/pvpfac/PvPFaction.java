@@ -53,6 +53,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public FactionClaimsManager getClaimsManager() {
 		return claimsManager;
 	}
+	
+	public WorldsManager getWorldsManager() {
+		return worldsManager;
+	}
 
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
 	public DynamicLine<Scoreboard<FactionPlayer>> lineGroup = new DynamicLine<>(x -> "§7Rang: §b" + x.getOlympaPlayer().getGroupNameColored());

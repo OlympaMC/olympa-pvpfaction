@@ -16,5 +16,7 @@ public class PvPFactionPermission {
 	public static final OlympaSpigotPermission TAX_COMMAND = new OlympaSpigotPermission(OlympaGroup.RESP_TECH);
 	public static final OlympaSpigotPermission MOD_COMMANDS = new OlympaSpigotPermission(OlympaGroup.MOD);
 	
-	public static final OlympaSpigotPermission TP_WORLDS_COMMANDS = new OlympaSpigotPermission(OlympaGroup.PLAYER);
+	public static final OlympaSpigotPermission WORLD_COMMAND_PLAYER = new OlympaSpigotPermission(OlympaGroup.PLAYER);
+	
+	public static final OlympaSpigotPermission WORLD_COMMAND_ADMIN = new OlympaSpigotPermission(OlympaGroup.PLAYER);
 }
