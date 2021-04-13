@@ -21,12 +21,11 @@ import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
-import fr.olympa.pvpfac.armorstand.ArmorStandWithHandListener;
+import fr.olympa.pvpfac.adminshop.AdminShopCommand;
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
-import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
@@ -53,7 +52,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public FactionClaimsManager getClaimsManager() {
 		return claimsManager;
 	}
-	
+
 	public WorldsManager getWorldsManager() {
 		return worldsManager;
 	}
@@ -100,7 +99,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(claimsManager = new FactionClaimsManager(), this);
 			//			pluginManager.registerEvents(new Test(), this);
 			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
-			
+
 			worldsManager = new WorldsManager(this);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -111,6 +110,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new FeedCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new BackCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
+		new AdminShopCommand(this);
 
 		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
 
