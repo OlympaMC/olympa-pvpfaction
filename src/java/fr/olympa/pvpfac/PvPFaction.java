@@ -1,7 +1,5 @@
 package fr.olympa.pvpfac;
 
-import org.bukkit.Bukkit;
-import org.bukkit.WorldCreator;
 import org.bukkit.plugin.PluginManager;
 
 import fr.olympa.api.auctions.AuctionsManager;
@@ -21,12 +19,11 @@ import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
-import fr.olympa.pvpfac.armorstand.ArmorStandWithHandListener;
+import fr.olympa.api.trades.TradesManager;
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
-import fr.olympa.pvpfac.faction.claim.FactionPvPListener;
 import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
@@ -45,6 +42,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public FactionClaimsManager claimsManager;
 	private WorldsManager worldsManager;
 	private TaxManager taxManager;
+	private TradesManager<FactionPlayer> trades;
 
 	public FactionManager getFactionManager() {
 		return factionManager;
@@ -56,6 +54,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 	
 	public WorldsManager getWorldsManager() {
 		return worldsManager;
+	}
+
+	public TradesManager<FactionPlayer> getTradesManager() {
+		return trades;
 	}
 
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
@@ -79,7 +81,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 		OlympaAPIPermissions.FLY_COMMAND.setMinGroup(OlympaGroup.DEVP);
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
-
+		
 		try {
 			taxManager = new TaxManager(this, PvPFactionPermission.TAX_COMMAND, "pvpfac_tax", 0);
 			new AuctionsManager(this, "pvpfac_auctions", taxManager);
@@ -108,11 +110,13 @@ public class PvPFaction extends OlympaAPIPlugin {
 		}
 
 		new MoneyCommand<FactionPlayer>(this, "money", "Gérer son porte-monnaie.", PvPFactionPermission.MONEY_COMMAND, PvPFactionPermission.MONEY_COMMAND_OTHER, PvPFactionPermission.MONEY_COMMAND_MANAGE, "monnaie").register();
+		trades = new TradesManager<FactionPlayer>(this);
+		
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new FeedCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new BackCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 
-		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
+		//Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
 
 		// Not needed now ? OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
@@ -128,4 +132,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			protocolSupport.disable1_8();*/
 		sendMessage("§2" + getDescription().getName() + "§a (" + getDescription().getVersion() + ") est activé.");
 	}
+
+	
+	
 }
