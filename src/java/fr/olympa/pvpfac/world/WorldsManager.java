@@ -85,6 +85,7 @@ public class WorldsManager {
 				config.set(type.toString() + ".next_reset", System.currentTimeMillis() + config.getLong(type.toString() + ".reset_interval") * 24 * 3600 * 1000 - 2 * 3600 * 1000);
 				config.save(configFile);
 				
+				type.generateChunks = true;
 				plugin.getLogger().info("§2World " + type + " will reset, this may take a while, generating " + loadChunks*loadChunks + " chunks...");
 			}else
 				plugin.getLogger().info("§aWorld " + type + " is loading...");
@@ -100,9 +101,10 @@ public class WorldsManager {
 			worlds.put(type.getWorld(), type);
 			
 			//preload chunks in min radius
-			for (int x = -loadChunks ; x <= loadChunks ; x++)
-				for (int z = -loadChunks ; z <= loadChunks ; z++)
-					type.getWorld().getChunkAt(x, z);
+			if (type.generateChunks)
+				for (int x = -loadChunks ; x <= loadChunks ; x++)
+					for (int z = -loadChunks ; z <= loadChunks ; z++)
+						type.getWorld().getChunkAt(x, z);
 			
 			//manage portals
 			if (config.get(type + ".portal", null) != null)
@@ -160,6 +162,8 @@ public class WorldsManager {
 		
 		private boolean useRandomTp;
 		private boolean canPvp;
+		
+		private boolean generateChunks = false;
 		
 		private World world;
 		
