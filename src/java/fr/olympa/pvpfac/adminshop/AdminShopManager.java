@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.command.OlympaCommand;
 import fr.olympa.api.module.OlympaModule;
@@ -22,7 +23,13 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		return items;
 	}
 
+	protected AdminShopItem getAdminShopItem(ItemStack item) {
+		return items.stream().filter(it -> it.getMaterial().equals(item.getType())).findFirst().orElse(null);
+	}
+
 	protected boolean addItem(AdminShopItem item) {
+		if (getAdminShopItem(item.getItemStack()) != null)
+			return false;
 		return items.add(item);
 	}
 

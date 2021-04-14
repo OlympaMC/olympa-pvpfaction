@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.item.OlympaItemBuild;
+import fr.olympa.api.utils.Prefix;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 
 public class AdminShopItem {
@@ -42,7 +43,7 @@ public class AdminShopItem {
 
 	protected void updateLore() {
 		String sep = "&e&m&l##########";
-		item.resetLore().lore(sep, "", "&6Valeur &2" + value, "", sep);
+		item.resetLore().lore(sep, "", "&6Valeur &2" + value, "", sep, "", "&7Clique &2Gauche &7> &aAchète", "&7Clique &cDroit &7> &cVends", "", sep);
 	}
 
 	public TranslatableComponent getName() {
@@ -88,5 +89,20 @@ public class AdminShopItem {
 
 	public boolean hasItemOnInv(Player player) {
 		return player.getInventory().contains(material);
+	}
+
+	public void sold(Player p) {
+		int amont = 1;
+		p.getInventory().remove(new ItemStack(material, amont));
+		soldToday += amont;
+		Prefix.FACTION.sendMessage(p, "&aTu as vendu %dx &2%s&.", amont, material.name());
+	}
+
+	public void buy(Player p) {
+		int amont = 1;
+		p.getInventory().addItem(new ItemStack(material, amont));
+		buyToday += amont;
+		Prefix.FACTION.sendMessage(p, "&aTu as acheté %dx &2%s&.", amont, material.name());
+
 	}
 }

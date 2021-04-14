@@ -21,10 +21,15 @@ public class AdminShopCommand extends ComplexCommand {
 		new AdminShopGui().create(player);
 	}
 
-	@Cmd(min = 1, description = "Ajoute un item grace à son type", args = "MATERAL")
+	@Cmd(min = 1, description = "Ajoute un item grace à son type", args = { "MATERAL", "FLOAT" })
 	public void addItem(CommandContext cmd) {
 		Material material = cmd.getArgument(0);
-		((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(0, material));
-		sendMessage(Prefix.FACTION, "%d a été ajouté à l'AdminShop.", material.name());
+		float value = 1;
+		if (cmd.getArgumentsLength() > 1)
+			value = cmd.getArgument(1);
+		if (((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(value, material)))
+			sendMessage(Prefix.FACTION, "&a%d&2 a été ajouté à l'AdminShop avec comme valeur &2%d&a..", material.name(), value);
+		else
+			sendMessage(Prefix.FACTION, "&cImpossible d'ajouter &4%d&c. Il doit surment déjà être dans le shop.", material.name());
 	}
 }
