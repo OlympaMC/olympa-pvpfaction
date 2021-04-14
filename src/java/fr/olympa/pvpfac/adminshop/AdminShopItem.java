@@ -1,6 +1,7 @@
 package fr.olympa.pvpfac.adminshop;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.item.OlympaItemBuild;
@@ -17,6 +18,8 @@ public class AdminShopItem {
 	long totalSold;
 	long buyToday;
 	long totalBuy;
+
+	boolean actived;
 
 	/**
 	 * @param name
@@ -37,4 +40,53 @@ public class AdminShopItem {
 		return itemStack;
 	}
 
+	protected void updateLore() {
+		String sep = "&e&m&l##########";
+		item.resetLore().lore(sep, "", "&6Valeur &2" + value, "", sep);
+	}
+
+	public TranslatableComponent getName() {
+		return name;
+	}
+
+	public float getValue() {
+		return value;
+	}
+
+	public Material getMaterial() {
+		return material;
+	}
+
+	public OlympaItemBuild getItem() {
+		return item;
+	}
+
+	public long getSoldToday() {
+		return soldToday;
+	}
+
+	public long getTotalSold() {
+		return totalSold;
+	}
+
+	public long getBuyToday() {
+		return buyToday;
+	}
+
+	public long getTotalBuy() {
+		return totalBuy;
+	}
+
+	public boolean isActived() {
+		return actived;
+	}
+
+	public void setValue(float value) {
+		this.value = value;
+		updateLore();
+	}
+
+	public boolean hasItemOnInv(Player player) {
+		return player.getInventory().contains(material);
+	}
 }

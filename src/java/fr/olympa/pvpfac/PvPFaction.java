@@ -22,6 +22,7 @@ import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
 import fr.olympa.pvpfac.adminshop.AdminShopCommand;
+import fr.olympa.pvpfac.adminshop.AdminShopManager;
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
@@ -44,6 +45,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public FactionClaimsManager claimsManager;
 	private WorldsManager worldsManager;
 	private TaxManager taxManager;
+	private AdminShopManager adminShop;
 
 	public FactionManager getFactionManager() {
 		return factionManager;
@@ -55,6 +57,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 	public WorldsManager getWorldsManager() {
 		return worldsManager;
+	}
+
+	public AdminShopManager getAdminShop() {
+		return adminShop;
 	}
 
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
@@ -111,6 +117,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 		new FeedCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new BackCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new AdminShopCommand(this);
+		adminShop = new AdminShopManager(this);
+		adminShop.enable(this);
 
 		Bukkit.createWorld(WorldCreator.name("minage").generateStructures(false));
 

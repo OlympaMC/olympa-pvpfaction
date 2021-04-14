@@ -5,12 +5,13 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.gui.OlympaGUI;
+import fr.olympa.pvpfac.PvPFaction;
 
 public class AdminShopGui extends OlympaGUI {
 
 	public AdminShopGui() {
 		super("&eAdmin Shop", 6);
-		for (AdminShopItem item : AdminShopItems.getItems())
+		for (AdminShopItem item : PvPFaction.getInstance().getAdminShop().getItems())
 			inv.addItem(item.getItemStack());
 	}
 
