@@ -18,19 +18,23 @@ import fr.olympa.api.item.ItemUtils;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.provider.OlympaPlayerObject;
 import fr.olympa.api.sql.SQLColumn;
+import fr.olympa.api.trades.TradeBag;
+import fr.olympa.api.trades.TradePlayerInterface;
 import fr.olympa.api.utils.observable.ObservableInt;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
+import net.minecraft.server.v1_16_R3.ItemSuspiciousStew;
 
-public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction, FactionPlayerData>, EnderChestPlayerInterface {
+public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction, FactionPlayerData>, EnderChestPlayerInterface, TradePlayerInterface {
 
 	public static int POWER_MAX = 5;
 
 	private static final SQLColumn<FactionPlayer> COLUMN_POWER = new SQLColumn<FactionPlayer>("power", "TINYINT(3) NULL DEFAULT 9", Types.TINYINT).setUpdatable();
 	private static final SQLColumn<FactionPlayer> COLUMN_ENDER_CHEST = new SQLColumn<FactionPlayer>("ender_chest", "VARBINARY(8000) NULL", Types.VARBINARY).setUpdatable();
 	private static final SQLColumn<FactionPlayer> COLUMN_MONEY = new SQLColumn<FactionPlayer>("money", "DOUBLE NULL DEFAULT 0", Types.DOUBLE).setUpdatable();
+	private static final SQLColumn<FactionPlayer> COLUMN_TRADE_BAG = new SQLColumn<FactionPlayer>("trade_bag", "VARBINARY(8000) NULL", Types.VARBINARY).setUpdatable();
 	
-	public static final List<SQLColumn<FactionPlayer>> COLUMNS = Arrays.asList(COLUMN_POWER, COLUMN_ENDER_CHEST, COLUMN_MONEY);
+	public static final List<SQLColumn<FactionPlayer>> COLUMNS = Arrays.asList(COLUMN_POWER, COLUMN_ENDER_CHEST, COLUMN_MONEY, COLUMN_TRADE_BAG);
 	
 	public static FactionPlayer get(Player p) {
 		return AccountProvider.get(p.getUniqueId());
@@ -39,6 +43,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	private ObservableInt power = new ObservableInt(0);
 	private ItemStack[] enderChestContents;
 	private OlympaMoney money = new OlympaMoney(0);
+	private TradeBag<FactionPlayer> tradeBag = new TradeBag<>(this);
 	
 	private Faction faction;
 	FactionChat chat = FactionChat.GENERAL;
@@ -52,6 +57,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 		super.loaded();
 		money.observe("datas", () -> COLUMN_MONEY.updateAsync(this, money.get(), null, null));
 		power.observe("datas", () -> COLUMN_POWER.updateAsync(this, power.get(), null, null));
+		tradeBag.observe("datas", () -> COLUMN_TRADE_BAG.updateAsync(this, ItemUtils.serializeItemsArray(tradeBag.getItems().toArray(new ItemStack[tradeBag.getItems().size()])), null, null));
 	}
 
 	public FactionChat getChat() {
@@ -124,6 +130,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 			power.set(resultSet.getInt("power"));
 			enderChestContents = ItemUtils.deserializeItemsArray(resultSet.getBytes("ender_chest"));
 			money.set(resultSet.getDouble("money"));
+			tradeBag.setItems(ItemUtils.deserializeItemsArray(resultSet.getBytes("trade_bag")));
 		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
@@ -140,5 +147,10 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	@Override
 	public void setClan(Faction faction) {
 		this.faction = faction;
+	}
+
+	@Override
+	public TradeBag<FactionPlayer> getTradeBag() {
+		return tradeBag;
 	}
 }

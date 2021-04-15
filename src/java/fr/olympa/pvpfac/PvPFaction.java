@@ -123,7 +123,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 		}
 
 		new MoneyCommand<FactionPlayer>(this, "money", "Gérer son porte-monnaie.", PvPFactionPermission.MONEY_COMMAND, PvPFactionPermission.MONEY_COMMAND_OTHER, PvPFactionPermission.MONEY_COMMAND_MANAGE, "monnaie").register();
-		trades = new TradesManager<FactionPlayer>(this);
+		trades = new TradesManager<FactionPlayer>(this, 10);
 		
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new FeedCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
