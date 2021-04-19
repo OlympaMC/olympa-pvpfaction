@@ -1,5 +1,6 @@
 package fr.olympa.pvpfac.adminshop;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -17,17 +18,22 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 	protected static AdminShopItem GRASS = new AdminShopItem(1f, Material.GRASS);
 	protected static AdminShopItem DIRT = new AdminShopItem(0.5f, Material.DIRT);
 
-	protected List<AdminShopItem> items = List.of(GRASS, DIRT);
+	protected List<AdminShopItem> items = new ArrayList<>();
 
-	protected List<AdminShopItem> getItems() {
+	public AdminShopManager() {
+		items.add(GRASS);
+		items.add(DIRT);
+	}
+
+	public List<AdminShopItem> getItems() {
 		return items;
 	}
 
-	protected AdminShopItem getAdminShopItem(ItemStack item) {
+	public AdminShopItem getAdminShopItem(ItemStack item) {
 		return items.stream().filter(it -> it.getMaterial().equals(item.getType())).findFirst().orElse(null);
 	}
 
-	protected boolean addItem(AdminShopItem item) {
+	public boolean addItem(AdminShopItem item) {
 		if (getAdminShopItem(item.getItemStack()) != null)
 			return false;
 		return items.add(item);

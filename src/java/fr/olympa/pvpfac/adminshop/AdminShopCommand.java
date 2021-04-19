@@ -8,16 +8,17 @@ import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.command.complex.ComplexCommand;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.adminshop.gui.AdminShopGui;
 
 public class AdminShopCommand extends ComplexCommand {
 
 	public AdminShopCommand(Plugin plugin) {
-		super(plugin, "adminshop", "Boutique", null);
+		super(plugin, "adminshop", "Boutique pour vendre/acheter des objets.", null, "boutique");
 		addArgumentParser("MATERAL", Material.class);
 	}
 
-	@Cmd(otherArg = true)
-	public void otherArg(CommandContext cmd) {
+	@Cmd
+	public void open(CommandContext cmd) {
 		new AdminShopGui().create(player);
 	}
 

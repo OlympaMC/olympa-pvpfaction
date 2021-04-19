@@ -19,12 +19,8 @@ import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
 import fr.olympa.api.scoreboard.sign.ScoreboardManager;
-
 import fr.olympa.api.trades.TradesManager;
-
-import fr.olympa.pvpfac.adminshop.AdminShopCommand;
 import fr.olympa.pvpfac.adminshop.AdminShopManager;
-
 import fr.olympa.pvpfac.faction.FactionManager;
 import fr.olympa.pvpfac.faction.chat.FactionChatListener;
 import fr.olympa.pvpfac.faction.claim.FactionClaimListener;
@@ -51,7 +47,6 @@ public class PvPFaction extends OlympaAPIPlugin {
 	private TradesManager<FactionPlayer> trades;
 
 	private AdminShopManager adminShop;
-
 
 	public FactionManager getFactionManager() {
 		return factionManager;
@@ -94,7 +89,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 		OlympaAPIPermissions.FLY_COMMAND.setMinGroup(OlympaGroup.DEVP);
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
-		
+
 		try {
 			taxManager = new TaxManager(this, PvPFactionPermission.TAX_COMMAND, "pvpfac_tax", 0);
 			new AuctionsManager(this, "pvpfac_auctions", taxManager);
@@ -123,12 +118,12 @@ public class PvPFaction extends OlympaAPIPlugin {
 		}
 
 		new MoneyCommand<FactionPlayer>(this, "money", "Gérer son porte-monnaie.", PvPFactionPermission.MONEY_COMMAND, PvPFactionPermission.MONEY_COMMAND_OTHER, PvPFactionPermission.MONEY_COMMAND_MANAGE, "monnaie").register();
-		trades = new TradesManager<FactionPlayer>(this, 10);
-		
+		trades = new TradesManager<>(this, 10);
+
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new FeedCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new BackCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
-		new AdminShopCommand(this);
+		//new AdminShopCommand(this);
 		adminShop = new AdminShopManager(this);
 		adminShop.enable(this);
 
@@ -149,6 +144,4 @@ public class PvPFaction extends OlympaAPIPlugin {
 		sendMessage("§2" + getDescription().getName() + "§a (" + getDescription().getVersion() + ") est activé.");
 	}
 
-	
-	
 }

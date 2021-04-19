@@ -32,6 +32,7 @@ public class AdminShopItem {
 		item = new OlympaItemBuild(material, material.name());
 		this.value = value;
 		this.material = material;
+		updateLore();
 	}
 
 	public ItemStack getItemStack() {
@@ -95,14 +96,14 @@ public class AdminShopItem {
 		int amont = 1;
 		p.getInventory().remove(new ItemStack(material, amont));
 		soldToday += amont;
-		Prefix.FACTION.sendMessage(p, "&aTu as vendu %dx &2%s&.", amont, material.name());
+		Prefix.FACTION.sendMessage(p, "&cTu as vendu %dx &4%s&c.", amont, material.name());
 	}
 
 	public void buy(Player p) {
 		int amont = 1;
 		p.getInventory().addItem(new ItemStack(material, amont));
 		buyToday += amont;
-		Prefix.FACTION.sendMessage(p, "&aTu as acheté %dx &2%s&.", amont, material.name());
+		Prefix.FACTION.sendMessage(p, "&aTu as acheté %dx &2%s&a.", amont, material.name());
 
 	}
 }

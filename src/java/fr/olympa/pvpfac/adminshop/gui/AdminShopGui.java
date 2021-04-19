@@ -1,4 +1,4 @@
-package fr.olympa.pvpfac.adminshop;
+package fr.olympa.pvpfac.adminshop.gui;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.adminshop.AdminShopItem;
 
 public class AdminShopGui extends OlympaGUI {
 
