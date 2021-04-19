@@ -20,7 +20,16 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 
 	protected List<AdminShopItem> items = new ArrayList<>();
 
-	public AdminShopManager() {
+	public AdminShopManager(OlympaAPIPlugin pl) {
+		items.clear();
+		try {
+			OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
+					.cmd(AdminShopCommand.class);
+			adminShopModule.enableModule();
+			adminShopModule.registerModule();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		items.add(GRASS);
 		items.add(DIRT);
 	}
@@ -57,16 +66,5 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 	@Override
 	public boolean isEnabled() {
 		return false;
-	}
-
-	public AdminShopManager(OlympaAPIPlugin pl) {
-		OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
-				.cmd(AdminShopCommand.class);
-		try {
-			adminShopModule.enableModule();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		adminShopModule.registerModule();
 	}
 }

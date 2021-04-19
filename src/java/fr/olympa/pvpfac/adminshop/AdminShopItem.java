@@ -96,14 +96,14 @@ public class AdminShopItem {
 		int amont = 1;
 		p.getInventory().remove(new ItemStack(material, amont));
 		soldToday += amont;
-		Prefix.FACTION.sendMessage(p, "&cTu as vendu %dx &4%s&c.", amont, material.name());
+		Prefix.FACTION.sendMessage(p, "&cTu as vendu x%d &4%s&c.", amont, material.name());
 	}
 
 	public void buy(Player p) {
 		int amont = 1;
 		p.getInventory().addItem(new ItemStack(material, amont));
 		buyToday += amont;
-		Prefix.FACTION.sendMessage(p, "&aTu as acheté %dx &2%s&a.", amont, material.name());
+		Prefix.FACTION.sendMessage(p, "&aTu as acheté x%d &2%s&a.", amont, material.name());
 
 	}
 }

@@ -20,10 +20,10 @@ public class AdminShopGui extends OlympaGUI {
 	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
 		AdminShopItem adminShopItem = PvPFaction.getInstance().getAdminShop().getAdminShopItem(current);
 		if (adminShopItem != null)
-			if (click.equals(ClickType.LEFT)) {
+			if (click.equals(ClickType.RIGHT)) {
 				if (adminShopItem.hasItemOnInv(p))
 					adminShopItem.sold(p);
-			} else if (click.equals(ClickType.RIGHT))
+			} else if (click.equals(ClickType.LEFT))
 				adminShopItem.buy(p);
 
 		return true;

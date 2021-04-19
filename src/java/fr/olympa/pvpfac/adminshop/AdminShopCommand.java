@@ -29,7 +29,7 @@ public class AdminShopCommand extends ComplexCommand {
 		if (cmd.getArgumentsLength() > 1)
 			value = cmd.getArgument(1);
 		if (((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(value, material)))
-			sendMessage(Prefix.FACTION, "&a%d&2 a été ajouté à l'AdminShop avec comme valeur &2%d&a..", material.name(), value);
+			sendMessage(Prefix.FACTION, "&a%s&2 a été ajouté à l'AdminShop avec comme valeur &2%d&a.", material.name(), value);
 		else
 			sendMessage(Prefix.FACTION, "&cImpossible d'ajouter &4%d&c. Il doit surment déjà être dans le shop.", material.name());
 	}
