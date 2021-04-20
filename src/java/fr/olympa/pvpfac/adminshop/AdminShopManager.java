@@ -25,6 +25,8 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 
 	public AdminShopManager(OlympaAPIPlugin pl) {
 		items = new ArrayList<>();
+		items.add(GRASS);
+		items.add(DIRT);
 		try {
 			OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
 					.cmd(AdminShopCommand.class);
@@ -33,8 +35,6 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		items.add(GRASS);
-		items.add(DIRT);
 	}
 
 	public int getGuiRows() {

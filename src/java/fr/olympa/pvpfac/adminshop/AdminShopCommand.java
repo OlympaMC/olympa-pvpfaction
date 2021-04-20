@@ -1,5 +1,7 @@
 package fr.olympa.pvpfac.adminshop;
 
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -36,7 +38,7 @@ public class AdminShopCommand extends ComplexCommand {
 		return true;
 	}
 
-	@Cmd(min = 0, description = "Ajoute un item grace à son type", args = { "MATERAL|INTEGER", "FLOAT" })
+	@Cmd(description = "Ajoute un item grace à son type", args = { "MATERAL|INTEGER", "FLOAT" })
 	public void addItem(CommandContext cmd) {
 		Material material;
 		int amout = 1;
@@ -52,8 +54,46 @@ public class AdminShopCommand extends ComplexCommand {
 		if (cmd.getArgumentsLength() > 1)
 			value = cmd.getArgument(1);
 		if (((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(material, amout, value)))
-			sendMessage(Prefix.FACTION, "&a%s&2 a été ajouté à l'AdminShop avec comme valeur &2%d&a.", material.name(), value);
+			sendMessage(Prefix.FACTION, "&a%s&2 a été ajouté à l'AdminShop avec comme valeur &2%f&a.", material.name(), value);
 		else
 			sendMessage(Prefix.FACTION, "&cImpossible d'ajouter &4%d&c. Il doit surment déjà être dans le shop.", material.name());
+	}
+
+	@Cmd(min = 1, description = "Ajoute un item grace à son type", args = { "INTEGER" })
+	public void enableItem(CommandContext cmd) {
+		AdminShopManager adminShop = ((PvPFaction) plugin).getAdminShop();
+		int index = cmd.getArgument(0);
+		List<AdminShopItem> allItem = adminShop.getAllItems();
+		AdminShopItem item;
+		if (allItem.isEmpty() || index < 0 || allItem.size() - 1 < index) {
+			sendMessage(Prefix.FACTION, "&cL'index &4%d&c n'existe pas.", index);
+			return;
+		}
+		item = adminShop.getAllItems().get(index);
+		if (!item.isEnable()) {
+			sendMessage(Prefix.FACTION, "&4%s&c est déjà &4activé&c.", item.getMaterial().name());
+			return;
+		}
+		item.enable();
+		sendMessage(Prefix.FACTION, "&2%s&a a été &2activé&a.", item.getMaterial().name());
+	}
+
+	@Cmd(min = 1, description = "Désactiver un item grace à son type", args = { "INTEGER" })
+	public void disableItem(CommandContext cmd) {
+		AdminShopManager adminShop = ((PvPFaction) plugin).getAdminShop();
+		int index = cmd.getArgument(0);
+		List<AdminShopItem> allItem = adminShop.getAllItems();
+		AdminShopItem item;
+		if (allItem.isEmpty() || index < 0 || allItem.size() - 1 < index) {
+			sendMessage(Prefix.FACTION, "&cL'index &4%d&c n'existe pas.", index);
+			return;
+		}
+		item = adminShop.getAllItems().get(index);
+		if (item.isEnable()) {
+			sendMessage(Prefix.FACTION, "&4%s&c est déjà &4désactivé&c.", item.getMaterial().name());
+			return;
+		}
+		item.disable();
+		sendMessage(Prefix.FACTION, "&4%s&c a été &4désactiver&c.", item.getMaterial().name());
 	}
 }

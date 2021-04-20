@@ -1,5 +1,7 @@
 package fr.olympa.pvpfac.adminshop;
 
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +19,8 @@ public class AdminShopItem {
 	int amont;
 	Material material;
 
-	OlympaItemBuild item;
+	ItemStack item;
+	OlympaItemBuild itemBuilder;
 	long soldToday;
 	long totalSold;
 	long buyToday;
@@ -29,25 +32,39 @@ public class AdminShopItem {
 		this(material, 1, value);
 	}
 
+	public AdminShopItem(ItemStack itemStack, float value) {
+		item = itemStack;
+		material = itemStack.getType();
+		amont = itemStack.getAmount();
+		name = new TranslatableComponent(material.getTranslationKey());
+		itemBuilder = new OlympaItemBuild(itemStack);
+		enable = false;
+		updateLore();
+	}
+
 	public AdminShopItem(Material material, int amont, float value) {
 		this.amont = amont;
 		name = new TranslatableComponent(material.getTranslationKey());
-		item = new OlympaItemBuild(material).size(amont);
+		itemBuilder = new OlympaItemBuild(material).size(amont);
 		enable = false;
 		updateLore();
+	}
+
+	public ItemStack getItemStackOriginal() {
+		return item;
 	}
 
 	public ItemStack getItemStackPlayer() {
 		if (!isEnable())
 			return null;
-		ItemStack itemStack = item.build();
+		ItemStack itemStack = itemBuilder.build();
 		//TranslatableComponent translatable = new TranslatableComponent(material.getTranslationKey());
 		//itemStack.getItemMeta().setLocalizedName(translatable.toLegacyText());
 		return itemStack;
 	}
 
 	public ItemStack getItemStackAdmin() {
-		OlympaItemBuild itemAdmin = item.clone();
+		OlympaItemBuild itemAdmin = itemBuilder.clone();
 		if (!isEnable()) {
 			itemAdmin.size(-1);
 			itemAdmin.addLoreBefore("&4&lOBJECT DESACTIVER");
@@ -59,7 +76,7 @@ public class AdminShopItem {
 	}
 
 	protected void updateLore() {
-		item.resetLore().lore(SEP, "", "&6Valeur &2" + value, "&6Nombre &2" + amont, "", SEP, "", "&7Clique &2Gauche &7> &aAchète", "&7Clique &cDroit &7> &cVends", "", SEP);
+		itemBuilder.resetLore().lore(SEP, "", "&6Valeur &2" + value, "&6Nombre &2" + amont, "", SEP, "", "&7Clique &2Gauche &7> &aAchète", "&7Clique &cDroit &7> &cVends", "", SEP);
 	}
 
 	public TranslatableComponent getName() {
@@ -74,8 +91,8 @@ public class AdminShopItem {
 		return material;
 	}
 
-	public OlympaItemBuild getItem() {
-		return item;
+	public OlympaItemBuild getItemBuilder() {
+		return itemBuilder;
 	}
 
 	public long getSoldToday() {
@@ -116,17 +133,49 @@ public class AdminShopItem {
 	}
 
 	public void sold(Player p) {
-		int amont = 1;
 		p.getInventory().remove(new ItemStack(material, amont));
 		soldToday += amont;
 		Prefix.FACTION.sendMessage(p, "&cTu as vendu x%d &4%s&c.", amont, material.name());
 	}
 
 	public void buy(Player p) {
-		int amont = 1;
 		p.getInventory().addItem(new ItemStack(material, amont));
 		buyToday += amont;
 		Prefix.FACTION.sendMessage(p, "&aTu as acheté x%d &2%s&a.", amont, material.name());
 
 	}
+
+	public boolean consumeItem(Player player, int count) {
+		Map<Integer, ? extends ItemStack> ammo;
+
+		if (item != null)
+			ammo = player.getInventory().all(item);
+		else
+			ammo = player.getInventory().all(material);
+
+		int found = 0;
+		for (ItemStack stack : ammo.values())
+			found += stack.getAmount();
+		if (count > found)
+			return false;
+
+		for (Integer index : ammo.keySet()) {
+			ItemStack stack = ammo.get(index);
+
+			int removed = Math.min(count, stack.getAmount());
+			count -= removed;
+
+			if (stack.getAmount() == removed)
+				player.getInventory().setItem(index, null);
+			else
+				stack.setAmount(stack.getAmount() - removed);
+
+			if (count <= 0)
+				break;
+		}
+
+		player.updateInventory();
+		return true;
+	}
+
 }
