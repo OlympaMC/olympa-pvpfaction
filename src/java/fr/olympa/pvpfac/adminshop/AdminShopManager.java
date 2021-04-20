@@ -2,6 +2,8 @@ package fr.olympa.pvpfac.adminshop;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
@@ -12,16 +14,17 @@ import fr.olympa.api.module.OlympaModule;
 import fr.olympa.api.module.OlympaModule.ModuleApi;
 import fr.olympa.api.module.SpigotModule;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
+import fr.olympa.api.sort.Sorting;
 
 public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 
-	protected static AdminShopItem GRASS = new AdminShopItem(1f, Material.GRASS);
-	protected static AdminShopItem DIRT = new AdminShopItem(0.5f, Material.DIRT);
+	protected static AdminShopItem GRASS = new AdminShopItem(Material.GRASS, 64, 1f);
+	protected static AdminShopItem DIRT = new AdminShopItem(Material.DIRT, 0.5f);
 
-	protected List<AdminShopItem> items = new ArrayList<>();
+	protected List<AdminShopItem> items;
 
 	public AdminShopManager(OlympaAPIPlugin pl) {
-		items.clear();
+		items = new ArrayList<>();
 		try {
 			OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
 					.cmd(AdminShopCommand.class);
@@ -34,8 +37,43 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		items.add(DIRT);
 	}
 
-	public List<AdminShopItem> getItems() {
-		return items;
+	public int getGuiRows() {
+		return 6;
+	}
+
+	public int getPageSize() {
+		return getGuiRows() * 9;
+	}
+
+	public int getMaxPlayerPlayer() {
+		return getItemsEnabled().size() / getPageSize();
+	}
+
+	public int getMaxPageAdmin() {
+		return items.size() / getPageSize();
+	}
+
+	public List<AdminShopItem> getItemPage(int page, Boolean enableOrDisableorAll) {
+		Stream<AdminShopItem> stream;
+		if (enableOrDisableorAll == null)
+			stream = items.stream().sorted(new Sorting<>(it -> it.isEnable() ? 1 : 0));
+		else if (enableOrDisableorAll)
+			stream = items.stream().filter(it -> it.isEnable());
+		else
+			stream = items.stream().filter(it -> !it.isEnable());
+		return stream.skip((page - 1) * getPageSize()).limit(getPageSize()).collect(Collectors.toList());
+	}
+
+	public List<AdminShopItem> getAllItems() {
+		return items.stream().sorted(new Sorting<AdminShopItem>(it -> it.isEnable() ? 1 : 0)).collect(Collectors.toList());
+	}
+
+	public List<AdminShopItem> getItemsEnabled() {
+		return items.stream().filter(it -> it.isEnable()).collect(Collectors.toList());
+	}
+
+	public List<AdminShopItem> getItemsDisabled() {
+		return items.stream().filter(it -> !it.isEnable()).collect(Collectors.toList());
 	}
 
 	public AdminShopItem getAdminShopItem(ItemStack item) {
@@ -43,8 +81,6 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 	}
 
 	public boolean addItem(AdminShopItem item) {
-		if (getAdminShopItem(item.getItemStack()) != null)
-			return false;
 		return items.add(item);
 	}
 

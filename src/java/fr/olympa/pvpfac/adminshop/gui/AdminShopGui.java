@@ -6,25 +6,61 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.gui.OlympaGUI;
 import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.adminshop.AdminShopItem;
+import fr.olympa.pvpfac.adminshop.AdminShopManager;
 
 public class AdminShopGui extends OlympaGUI {
 
-	public AdminShopGui() {
-		super("&eAdmin Shop", 6);
-		for (AdminShopItem item : PvPFaction.getInstance().getAdminShop().getItems())
-			inv.addItem(item.getItemStack());
+	int page = 1;
+
+	public AdminShopGui(Player player) {
+		super("&eAdmin Shop ", PvPFaction.getInstance().getAdminShop().getGuiRows());
+		updateInventory(player);
+	}
+
+	public void updateInventory(Player player) {
+		inv.clear();
+		AdminShopManager adminShopHandler = PvPFaction.getInstance().getAdminShop();
+		if (PvPFactionPermission.ADMINSHOP_ADMIN.hasSenderPermission(player))
+			for (AdminShopItem item : adminShopHandler.getItemPage(1, null))
+				inv.addItem(item.getItemStackAdmin());
+		else
+			for (AdminShopItem item : adminShopHandler.getItemPage(1, true))
+				inv.addItem(item.getItemStackPlayer());
+
 	}
 
 	@Override
-	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
+	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
+		player.sendMessage("slot " + slot);
 		AdminShopItem adminShopItem = PvPFaction.getInstance().getAdminShop().getAdminShopItem(current);
 		if (adminShopItem != null)
-			if (click.equals(ClickType.RIGHT)) {
-				if (adminShopItem.hasItemOnInv(p))
-					adminShopItem.sold(p);
-			} else if (click.equals(ClickType.LEFT))
-				adminShopItem.buy(p);
+			switch (click) {
+			case LEFT:
+				adminShopItem.buy(player);
+				break;
+			case RIGHT:
+				if (adminShopItem.hasItemOnInv(player))
+					adminShopItem.sold(player);
+				break;
+			case SHIFT_LEFT:
+				if (PvPFactionPermission.ADMINSHOP_ADMIN.hasSenderPermission(player))
+					adminShopItem.enable();
+				break;
+			case SHIFT_RIGHT:
+				if (PvPFactionPermission.ADMINSHOP_ADMIN.hasSenderPermission(player))
+					adminShopItem.disable();
+				break;
+			case DOUBLE_CLICK:
+				break;
+			case MIDDLE:
+				break;
+			case NUMBER_KEY:
+				break;
+			default:
+				break;
+			}
 
 		return true;
 	}
