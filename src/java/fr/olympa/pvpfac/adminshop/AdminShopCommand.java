@@ -24,7 +24,7 @@ public class AdminShopCommand extends ComplexCommand {
 				sender.spigot().sendMessage(new TranslatableComponent(name));
 				return name;
 			}).collect(Collectors.toList());
-
+		
 			return list;
 		}, string -> Arrays.stream(Material.values()).map(m -> m.getTranslationKey()).collect(Collectors.toList()),
 				x -> String.format("Le type d'object &4%s&c n'existe pas.", x));*/
@@ -70,7 +70,7 @@ public class AdminShopCommand extends ComplexCommand {
 			return;
 		}
 		item = adminShop.getAllItems().get(index);
-		if (!item.isEnable()) {
+		if (item.isEnable()) {
 			sendMessage(Prefix.FACTION, "&4%s&c est déjà &4activé&c.", item.getMaterial().name());
 			return;
 		}
@@ -89,7 +89,7 @@ public class AdminShopCommand extends ComplexCommand {
 			return;
 		}
 		item = adminShop.getAllItems().get(index);
-		if (item.isEnable()) {
+		if (!item.isEnable()) {
 			sendMessage(Prefix.FACTION, "&4%s&c est déjà &4désactivé&c.", item.getMaterial().name());
 			return;
 		}

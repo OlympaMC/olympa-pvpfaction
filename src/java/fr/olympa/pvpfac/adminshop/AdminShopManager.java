@@ -65,7 +65,7 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 	}
 
 	public List<AdminShopItem> getAllItems() {
-		return items.stream().sorted(new Sorting<AdminShopItem>(it -> it.isEnable() ? 1 : 0)).collect(Collectors.toList());
+		return items.stream().sorted(new Sorting<>(it -> it.isEnable() ? 1 : 0)).collect(Collectors.toList());
 	}
 
 	public List<AdminShopItem> getItemsEnabled() {

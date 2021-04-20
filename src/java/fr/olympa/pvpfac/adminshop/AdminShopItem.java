@@ -44,6 +44,7 @@ public class AdminShopItem {
 
 	public AdminShopItem(Material material, int amont, float value) {
 		this.amont = amont;
+		this.material = material;
 		name = new TranslatableComponent(material.getTranslationKey());
 		itemBuilder = new OlympaItemBuild(material).size(amont);
 		enable = false;
