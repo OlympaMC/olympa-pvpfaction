@@ -316,16 +316,25 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			sendHelp(getSender());
 			return;
 		}
-		FactionClaimPermLevel perm = cmd.getArgument(3);
+		FactionClaimPermLevel perm = cmd.getArgument(2);
 		
 		if (cmd.getArgument(1) instanceof Player) {
-			if (claim.setPlayerLevel(AccountProvider.get(((Player)cmd.getArgument(1)).getUniqueId()), perm))
-				sendMessage(Prefix.FACTION, "Permissions de %s définies sur %s.", args);
+			FactionPlayer fp = AccountProvider.get(((Player)cmd.getArgument(1)).getUniqueId());
+			if (claim.setPlayerLevel(fp, perm))
+				sendMessage(Prefix.FACTION, "Permission de %s définie sur %s.", fp.getName(), perm.toString().toLowerCase());
+			else
+				sendMessage(Prefix.FACTION, "§ePermission de %s déjà définie sur %s.", fp.getName(), perm.toString().toLowerCase());
 			
 		}else if (cmd.getArgument(1) instanceof Faction && cmd.getArgumentsLength() >= 4) {
-			claim.setFactionLevel(cmd.getArgument(1), cmd.getArgument(3), perm);	
-		}
-		
+			Faction fac = cmd.getArgument(1);
+			FactionRole role = cmd.getArgument(3);
+			if (claim.setFactionLevel(fac, role, perm))
+				sendMessage(Prefix.FACTION, "Permission du rôle %s de la faction %s définie sur %s.", role.name, fac.getName(), perm.toString().toLowerCase());
+			else
+				sendMessage(Prefix.FACTION, "§ePermission du rôle %s de la faction %s déjà définie sur %s.", role.name, fac.getName(), perm.toString().toLowerCase());
+				
+		}else
+			sendIncorrectSyntax();
 	}
 }
 

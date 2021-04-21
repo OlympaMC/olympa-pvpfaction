@@ -142,7 +142,7 @@ public class FactionClaimListener implements Listener {
 			}
 		}else if (claim != null) {
 			if (target.getType() == EntityType.ARMOR_STAND || target.getType() == EntityType.ITEM_FRAME || target.getType() == EntityType.PAINTING) 
-				isActionCancelled(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
+				isActionCancelled(e.getEntity().getLocation(), damagerFp.getPlayer(), e, 
 						FactionClaimPermLevel::canInterractContainers, 
 						"§cPas touche à ce qui ne t'appartient pas !");
 			else
@@ -383,7 +383,7 @@ public class FactionClaimListener implements Listener {
 		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID()))
 			return false;
 		
-		if (!PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getType().isProtected()) {
+		if (PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getType().isProtected()) {
 			e.setCancelled(true);
 			return true;
 		}
@@ -394,12 +394,13 @@ public class FactionClaimListener implements Listener {
 	/**
 	 * Return true if event was cancelled, false otherwise
 	 */
-	private boolean isActionCancelled(Location loc, Player p, Cancellable event, Function<FactionClaimPermLevel, Boolean> method, String denyMessage, Object...args) {
+	private boolean isActionCancelled(Location loc, Player p, Cancellable event, Function<FactionClaimPermLevel, Boolean> method, String denyMessage) {
 		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID()))
 			return false;
 		
 		if (!method.apply(PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getPlayerPerm(AccountProvider.get(p.getUniqueId())))) {
-			Prefix.FACTION.sendMessage(p, denyMessage, args);
+			Prefix.FACTION.sendMessage(p, denyMessage);
+			//Bukkit.broadcastMessage("CANCELLED : " + event + " triggered by " + p);
 			event.setCancelled(true);
 			return true;
 		}
