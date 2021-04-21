@@ -116,12 +116,14 @@ public class AdminShopItem {
 		return enable;
 	}
 
-	public void enable() {
+	public AdminShopItem enable() {
 		enable = true;
+		return this;
 	}
 
-	public void disable() {
+	public AdminShopItem disable() {
 		enable = false;
+		return this;
 	}
 
 	public void setValue(float value) {
@@ -148,13 +150,11 @@ public class AdminShopItem {
 
 	public boolean consumeItem(Player player, int count) {
 		Map<Integer, ? extends ItemStack> ammo;
-
+		int found = 0;
 		if (item != null)
 			ammo = player.getInventory().all(item);
 		else
 			ammo = player.getInventory().all(material);
-
-		int found = 0;
 		for (ItemStack stack : ammo.values())
 			found += stack.getAmount();
 		if (count > found)

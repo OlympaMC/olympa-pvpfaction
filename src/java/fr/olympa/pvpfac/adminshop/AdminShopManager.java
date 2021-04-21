@@ -18,15 +18,15 @@ import fr.olympa.api.sort.Sorting;
 
 public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 
-	protected static AdminShopItem GRASS = new AdminShopItem(Material.GRASS, 64, 1f);
-	protected static AdminShopItem DIRT = new AdminShopItem(Material.DIRT, 0.5f);
+	protected static final AdminShopItem GRASS = new AdminShopItem(Material.GRASS, 64, 1f);
+	protected static final AdminShopItem DIRT = new AdminShopItem(Material.DIRT, 0.5f);
 
 	protected List<AdminShopItem> items;
 
 	public AdminShopManager(OlympaAPIPlugin pl) {
 		items = new ArrayList<>();
-		items.add(GRASS);
-		items.add(DIRT);
+		items.add(GRASS.enable());
+		items.add(DIRT.enable());
 		try {
 			OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
 					.cmd(AdminShopCommand.class);

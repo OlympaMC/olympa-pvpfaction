@@ -15,7 +15,7 @@ public class AdminShopGui extends OlympaGUI {
 	int page = 1;
 
 	public AdminShopGui(Player player) {
-		super("&eAdmin Shop ", PvPFaction.getInstance().getAdminShop().getGuiRows());
+		super("&6Admin Shop ", PvPFaction.getInstance().getAdminShop().getGuiRows());
 		updateInventory(player);
 	}
 
@@ -29,6 +29,12 @@ public class AdminShopGui extends OlympaGUI {
 			for (AdminShopItem item : adminShopHandler.getItemPage(1, true))
 				inv.addItem(item.getItemStackPlayer());
 
+	}
+
+	@Override
+	public boolean onClickCursor(Player player, ItemStack current, ItemStack cursor, int slot) {
+		player.sendMessage("slot " + slot);
+		return false;
 	}
 
 	@Override
@@ -61,7 +67,6 @@ public class AdminShopGui extends OlympaGUI {
 			default:
 				break;
 			}
-
 		return true;
 	}
 
