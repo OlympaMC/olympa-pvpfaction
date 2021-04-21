@@ -79,6 +79,8 @@ public class FactionClaimsManager implements Listener {
 			statement.setString(i++, claim.getFactionMembersToJson());
 
 			statement.setLong(i++, claim.getClaimId().getId());
+			
+			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.addSuppressed(new Throwable("§cFailed to SAVE chunk " + claim.getClaimId() + "as claim of " + (claim.getFaction() == null ? "§4NONE" : claim.getFaction().getName())));
 			e.printStackTrace();

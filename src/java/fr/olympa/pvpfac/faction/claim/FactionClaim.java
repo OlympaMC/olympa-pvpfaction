@@ -23,8 +23,8 @@ public class FactionClaim {
 	private ClaimId claimId;
 	private Faction faction;
 	private FactionClaimType type;
-	private Map<Long, ClaimPermLevel> membersPlayers = new HashMap<Long, ClaimPermLevel>();
-	private Map<Integer, ClaimPermLevel[]> membersFactions = new HashMap<Integer, ClaimPermLevel[]>();
+	private Map<Long, FactionClaimPermLevel> membersPlayers = new HashMap<Long, FactionClaimPermLevel>();
+	private Map<Integer, FactionClaimPermLevel[]> membersFactions = new HashMap<Integer, FactionClaimPermLevel[]>();
 
 	public FactionClaim(ClaimId id, FactionClaimType type, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
 		this.claimId = id;
@@ -33,15 +33,15 @@ public class FactionClaim {
 		
 		faction = factionId == null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
 
-		this.membersPlayers = playersMembersAsJson == null || playersMembersAsJson.length() <= 2? new HashMap<Long, ClaimPermLevel>() : 
+		this.membersPlayers = playersMembersAsJson == null || playersMembersAsJson.length() <= 2? new HashMap<Long, FactionClaimPermLevel>() : 
 			((Map<Long, Integer>)new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Long, Integer>>(){}.getType())).entrySet()
-			.stream().map(e -> new AbstractMap.SimpleEntry<Long, ClaimPermLevel>(e.getKey(), ClaimPermLevel.fromLevel(e.getValue())))
+			.stream().map(e -> new AbstractMap.SimpleEntry<Long, FactionClaimPermLevel>(e.getKey(), FactionClaimPermLevel.fromLevel(e.getValue())))
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 		
-		this.membersFactions = factionsMembersAsJson == null || factionsMembersAsJson.length() <= 2 ? new HashMap<Integer, ClaimPermLevel[]>() : 
+		this.membersFactions = factionsMembersAsJson == null || factionsMembersAsJson.length() <= 2 ? new HashMap<Integer, FactionClaimPermLevel[]>() : 
 			((Map<Integer, Integer[]>)new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Integer, Integer[]>>(){}.getType())).entrySet()
-			.stream().map(e -> new AbstractMap.SimpleEntry<Integer, ClaimPermLevel[]>(e.getKey(), 
-					(ClaimPermLevel[]) Stream.of(e.getValue()).map(perm -> ClaimPermLevel.fromLevel(perm)).toArray()))
+			.stream().map(e -> new AbstractMap.SimpleEntry<Integer, FactionClaimPermLevel[]>(e.getKey(), 
+					(FactionClaimPermLevel[]) Stream.of(e.getValue()).map(perm -> FactionClaimPermLevel.fromLevel(perm)).toArray()))
 			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 	
@@ -56,6 +56,14 @@ public class FactionClaim {
 		membersPlayers.clear();
 		membersFactions.clear();
 		
+		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
+	}
+	
+	public void setType(FactionClaimType type) {
+		if (this.type == type)
+			return;
+		
+		this.type = type;
 		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
 	}
 
@@ -108,7 +116,7 @@ public class FactionClaim {
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())), new TypeToken<Map<Integer, Integer[]>>(){}.getType());
 	}
 	
-	public boolean setPlayerLevel(FactionPlayer pf, ClaimPermLevel level) {
+	public boolean setPlayerLevel(FactionPlayer pf, FactionClaimPermLevel level) {
 		if (membersPlayers.containsKey(pf.getId()) && membersPlayers.get(pf.getId()) == level)
 			return false;
 		
@@ -118,18 +126,18 @@ public class FactionClaim {
 		return true;
 	}
 	
-	public boolean setFactionLevel(Faction f, FactionRole role, ClaimPermLevel level) {
-		if ((membersFactions.containsKey(f.getID()) && level == ClaimPermLevel.LEVEL_NONE) || (membersFactions.containsKey(f.getID()) && membersFactions.get(f.getID())[role.weight] == level))
+	public boolean setFactionLevel(Faction f, FactionRole role, FactionClaimPermLevel level) {
+		if ((membersFactions.containsKey(f.getID()) && level == FactionClaimPermLevel.NONE) || (membersFactions.containsKey(f.getID()) && membersFactions.get(f.getID())[role.weight] == level))
 			return false;
 
 		//on ajoute les permissions par défaut à tous les grades de la faction elle n'est pas encore dans la liste
 		if (!membersFactions.containsKey(f.getID())) {
-			membersFactions.put(f.getID(), new ClaimPermLevel[FactionRole.LEADER.weight + 1]);
+			membersFactions.put(f.getID(), new FactionClaimPermLevel[FactionRole.LEADER.weight + 1]);
 			for (int i = 0 ; i <= FactionRole.LEADER.weight ; i++)
-				membersFactions.get(f.getID())[i] = ClaimPermLevel.LEVEL_NONE;
+				membersFactions.get(f.getID())[i] = FactionClaimPermLevel.NONE;
 		}
 		
-		ClaimPermLevel[] perms = membersFactions.get(f.getID());
+		FactionClaimPermLevel[] perms = membersFactions.get(f.getID());
 		perms[role.weight] = level;
 		
 		//fais en sorte que les roles inférieurs n'ai pas plus de permission que le role en cours d'édition, et vice versa
@@ -138,7 +146,7 @@ public class FactionClaim {
 				perms[i] = level;
 		
 		//si aucun grade dans la fac n'a de permission, on retire la fac de la liste
-		if (Stream.of(membersFactions.get(f.getID())).filter(perm -> perm != ClaimPermLevel.LEVEL_NONE).findFirst().isEmpty())
+		if (Stream.of(membersFactions.get(f.getID())).filter(perm -> perm != FactionClaimPermLevel.NONE).findFirst().isEmpty())
 			membersFactions.remove(f.getID());
 		
 		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
@@ -146,24 +154,24 @@ public class FactionClaim {
 	}
 	
 	
-	public ClaimPermLevel getPlayerPerm(FactionPlayer pf) {
+	public FactionClaimPermLevel getPlayerPerm(FactionPlayer pf) {
 		if (!type.isClaimable())
-			return ClaimPermLevel.LEVEL_1;
+			return FactionClaimPermLevel.LVL_1;
 		
 		else if (faction == null)
-			return ClaimPermLevel.LEVEL_4;
+			return FactionClaimPermLevel.LVL_4;
 		
 		else if (pf.getClan() != null && membersFactions.containsKey(pf.getClan().getID()))
 			return membersFactions.get(pf.getClan().getID()) [pf.getClan().getMember(pf.getInformation()).getRole().weight];
 		
 		else if (membersPlayers.size() > 0)
-			return membersPlayers.containsKey(pf.getId()) ? membersPlayers.get(pf.getId()) : ClaimPermLevel.LEVEL_NONE;
+			return membersPlayers.containsKey(pf.getId()) ? membersPlayers.get(pf.getId()) : FactionClaimPermLevel.NONE;
 			
 		else if (pf.getClan() != null && pf.getClan().equals(faction))
 			return faction.getMember(pf.getInformation()).getRole().getDefaultClaimLevel();
 		
 		else
-			return ClaimPermLevel.LEVEL_NONE;
+			return FactionClaimPermLevel.NONE;
 	}
 	
 	

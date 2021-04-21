@@ -143,11 +143,11 @@ public class FactionClaimListener implements Listener {
 		}else if (claim != null) {
 			if (target.getType() == EntityType.ARMOR_STAND || target.getType() == EntityType.ITEM_FRAME || target.getType() == EntityType.PAINTING) 
 				isActionCancelled(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
-						ClaimPermLevel::canInterractContainers, 
+						FactionClaimPermLevel::canInterractContainers, 
 						"§cPas touche à ce qui ne t'appartient pas !");
 			else
 				isActionCancelled(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
-						ClaimPermLevel::canDamageEntities, 
+						FactionClaimPermLevel::canDamageEntities, 
 						"§7Tu ne peux pas attaquer d'entités dans ce claim.");
 		}	
 	}
@@ -196,7 +196,7 @@ public class FactionClaimListener implements Listener {
 			return;
 			
 		if (!isActionCancelled(e.getBlock().getLocation(), e.getPlayer(), e, 
-				ClaimPermLevel::canBuild, 
+				FactionClaimPermLevel::canBuild, 
 				"§cTu ne peux pas construire ici.") && e.getBlock() instanceof Container) {
 		
 			FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(e.getBlock().getLocation().getChunk());
@@ -211,7 +211,7 @@ public class FactionClaimListener implements Listener {
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e) {
 		isActionCancelled(e.getBlock().getLocation(), e.getPlayer(), e, 
-				ClaimPermLevel::canBuild, 
+				FactionClaimPermLevel::canBuild, 
 				"§cTu ne peux pas construire ici.");
 	}
 	
@@ -225,14 +225,14 @@ public class FactionClaimListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onUseBucket(PlayerBucketFillEvent e) {
 		isActionCancelled(e.getBlock().getLocation(), e.getPlayer(), e, 
-				ClaimPermLevel::canBuild, 
+				FactionClaimPermLevel::canBuild, 
 				"§cNon, tu ne feras pas ça ici !");
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onUseBucket(PlayerBucketEmptyEvent e) {
 		isActionCancelled(e.getBlock().getLocation(), e.getPlayer(), e, 
-				ClaimPermLevel::canBuild, 
+				FactionClaimPermLevel::canBuild, 
 				"§cNon, tu ne feras pas ça ici !");
 	}
 
@@ -257,24 +257,24 @@ public class FactionClaimListener implements Listener {
 		
 		if (e.getClickedBlock() instanceof Container)
 			isActionCancelled(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
-					ClaimPermLevel::canInterractContainers, 
+					FactionClaimPermLevel::canInterractContainers, 
 					"§cPas touche à ce qui ne t'appartient pas !");
 		
 		if (e.getClickedBlock() instanceof Openable)
 			isActionCancelled(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
-					ClaimPermLevel::canInterractDoors, 
+					FactionClaimPermLevel::canInterractDoors, 
 					"§cTu ne peux pas passer par ici...");
 		
 		if (e.getClickedBlock() instanceof Powerable)
 			isActionCancelled(e.getClickedBlock().getLocation(), e.getPlayer(), e, 
-					ClaimPermLevel::canInterractDoors, 
+					FactionClaimPermLevel::canInterractDoors, 
 					"§cTu ne peux pas activer de redstone dans cette zone.");
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onInterractArmorstand(PlayerArmorStandManipulateEvent e) {
 		isActionCancelled(e.getRightClicked().getLocation(), e.getPlayer(), e, 
-				ClaimPermLevel::canInterractContainers, 
+				FactionClaimPermLevel::canInterractContainers, 
 				"§cpas touche à ce qui ne t'appartient pas !");
 	}
 	
@@ -288,14 +288,14 @@ public class FactionClaimListener implements Listener {
 		
 		else if (e.getRemover() instanceof Player)
 			isActionCancelled(e.getEntity().getLocation(), (Player) e.getRemover(), e, 
-					ClaimPermLevel::canBuild, 
+					FactionClaimPermLevel::canBuild, 
 					"§cTu ne peux pas prendre cet item.");
 	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onInterractItemframe(HangingPlaceEvent e) {
 		isActionCancelled(e.getEntity().getLocation(), e.getPlayer(), e, 
-				ClaimPermLevel::canBuild, 
+				FactionClaimPermLevel::canBuild, 
 				"§cTu ne peux pas placer ça ici.");
 	}
 	
@@ -394,7 +394,7 @@ public class FactionClaimListener implements Listener {
 	/**
 	 * Return true if event was cancelled, false otherwise
 	 */
-	private boolean isActionCancelled(Location loc, Player p, Cancellable event, Function<ClaimPermLevel, Boolean> method, String denyMessage, Object...args) {
+	private boolean isActionCancelled(Location loc, Player p, Cancellable event, Function<FactionClaimPermLevel, Boolean> method, String denyMessage, Object...args) {
 		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID()))
 			return false;
 		

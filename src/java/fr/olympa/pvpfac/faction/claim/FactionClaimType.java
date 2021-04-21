@@ -41,6 +41,10 @@ public enum FactionClaimType {
 		return canPlaceContainers;
 	}
 	
+	public String getName() {
+		return this.toString().toLowerCase();
+	}
+	
 	public static FactionClaimType fromString(String s) {
 		FactionClaimType obj = null;
 		for (FactionClaimType t : FactionClaimType.values())
