@@ -23,7 +23,7 @@ public class AdminShopGui extends OlympaGUI {
 		inv.clear();
 		AdminShopManager adminShopHandler = PvPFaction.getInstance().getAdminShop();
 		if (PvPFactionPermission.ADMINSHOP_ADMIN.hasSenderPermission(player))
-			for (AdminShopItem item : adminShopHandler.getItemPage(1, null))
+			for (AdminShopItem item : adminShopHandler.getItemPage(1, (Boolean) null))
 				inv.addItem(item.getItemStackAdmin());
 		else
 			for (AdminShopItem item : adminShopHandler.getItemPage(1, true))

@@ -75,6 +75,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public void onDisable() {
 		if (scoreboards != null)
 			scoreboards.unload();
+		adminShop.disable(this);
 		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactivé.");
 	}
 
@@ -123,7 +124,6 @@ public class PvPFaction extends OlympaAPIPlugin {
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new FeedCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
 		new BackCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
-		//new AdminShopCommand(this);
 		adminShop = new AdminShopManager(this);
 		adminShop.enable(this);
 

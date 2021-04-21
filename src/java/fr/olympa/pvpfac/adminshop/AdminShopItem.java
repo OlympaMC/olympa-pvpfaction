@@ -5,9 +5,12 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import fr.olympa.api.item.OlympaItemBuild;
 import fr.olympa.api.utils.Prefix;
+import fr.olympa.api.utils.Utils;
+import fr.olympa.api.utils.spigot.SpigotUtils;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 
 public class AdminShopItem {
@@ -15,8 +18,11 @@ public class AdminShopItem {
 	private static final String SEP = "&e&m&l##########";
 
 	TranslatableComponent name;
-	float value;
+	@NotNull
+	double value;
+	@NotNull
 	int amont;
+	@NotNull
 	Material material;
 
 	ItemStack item;
@@ -28,11 +34,11 @@ public class AdminShopItem {
 
 	boolean enable;
 
-	public AdminShopItem(Material material, float value) {
+	public AdminShopItem(Material material, double value) {
 		this(material, 1, value);
 	}
 
-	public AdminShopItem(ItemStack itemStack, float value) {
+	public AdminShopItem(ItemStack itemStack, double value) {
 		item = itemStack;
 		material = itemStack.getType();
 		amont = itemStack.getAmount();
@@ -42,13 +48,21 @@ public class AdminShopItem {
 		updateLore();
 	}
 
-	public AdminShopItem(Material material, int amont, float value) {
+	public AdminShopItem(Material material, int amont, double value) {
 		this.amont = amont;
 		this.material = material;
 		name = new TranslatableComponent(material.getTranslationKey());
 		itemBuilder = new OlympaItemBuild(material).size(amont);
 		enable = false;
 		updateLore();
+	}
+
+	public ItemStack getRepresentItemStack() {
+		ItemStack it = getItemStackOriginal();
+		if (it != null)
+			return it;
+		it = new ItemStack(material, amont);
+		return it;
 	}
 
 	public ItemStack getItemStackOriginal() {
@@ -84,7 +98,15 @@ public class AdminShopItem {
 		return name;
 	}
 
-	public float getValue() {
+	public String getId() {
+		return material.name().replace("_", "") + (amont != 1 ? "x" + amont : "");
+	}
+
+	public String getClearId() {
+		return Utils.capitalize(getId());
+	}
+
+	public double getValue() {
 		return value;
 	}
 
@@ -136,15 +158,23 @@ public class AdminShopItem {
 	}
 
 	public void sold(Player p) {
-		p.getInventory().remove(new ItemStack(material, amont));
-		soldToday += amont;
-		Prefix.FACTION.sendMessage(p, "&cTu as vendu x%d &4%s&c.", amont, material.name());
+		ItemStack it = getRepresentItemStack();
+		if (SpigotUtils.containsItems(p.getInventory(), it, amont)) {
+			SpigotUtils.removeItems(p.getInventory(), it, amont);
+			soldToday += amont;
+			Prefix.FACTION.sendMessage(p, "&cTu as vendu &4%s&c à %d.", amont, getClearId(), Double.toString(value / 2));
+		} else
+			Prefix.FACTION.sendMessage(p, "&cTu n'as pas &4%s&c dans ton inventaire.", getClearId());
 	}
 
 	public void buy(Player p) {
-		p.getInventory().addItem(new ItemStack(material, amont));
-		buyToday += amont;
-		Prefix.FACTION.sendMessage(p, "&aTu as acheté x%d &2%s&a.", amont, material.name());
+		ItemStack it = getRepresentItemStack();
+		if (SpigotUtils.hasEnoughPlace(p.getInventory(), it)) {
+			Prefix.FACTION.sendMessage(p, "&aTu as acheté &2%s&a au prix de %s.", getClearId(), Double.toString(value));
+			SpigotUtils.giveItems(p, it);
+			buyToday += amont;
+		} else
+			Prefix.FACTION.sendMessage(p, "&cTu n'as pas la place dans ton inventaire pour &4%s&c.", getClearId());
 
 	}
 
