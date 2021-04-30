@@ -8,8 +8,8 @@ import fr.olympa.pvpfac.player.FactionPlayerData;
 
 public class FactionManagementGUI extends ClanManagementGUI<Faction, FactionPlayerData> {
 
-	public FactionManagementGUI(ClanPlayerInterface<Faction, FactionPlayerData> p, ClansManager<Faction, FactionPlayerData> manager) {
-		super(p, manager, 3);
+	public FactionManagementGUI(ClanPlayerInterface<Faction, FactionPlayerData> p, Faction fac, ClansManager<Faction, FactionPlayerData> manager) {
+		super(p, fac, manager, 3);
 	}
 	
 	@Override

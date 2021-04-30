@@ -30,7 +30,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected SQLColumn<Faction> tagColumn;
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
-		super(PvPFaction.getInstance(), "pvpfac_factions", 10);
+		super(PvPFaction.getInstance(), "pvpfac_factions");
 		new FactionCommand(this, "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
 		//		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
 		//
@@ -105,6 +105,11 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected FactionPlayerData provideClanData(OlympaPlayerInformations informations, ResultSet resultSet) throws SQLException {
 		return new FactionPlayerData(informations, FactionRole.values()[resultSet.getInt("role")]);
 	}
+	
+	@Override
+	public int getMaxSize(ClanPlayerInterface<Faction, FactionPlayerData> p) {
+		return 10;
+	}
 
 	@Override
 	public List<SQLColumn<Faction>> addDBClansCollums(List<SQLColumn<Faction>> columns) {
@@ -127,7 +132,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
 	@Override
 	public ClanManagementGUI<Faction, FactionPlayerData> provideManagementGUI(ClanPlayerInterface<Faction, FactionPlayerData> player) {
-		return new FactionManagementGUI(player, this);
+		return new FactionManagementGUI(player, player.getClan(), this);
 	}
 
 	public Faction getByName(String name) {

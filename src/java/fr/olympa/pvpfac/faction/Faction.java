@@ -59,11 +59,6 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		super(manager, id, name, tag, chief, maxSize);
 	}
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String tag, String description, OlympaPlayerInformations chief) {
-		super(manager, id, name, tag, chief, manager.defaultMaxSize);
-		this.description = description;
-	}
-
 	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home) {
 		super(manager, id, name, tag, chief, maxSize, money, created);
 		this.tag = tag;
