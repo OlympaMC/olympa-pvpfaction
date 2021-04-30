@@ -204,7 +204,8 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	 * @return
 	 */
 	public boolean isAlly(Faction fac) {
-		return false;//TODO
+		throw new UnsupportedOperationException("Gestion des factions alliées non encore implémentée !");
+		//return false;//TODO
 	}
 
 	@Override
