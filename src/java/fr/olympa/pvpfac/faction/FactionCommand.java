@@ -38,7 +38,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		this.addArgumentParser("FACTIONS", (player, arg) -> manager.getClans().stream().map(e -> e.getValue().getName()).collect(Collectors.toSet()),
 				arg -> manager.getByName(arg),
 				x -> String.format("&cLa faction &4%s&c n'existe pas.", x));
-		this.addArgumentParser("FACTION_ROLE", FactionRole.class);
+		this.addArgumentParser("FACTION_ROLE", FactionRole.class, fr -> fr.name);
 		this.addArgumentParser("FACTION_CLAIM_TYPE", FactionClaimType.class);
 	}
 
