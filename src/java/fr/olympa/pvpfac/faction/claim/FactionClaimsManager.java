@@ -3,7 +3,6 @@ package fr.olympa.pvpfac.faction.claim;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -45,13 +44,13 @@ public class FactionClaimsManager implements Listener {
 			"INSERT INTO " + tableName +
 					" (`x`, `z`, `claim_type`, `faction_id`, `members_players`, `members_factions`)" +
 					" VALUES (?, ?, ?, ?, ?, ?);")
-			.returnGeneratedKeys();
+							.returnGeneratedKeys();
 
 	private static final OlympaStatement updateClaim = new OlympaStatement(
 			"UPDATE " + tableName +
 					" SET `claim_type` = ?, `faction_id` = ?, `members_players` = ?, `members_factions` = ? WHERE `claim_id` = ?;");
 
-	private Cache<Chunk, FactionClaim> claims = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES).build();
+	private Cache<Chunk, FactionClaim> claims = CacheBuilder.newBuilder().recordStats().expireAfterAccess(10, TimeUnit.MINUTES).build();
 
 	public FactionClaimsManager() {
 		try {
@@ -79,7 +78,7 @@ public class FactionClaimsManager implements Listener {
 			statement.setString(i++, claim.getFactionMembersAsJson());
 
 			statement.setLong(i++, claim.getClaimId().getId());
-			
+
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.addSuppressed(new Throwable("§cFailed to SAVE chunk " + claim.getClaimId() + "as claim of " + (claim.getFaction() == null ? "§4NONE" : claim.getFaction().getName())));
@@ -98,10 +97,10 @@ public class FactionClaimsManager implements Listener {
 			statement.setInt(i++, chunk.getZ());
 			ResultSet resultSet = statement.executeQuery();
 
-			if (resultSet.next()) {
+			if (resultSet.next())
 				//System.out.println("retrieved claim " + getFactionClaim(resultSet) + " from database");
 				return getFactionClaim(resultSet);
-			}else {
+			else {
 				PreparedStatement insert = createClaim.createStatement();
 				int j = 1;
 
@@ -113,12 +112,12 @@ public class FactionClaimsManager implements Listener {
 				insert.setObject(j++, null);
 
 				insert.executeUpdate();
-				
+
 				ResultSet inserted = insert.getGeneratedKeys();
 				if (inserted.next()) {
 					claim = new FactionClaim(new ClaimId(inserted.getInt("claim_id"), chunk), FactionClaimType.NORMAL, null, null, null);
 					claims.put(chunk, claim);
-					
+
 					//System.out.println("created new claim : " + claim);
 					return claim;
 
