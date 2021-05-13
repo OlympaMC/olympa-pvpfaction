@@ -131,8 +131,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	protected void removedOnlinePlayer(ClanPlayerInterface<Faction, FactionPlayerData> oplayer) {
 		super.removedOnlinePlayer(oplayer);
 
-		PvPFaction.getInstance().scoreboards.removePlayerScoreboard((FactionPlayer) oplayer);
-		PvPFaction.getInstance().scoreboards.create((FactionPlayer) oplayer);
+		PvPFaction.getInstance().scoreboards.refresh((FactionPlayer) oplayer);
 	}
 
 	public void claim(FactionClaim factionClaim) throws SQLException {
