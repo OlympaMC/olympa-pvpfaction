@@ -19,8 +19,8 @@ import fr.olympa.api.utils.Utils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.chat.FactionChat;
-import fr.olympa.pvpfac.faction.claim.FactionClaimPermLevel;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
+import fr.olympa.pvpfac.faction.claim.FactionClaimPermLevel;
 import fr.olympa.pvpfac.faction.claim.FactionClaimType;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;
 import fr.olympa.pvpfac.faction.map.FactionMap;
@@ -35,8 +35,8 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
-	public FactionCommand(FactionManager manager, String description, OlympaSpigotPermission permission, String... aliases) {
-		super(manager, description, permission, aliases);
+	public FactionCommand(FactionManager manager, OlympaSpigotPermission permission, String... aliases) {
+		super(manager, "Permet de gérer les factions.", permission, aliases);
 		this.addArgumentParser("FACTIONS", (player, arg) -> manager.getClans().stream().map(e -> e.getValue().getName()).collect(Collectors.toSet()),
 				arg -> manager.getByName(arg),
 				x -> String.format("&cLa faction &4%s&c n'existe pas.", x));

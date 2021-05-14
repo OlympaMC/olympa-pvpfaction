@@ -15,7 +15,7 @@ public class WorldCommand extends ComplexCommand {
 	private PvPFaction plugin;
 	
 	public WorldCommand(PvPFaction plugin) {
-		super(plugin, "world", "Permet de se téléporter d'un monde à un autre", PvPFactionPermission.WORLD_COMMAND_PLAYER, "worlds");
+		super(plugin, "world", "Permet de se téléporter d'un monde à un autre.", PvPFactionPermission.WORLD_COMMAND_PLAYER, "worlds");
 		
 		this.plugin = plugin;
 	}

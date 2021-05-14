@@ -31,7 +31,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions");
-		new FactionCommand(this, "Permet de gérer les factions.", PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
+		new FactionCommand(this, PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
 		//		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
 		//
 		//			PreparedStatement statement = createDefaultClanStatement.getStatement();
