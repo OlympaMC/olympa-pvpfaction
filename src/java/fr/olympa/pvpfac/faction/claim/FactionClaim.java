@@ -149,7 +149,7 @@ public class FactionClaim {
 		FactionClaimPermLevel[] perms = membersFactions.get(f.getID());
 		perms[role.weight] = level;
 		
-		//fais en sorte que les roles inférieurs n'ai pas plus de permission que le role en cours d'édition, et vice versa
+		//fais en sorte que les rôles inférieurs n'aient pas plus de permission que le rôle en cours d'édition, et vice-versa
 		for (int i = 0 ; i <= FactionRole.RECRUT.weight ; i++)
 			if ((perms[i].getLevel() > level.getLevel() && i < role.weight) || (perms[i].getLevel() < level.getLevel() && i > role.weight))
 				perms[i] = level;

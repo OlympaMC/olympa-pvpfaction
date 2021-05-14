@@ -82,7 +82,7 @@ public class AdminShopItem {
 		OlympaItemBuild itemAdmin = itemBuilder.clone();
 		if (!isEnable()) {
 			itemAdmin.size(-1);
-			itemAdmin.addLoreBefore("&4&lOBJECT DESACTIVER");
+			itemAdmin.addLoreBefore("&4&lOBJET DESACTIVÉ");
 		}
 		itemAdmin.lore("", "&4&nActions Admin", "&7Shift-Clique &2Gauche &7> &aActive l'objet", "&7Shift-Clique &cDroit &7> &cDésactive l'objet", SEP);
 		ItemStack itemStack = itemAdmin.build();

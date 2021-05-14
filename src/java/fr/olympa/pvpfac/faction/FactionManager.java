@@ -78,7 +78,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringAddedMoney = "Tu viens d'ajouter %s à la cagnotte de la faction !";
 		stringItemLeaveChiefLore = new String[] { "§7§oPour pouvoir quitter votre faction,", "§7§ovous devez tout d'abord", "§7§otransmettre la direction de celle-ci", "§7§oà un autre membre." };
 		stringClanNameTooLong = "Le nom d'une faction ne peut pas excéder %d caractères !";
-		stringItemDisband = "§cDémenteler la faction";
+		stringItemDisband = "§cDémanteler la faction";
 	}
 
 	@Override

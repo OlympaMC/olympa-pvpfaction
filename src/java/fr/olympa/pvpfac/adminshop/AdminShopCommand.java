@@ -17,8 +17,8 @@ public class AdminShopCommand extends ComplexCommand {
 
 	public AdminShopCommand(Plugin plugin) {
 		super(plugin, "adminshop", "Boutique pour vendre/acheter des objets.", null, "boutique");
-		addArgumentParser("MATERAL", Material.class);
-		/*addArgumentParser("MATERAL_TRANSLATED", (sender, string) -> {
+		addArgumentParser("MATERIAL", Material.class);
+		/*addArgumentParser("MATERIAL_TRANSLATED", (sender, string) -> {
 			Collection<String> list = Arrays.stream(Material.values()).map(m -> {
 				String name = m.getTranslationKey();
 				sender.spigot().sendMessage(new TranslatableComponent(name));
@@ -27,7 +27,7 @@ public class AdminShopCommand extends ComplexCommand {
 		
 			return list;
 		}, string -> Arrays.stream(Material.values()).map(m -> m.getTranslationKey()).collect(Collectors.toList()),
-				x -> String.format("Le type d'object &4%s&c n'existe pas.", x));*/
+				x -> String.format("Le type d'objets &4%s&c n'existe pas.", x));*/
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class AdminShopCommand extends ComplexCommand {
 		return true;
 	}
 
-	@Cmd(description = "Ajoute un item grace à son type", args = { "MATERAL|INTEGER", "FLOAT" })
+	@Cmd(description = "Ajoute un item grace à son type", args = { "MATERIAL|INTEGER", "FLOAT" })
 	public void addItem(CommandContext cmd) {
 		Material material;
 		int amout = 1;
@@ -56,7 +56,7 @@ public class AdminShopCommand extends ComplexCommand {
 		if (((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(material, amout, value)))
 			sendMessage(Prefix.FACTION, "&a%s&2 a été ajouté à l'AdminShop avec comme valeur &2%f&a.", material.name(), value);
 		else
-			sendMessage(Prefix.FACTION, "&cImpossible d'ajouter &4%d&c. Il doit surment déjà être dans le shop.", material.name());
+			sendMessage(Prefix.FACTION, "&cImpossible d'ajouter &4%d&c. Il doit sûrement déjà être dans le shop.", material.name());
 	}
 
 	@Cmd(min = 1, description = "Ajoute un item grace à son type", args = { "INTEGER" })

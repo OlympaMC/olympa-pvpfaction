@@ -66,7 +66,7 @@ public class OldFactionCommand extends OlympaCommand {
 						return false;
 					}
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
@@ -206,7 +206,7 @@ public class OldFactionCommand extends OlympaCommand {
 						return false;
 					}
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					target = Bukkit.getPlayer(args[1]);
@@ -316,7 +316,7 @@ public class OldFactionCommand extends OlympaCommand {
 					break;
 				case "claim":
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
@@ -348,7 +348,7 @@ public class OldFactionCommand extends OlympaCommand {
 					break;
 				case "autoclaim":
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					break;
@@ -358,7 +358,7 @@ public class OldFactionCommand extends OlympaCommand {
 					break;
 				case "kick":
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					if (args.length < 2) {
@@ -377,7 +377,7 @@ public class OldFactionCommand extends OlympaCommand {
 					break;
 				case "promote":
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					if (args.length < 2) {
@@ -462,7 +462,7 @@ public class OldFactionCommand extends OlympaCommand {
 				case "c":
 				case "chat":
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					FactionChat askChat;
@@ -505,7 +505,7 @@ public class OldFactionCommand extends OlympaCommand {
 					break;
 				case "sethome":
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					if (!OlympaFactionRole.OFFICER.hasPermission(faction.getRole(player))) {
@@ -522,7 +522,7 @@ public class OldFactionCommand extends OlympaCommand {
 					break;
 				case "home":
 					if (FactionMsg.youHaveNoFaction(player, faction)) {
-						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+						sendMessage(Prefix.FACTION + "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 						return false;
 					}
 					Location home = faction.getHome();

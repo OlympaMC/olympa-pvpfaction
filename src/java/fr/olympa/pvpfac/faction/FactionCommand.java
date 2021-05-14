@@ -49,11 +49,11 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	public void description(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
-			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
 		}
 		faction.updateDescription(Utils.capitalize(cmd.getFrom(1).toString().replace("\n", "")));
-		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer la decription en &2%s&a.", player.getName(), faction.getDescription());
+		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer la description en &2%s&a.", player.getName(), faction.getDescription());
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	public void tag(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
-			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
 		}
 		faction.updateTag(cmd.getArgument(0).toString().toUpperCase());
@@ -73,7 +73,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		FactionPlayer fp;
 		if (cmd.getArgumentsLength() != 0)
 			try {
-				fp = AccountProvider.get(cmd.getArgument(0, new String()));
+				fp = AccountProvider.get(cmd.getArgument(0, ""));
 				if (cmd.getArgumentsLength() != 1 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player) && cmd.getArgument(1) instanceof Integer) {
 					fp.setPower(cmd.getArgument(1));
 					sendMessage(Prefix.FACTION, "&aLe power de &2" + fp.getName() + "&a est désormais de &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + ".");
@@ -118,7 +118,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		} else if (cmd.getArgument(0) instanceof FactionClaimType) {
 			FactionClaimType type = cmd.getArgument(0);
 			if (type == null) {
-				sendMessage(Prefix.FACTION, "&cFaction &4%s%c inconnu.", cmd.getArgument(0, new String()));
+				sendMessage(Prefix.FACTION, "&cFaction &4%s%c inconnue.", cmd.getArgument(0, ""));
 				return;
 			}
 			//sendMessage(Prefix.FACTION, "TODO > Claim &2%s&a.", type.name());
@@ -140,7 +140,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 				return;
 			}
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
-			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
 		}
 		//		if (!FactionRole.OFFICER.hasPermission(faction.getRole(player))) {
@@ -189,7 +189,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 				return;
 			}
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
-			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
 		}
 
@@ -227,7 +227,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	public void chat(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
-			//sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'infos.");
+			//sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
 		}
 
@@ -247,7 +247,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		} else
 			askChat = chat.getOther();
 		player.setChat(askChat);
-		sendMessage(Prefix.FACTION, "Tu parle désormais en chat &2" + askChat.getName() + "&a.");
+		sendMessage(Prefix.FACTION, "Tu parles désormais en chat &2" + askChat.getName() + "&a.");
 	}
 
 	@Cmd(player = true, aliases = { "who", "f" }, args = "PLAYERS|FACTIONS")
@@ -255,7 +255,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		Faction faction = getPlayerClan(false);
 		if (cmd.getArgumentsLength() == 0) {
 			if (FactionMsg.youHaveNoFaction(player, faction)) {
-				sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f show <nom|tag|joueur>&c pour plus d'infos.");
+				sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f show <nom|tag|joueur>&c pour plus d'informations.");
 				return;
 			}
 		} else {
@@ -288,7 +288,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		sj.add("&3Joueurs max: &b" + faction.getMaxSize());
 		sj.add("&3Joueurs connectés: &a" + faction.getOnlineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &a")));
 		try {
-			// BUG java.lang.NullPointerException -> pas plus d'infos, c'est la ligne du dessous
+			// BUG java.lang.NullPointerException -> pas plus d'informations, c'est la ligne du dessous
 			sj.add("&3Joueurs déconnectés: &c" + faction.getOfflineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &c")));
 		} catch (Exception e) {
 			e.printStackTrace();

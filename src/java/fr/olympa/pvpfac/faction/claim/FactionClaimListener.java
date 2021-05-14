@@ -124,7 +124,7 @@ public class FactionClaimListener implements Listener {
 		if (damager.getType() != EntityType.PLAYER)
 			return;
 
-		FactionPlayer damagerFp = AccountProvider.get(damager.getUniqueId());
+		FactionPlayer damagerFactionPlayer = AccountProvider.get(damager.getUniqueId());
 		FactionClaim damagerClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(damager.getLocation().getChunk());
 		if (damagerClaim.getType() != null && !damagerClaim.getType().canPvp()) {
 			e.setCancelled(true);
@@ -136,17 +136,17 @@ public class FactionClaimListener implements Listener {
 		if (target.getType() == EntityType.PLAYER) {
 			FactionPlayer targetFp = AccountProvider.get(target.getUniqueId());
 			
-			if (targetFp.getClan() != null && (targetFp.getClan().equals(damagerFp.getClan()) || targetFp.getClan().isAlly(damagerFp.getClan()))) {
+			if (targetFp.getClan() != null && (targetFp.getClan().equals(damagerFactionPlayer.getClan()) || targetFp.getClan().isAlly(damagerFactionPlayer.getClan()))) {
 				Prefix.FACTION.sendMessage(damager, "§7On attaque pas le copain !");
 				e.setCancelled(true);
 			}
 		}else if (claim != null) {
 			if (target.getType() == EntityType.ARMOR_STAND || target.getType() == EntityType.ITEM_FRAME || target.getType() == EntityType.PAINTING) 
-				isActionCancelled(e.getEntity().getLocation(), damagerFp.getPlayer(), e, 
+				isActionCancelled(e.getEntity().getLocation(), damagerFactionPlayer.getPlayer(), e,
 						FactionClaimPermLevel::canInterractContainers, 
 						"§cPas touche à ce qui ne t'appartient pas !");
 			else
-				isActionCancelled(e.getEntity().getLocation(),damagerFp.getPlayer(), e, 
+				isActionCancelled(e.getEntity().getLocation(),damagerFactionPlayer.getPlayer(), e,
 						FactionClaimPermLevel::canDamageEntities, 
 						"§7Tu ne peux pas attaquer d'entités dans ce claim.");
 		}	
@@ -218,7 +218,7 @@ public class FactionClaimListener implements Listener {
 
 
 	/////////////////////////////////////////////////////////////
-	//                    INTERRACT EVENTS                     //
+	//                    INTERACT EVENTS                     //
 	/////////////////////////////////////////////////////////////
 
 
@@ -239,7 +239,7 @@ public class FactionClaimListener implements Listener {
 	
 	
 	@EventHandler(ignoreCancelled = true)
-	public void onInterractBlock(PlayerInteractEvent e) {
+	public void onInteractBlock(PlayerInteractEvent e) {
 		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(e.getPlayer().getLocation().getWorld().getUID()))
 			return;
 		
@@ -272,7 +272,7 @@ public class FactionClaimListener implements Listener {
 	}
 	
 	@EventHandler(ignoreCancelled = true)
-	public void onInterractArmorstand(PlayerArmorStandManipulateEvent e) {
+	public void onInteractArmorstand(PlayerArmorStandManipulateEvent e) {
 		isActionCancelled(e.getRightClicked().getLocation(), e.getPlayer(), e, 
 				FactionClaimPermLevel::canInterractContainers, 
 				"§cpas touche à ce qui ne t'appartient pas !");
@@ -293,7 +293,7 @@ public class FactionClaimListener implements Listener {
 	}
 	
 	@EventHandler(ignoreCancelled = true)
-	public void onInterractItemframe(HangingPlaceEvent e) {
+	public void onInteractItemframe(HangingPlaceEvent e) {
 		isActionCancelled(e.getEntity().getLocation(), e.getPlayer(), e, 
 				FactionClaimPermLevel::canBuild, 
 				"§cTu ne peux pas placer ça ici.");

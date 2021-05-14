@@ -37,7 +37,7 @@ public class FactionMap {
 		World world = chunk.getWorld();
 		int chunkX = chunk.getX();
 		int chunkZ = chunk.getZ();
-		int mapRaduisSize = 4;
+		int mapRadiusSize = 4;
 		int sidesCoeff = 2;
 		int startX, startZ, endX, endZ;
 		String facingName;
@@ -53,10 +53,10 @@ public class FactionMap {
 		default:
 		case NORTH:
 			facingName = "Nord";
-			startX = chunkX - mapRaduisSize * sidesCoeff;
-			endX = chunkX + mapRaduisSize * sidesCoeff;
-			startZ = chunkZ - mapRaduisSize;
-			endZ = chunkZ + mapRaduisSize;
+			startX = chunkX - mapRadiusSize * sidesCoeff;
+			endX = chunkX + mapRadiusSize * sidesCoeff;
+			startZ = chunkZ - mapRadiusSize;
+			endZ = chunkZ + mapRadiusSize;
 			for (int iZ = startZ; endZ > iZ; iZ++) {
 				for (int iX = startX; endX > iX; iX++)
 					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
@@ -65,10 +65,10 @@ public class FactionMap {
 			break;
 		case EAST:
 			facingName = "Est";
-			startX = chunkX + mapRaduisSize;
-			endX = chunkX - mapRaduisSize;
-			startZ = chunkZ - mapRaduisSize * sidesCoeff;
-			endZ = chunkZ + mapRaduisSize * sidesCoeff;
+			startX = chunkX + mapRadiusSize;
+			endX = chunkX - mapRadiusSize;
+			startZ = chunkZ - mapRadiusSize * sidesCoeff;
+			endZ = chunkZ + mapRadiusSize * sidesCoeff;
 			for (int iX = startX; endX < iX; iX--) {
 				for (int iZ = startZ; endZ > iZ; iZ++)
 					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
@@ -77,10 +77,10 @@ public class FactionMap {
 			break;
 		case WEST:
 			facingName = "Ouest";
-			startX = chunkX - mapRaduisSize;
-			endX = chunkX + mapRaduisSize;
-			startZ = chunkZ + mapRaduisSize * sidesCoeff;
-			endZ = chunkZ - mapRaduisSize * sidesCoeff;
+			startX = chunkX - mapRadiusSize;
+			endX = chunkX + mapRadiusSize;
+			startZ = chunkZ + mapRadiusSize * sidesCoeff;
+			endZ = chunkZ - mapRadiusSize * sidesCoeff;
 			for (int iX = startX; endX > iX; iX++) {
 				for (int iZ = startZ; endZ < iZ; iZ--)
 					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
@@ -89,10 +89,10 @@ public class FactionMap {
 			break;
 		case SOUTH:
 			facingName = "Sud";
-			startX = chunkX + mapRaduisSize * sidesCoeff;
-			endX = chunkX - mapRaduisSize * sidesCoeff;
-			startZ = chunkZ + mapRaduisSize;
-			endZ = chunkZ - mapRaduisSize;
+			startX = chunkX + mapRadiusSize * sidesCoeff;
+			endX = chunkX - mapRadiusSize * sidesCoeff;
+			startZ = chunkZ + mapRadiusSize;
+			endZ = chunkZ - mapRadiusSize;
 			for (int iZ = startZ; endZ < iZ; iZ--) {
 				for (int iX = startX; endX < iX; iX--)
 					sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));

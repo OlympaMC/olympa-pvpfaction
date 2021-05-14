@@ -4,8 +4,8 @@ public enum FactionClaimPermLevel {
 
 	NONE(0, "aucune", false, false, false, false, false),
 	LVL_1(1, "infliger des dégâts aux entités", true, false, false, false, false),
-	LVL_2(2, "niveau précédent, et interragir avec les portes", true, true, false, false, false),
-	LVL_3(3, "niveau précédent, et interragir avec les coffres", true, true, true, false, false), //also used for armorstands, itemframes and paintings
+	LVL_2(2, "niveau précédent, et interagir avec les portes", true, true, false, false, false),
+	LVL_3(3, "niveau précédent, et interagir avec les coffres", true, true, true, false, false), //also used for armorstands, itemframes and paintings
 	LVL_4(4, "niveau précédent, et construire", true, true, true, true, false),
 	LVL_OWNER(5, "gérer les membres du claim. Attention, une fois défini plus personne n'a accès au claim, sauf si le propriétaire ajoute des joueurs/factions lui-même !", true, true, true, true, true),
 	;

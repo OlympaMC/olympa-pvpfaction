@@ -7,7 +7,7 @@ import fr.olympa.api.utils.Utils;
 
 public enum FactionChat {
 
-	GENERAL("Géneral", "normal", "reset"),
+	GENERAL("Général", "normal", "reset"),
 	FACTION("Faction", "fac", "f"),
 	ALLY("Allié", "ally", "a", "alliée", "alliés", "alliées");
 

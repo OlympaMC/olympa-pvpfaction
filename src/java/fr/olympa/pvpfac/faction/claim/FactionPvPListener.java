@@ -26,13 +26,13 @@ public class FactionPvPListener implements Listener {
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
 		Entity entityVictim = event.getEntity();
 		Entity entityAttacker = event.getDamager();
-		Faction victimfaction;
+		Faction victimFaction;
 		if (!(entityVictim instanceof Player))
 			return;
 		Player victim = (Player) entityVictim;
-		FactionPlayer victimfp = AccountProvider.get(victim.getUniqueId());
-		victimfaction = victimfp.getClan();
-		if (victimfaction == null)
+		FactionPlayer victimFactionPlayer = AccountProvider.get(victim.getUniqueId());
+		victimFaction = victimFactionPlayer.getClan();
+		if (victimFaction == null)
 			return;
 		Player attacker = null;
 		if (entityAttacker instanceof Player)
@@ -46,11 +46,11 @@ public class FactionPvPListener implements Listener {
 		if (attacker == null)
 			return;
 
-		FactionPlayer attackerfp = AccountProvider.get(attacker.getUniqueId());
-		Faction attackerfaction = attackerfp.getClan();
-		if (attackerfaction == null)
+		FactionPlayer attackerFactionPlayer = AccountProvider.get(attacker.getUniqueId());
+		Faction attackerFaction = attackerFactionPlayer.getClan();
+		if (attackerFaction == null)
 			return;
-		if (!victimfaction.isSameClan(attackerfaction)) {
+		if (!victimFaction.isSameClan(attackerFaction)) {
 			Chunk victimChunk = victim.getLocation().getChunk();
 			FactionClaim factionClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(victimChunk);
 			if (factionClaim == null) {
@@ -59,7 +59,7 @@ public class FactionPvPListener implements Listener {
 				return;
 				
 				//Retiré car méthodes modifiées
-			}/* else if (factionClaim.getPlayerPerm(attackerfp).canInterract()) {
+			}/* else if (factionClaim.getPlayerPerm(attackerFactionPlayer).canInteract()) {
 				Prefix.FACTION.sendMessage(attacker, "&cImpossible d'attaquer &4%s&c dans son claim.", victim.getName());
 				event.setCancelled(false);
 			}*/
@@ -76,8 +76,8 @@ public class FactionPvPListener implements Listener {
 		if (!material.equals(Material.LAVA_BUCKET))
 			return;
 		Location location = event.getBlockClicked().getLocation();
-		FactionPlayer attackerfp = AccountProvider.get(player.getUniqueId());
-		Faction faction = attackerfp.getClan();
+		FactionPlayer attackerFactionPlayer = AccountProvider.get(player.getUniqueId());
+		Faction faction = attackerFactionPlayer.getClan();
 		if (faction.getOnlineFactionPlayers().stream().filter(p -> SpigotUtils.playerisIn(p.getPlayer(), location)).findFirst().isPresent()) {
 			Prefix.FACTION.sendMessage(player, "Brûle pas le collègue !");
 			event.setCancelled(true);
