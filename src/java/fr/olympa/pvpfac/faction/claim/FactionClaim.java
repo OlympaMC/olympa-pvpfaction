@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
 import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,10 +19,10 @@ import java.util.stream.Stream;
 public class FactionClaim {
 
 	private final ClaimId claimId;
+	private final Map<Long, FactionClaimPermLevel> membersPlayers;
+	private final Map<Integer, FactionClaimPermLevel[]> membersFactions;
 	private Faction faction;
 	private FactionClaimType type;
-	private Map<Long, FactionClaimPermLevel> membersPlayers = new HashMap<Long, FactionClaimPermLevel>();
-	private Map<Integer, FactionClaimPermLevel[]> membersFactions = new HashMap<Integer, FactionClaimPermLevel[]>();
 
 	public FactionClaim(ClaimId id, FactionClaimType type, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
 		this.claimId = id;
@@ -30,18 +31,18 @@ public class FactionClaim {
 
 		faction = factionId == null ? null : PvPFaction.getInstance().getFactionManager().getClan(factionId);
 
-		this.membersPlayers = playersMembersAsJson == null || playersMembersAsJson.length() <= 2 ? new HashMap<Long, FactionClaimPermLevel>() :
+		this.membersPlayers = playersMembersAsJson == null || playersMembersAsJson.length() <= 2 ? new HashMap<>() :
 		                      ((Map<Long, Integer>) new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Long, Integer>>() {}.getType())).entrySet()
-			                      .stream().map(e -> new AbstractMap.SimpleEntry<Long, FactionClaimPermLevel>(e.getKey(), FactionClaimPermLevel.fromLevel(e.getValue())))
-			                      .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+			                      .stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), FactionClaimPermLevel.fromLevel(e.getValue())))
+			                      .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
-		this.membersFactions = factionsMembersAsJson == null || factionsMembersAsJson.length() <= 2 ? new HashMap<Integer, FactionClaimPermLevel[]>() :
+		this.membersFactions = factionsMembersAsJson == null || factionsMembersAsJson.length() <= 2 ? new HashMap<>() :
 		                       ((Map<Integer, Integer[]>) new Gson().fromJson(playersMembersAsJson, new TypeToken<Map<Integer, Integer[]>>() {}.getType())).entrySet()
-			                       .stream().map(e -> new AbstractMap.SimpleEntry<Integer, FactionClaimPermLevel[]>(
+			                       .stream().map(e -> new AbstractMap.SimpleEntry<>(
 			                       e.getKey(),
-			                       (FactionClaimPermLevel[]) Stream.of(e.getValue()).map(perm -> FactionClaimPermLevel.fromLevel(perm)).toArray()
+			                       (FactionClaimPermLevel[]) Stream.of(e.getValue()).map(FactionClaimPermLevel::fromLevel).toArray()
 		                       ))
-			                       .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+			                       .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 	}
 
 	public void sendTitle(Player player) {
@@ -194,10 +195,10 @@ public class FactionClaim {
 				.map(e -> new AbstractMap.SimpleEntry<Integer, Integer[]>(
 					e.getKey(),
 					Stream.of(e.getValue())
-						.map(perm -> perm.getLevel())
-						.toArray(i -> new Integer[i])
+						.map(FactionClaimPermLevel::getLevel)
+						.toArray(Integer[]::new)
 				))
-				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()))
+				.collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue))
 		);
 	}
 
@@ -206,7 +207,7 @@ public class FactionClaim {
 		return membersPlayers.size() == 0 ? null : new Gson().toJson(
 			membersPlayers.entrySet().stream()
 				.map(e -> new AbstractMap.SimpleEntry<Long, Integer>(e.getKey(), e.getValue().getLevel()))
-				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));//, new TypeToken<Map<Long, Integer>>(){}.getType());
+				.collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));//, new TypeToken<Map<Long, Integer>>(){}.getType());
 	}
 
 	public FactionClaimType getType() {
@@ -228,9 +229,7 @@ public class FactionClaim {
 	}
 
 	public boolean isOverClaimable() {
-		if (!type.isClaimable()) return false;
-		else if (faction == null) return true;
-		else return faction.isOverClaimable();
+		return type.isClaimable() && (faction == null || faction.isOverClaimable());
 	}
 
 }

@@ -13,7 +13,8 @@ public enum FactionClaimType {
 	private final boolean isClaimable;
 	private final boolean canPvp;
 
-	private final boolean isProtected; //used for build, explosion and mob spawning (except CUSTOM)
+	//used for build, explosion and mob spawning (except CUSTOM)
+	private final boolean isProtected;
 	private final boolean canPlaceContainers;
 
 

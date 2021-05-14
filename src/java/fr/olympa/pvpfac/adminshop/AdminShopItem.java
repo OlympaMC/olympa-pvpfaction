@@ -17,9 +17,7 @@ public class AdminShopItem {
 	private static final String SEP = "&e&m&l##########";
 
 	TranslatableComponent name;
-	@NotNull
 	double value;
-	@NotNull
 	int amont;
 	@NotNull
 	Material material;
@@ -169,9 +167,8 @@ public class AdminShopItem {
 			itemAdmin.addLoreBefore("&4&lOBJET DESACTIVÉ");
 		}
 		itemAdmin.lore("", "&4&nActions Admin", "&7Shift-Clique &2Gauche &7> &aActive l'objet", "&7Shift-Clique &cDroit &7> &cDésactive l'objet", SEP);
-		ItemStack itemStack = itemAdmin.build();
 
-		return itemStack;
+		return itemAdmin.build();
 	}
 
 	public ItemStack getItemStackPlayer() {
@@ -188,7 +185,7 @@ public class AdminShopItem {
 		return enable;
 	}
 
-	public Material getMaterial() {
+	public @NotNull Material getMaterial() {
 		return material;
 	}
 

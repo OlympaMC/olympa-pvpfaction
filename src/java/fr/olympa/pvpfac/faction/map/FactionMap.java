@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class FactionMap {
 
-	private static final List<String> symboles = Arrays.asList("#", "%", "&", "$", "@", "=", "+", "A", "B", "C", "D", "E", "G", "0", "7");
+	private static final List<String> SYMBOLES = Arrays.asList("#", "%", "&", "$", "@", "=", "+", "A", "B", "C", "D", "E", "G", "0", "7");
 	protected static List<Player> autoMapPlayers = new ArrayList<>();
 
 	public static void sendMap(Player player, Faction playerFaction) {
@@ -116,16 +116,12 @@ public class FactionMap {
 		if (claimFaction == null) {
 			return /*factionClaim.getColor() + */(isCenter ? "§m" : "") + "-";
 		}
-		String symb = factions.get(claimFaction);
-		if (symb == null) {
-			symb = symboles.get(indexSymbole);
-			factions.put(claimFaction, symb);
-		}
+		String symbol = factions.computeIfAbsent(claimFaction, k -> SYMBOLES.get(indexSymbole));
 		ChatColor color = ChatColor.RED;
 		if (targetFaction != null && targetFaction.getID() == claimFaction.getID()) {
 			color = ChatColor.GREEN;
 		}
-		return color + (isCenter ? "§m" : "") + symb;
+		return color + (isCenter ? "§m" : "") + symbol;
 	}
 
 	public static void toggleAutoMap(Player player) {

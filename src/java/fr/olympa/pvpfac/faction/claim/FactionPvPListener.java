@@ -74,7 +74,7 @@ public class FactionPvPListener implements Listener {
 		Location location = event.getBlockClicked().getLocation();
 		FactionPlayer attackerFactionPlayer = AccountProvider.get(player.getUniqueId());
 		Faction faction = attackerFactionPlayer.getClan();
-		if (faction.getOnlineFactionPlayers().stream().filter(p -> SpigotUtils.playerisIn(p.getPlayer(), location)).findFirst().isPresent()) {
+		if (faction.getOnlineFactionPlayers().stream().anyMatch(p -> SpigotUtils.playerisIn(p.getPlayer(), location))) {
 			Prefix.FACTION.sendMessage(player, "Brûle pas le collègue !");
 			event.setCancelled(true);
 			player.updateInventory();

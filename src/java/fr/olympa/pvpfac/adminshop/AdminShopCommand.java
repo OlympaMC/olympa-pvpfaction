@@ -31,9 +31,7 @@ public class AdminShopCommand extends ComplexCommand {
 
 	@Override
 	public boolean noArguments(CommandSender sender) {
-		if (isConsole()) {
-			return false;
-		}
+		if (isConsole()) return false;
 		new AdminShopGui(player).create(player);
 		return true;
 	}

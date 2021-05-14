@@ -35,16 +35,16 @@ public class FactionClaimsManager implements Listener {
 
 	//private static final OlympaStatement createClaim = new OlympaStatement(StatementType.INSERT, tableName, "world_name", "x", "z", "faction_id", "members").returnGeneratedKeys();
 
-	private static final OlympaStatement selectClaimByChunk = new OlympaStatement(StatementType.SELECT, tableName, new String[]{ "x", "z" });
-	private static final OlympaStatement selectClaimsByFaction = new OlympaStatement(StatementType.SELECT, tableName, new String[]{ "faction_id" });
+	private static final OlympaStatement SELECT_CLAIM_BY_CHUNK = new OlympaStatement(StatementType.SELECT, tableName, new String[]{ "x", "z" });
+	private static final OlympaStatement SELECT_CLAIMS_BY_FACTION = new OlympaStatement(StatementType.SELECT, tableName, new String[]{ "faction_id" });
 
-	private static final OlympaStatement createClaim = new OlympaStatement(
+	private static final OlympaStatement CREATE_CLAIM = new OlympaStatement(
 		"INSERT INTO " + tableName +
 		" (`x`, `z`, `claim_type`, `faction_id`, `members_players`, `members_factions`)" +
 		" VALUES (?, ?, ?, ?, ?, ?);")
 		.returnGeneratedKeys();
 
-	private static final OlympaStatement updateClaim = new OlympaStatement(
+	private static final OlympaStatement UPDATE_CLAIM = new OlympaStatement(
 		"UPDATE " + tableName +
 		" SET `claim_type` = ?, `faction_id` = ?, `members_players` = ?, `members_factions` = ? WHERE `claim_id` = ?;");
 
@@ -70,7 +70,7 @@ public class FactionClaimsManager implements Listener {
 	}
 
 	public void updateClaim(FactionClaim claim) {
-		try (PreparedStatement statement = updateClaim.createStatement()) {
+		try (PreparedStatement statement = UPDATE_CLAIM.createStatement()) {
 			int i = 1;
 			statement.setString(i++, claim.getType().toString());
 			statement.setObject(i++, claim.getFaction() == null ? null : claim.getFaction().getID());
@@ -92,7 +92,7 @@ public class FactionClaimsManager implements Listener {
 			return claim;
 		}
 
-		try (PreparedStatement statement = selectClaimByChunk.createStatement()) {
+		try (PreparedStatement statement = SELECT_CLAIM_BY_CHUNK.createStatement()) {
 			int i = 1;
 			statement.setInt(i++, chunk.getX());
 			statement.setInt(i++, chunk.getZ());
@@ -103,7 +103,7 @@ public class FactionClaimsManager implements Listener {
 			{
 				return getFactionClaim(resultSet);
 			} else {
-				PreparedStatement insert = createClaim.createStatement();
+				PreparedStatement insert = CREATE_CLAIM.createStatement();
 				int j = 1;
 
 				insert.setInt(j++, chunk.getX());
@@ -149,7 +149,7 @@ public class FactionClaimsManager implements Listener {
 	}
 
 	public Set<FactionClaim> ofFaction(Faction faction) {
-		try (PreparedStatement statement = selectClaimsByFaction.createStatement()) {
+		try (PreparedStatement statement = SELECT_CLAIMS_BY_FACTION.createStatement()) {
 			statement.setInt(1, faction.getID());
 			ResultSet resultSet = statement.executeQuery();
 

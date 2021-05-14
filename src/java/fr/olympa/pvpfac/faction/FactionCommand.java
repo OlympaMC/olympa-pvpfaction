@@ -37,7 +37,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	public FactionCommand(FactionManager manager, OlympaSpigotPermission permission, String... aliases) {
 		super(manager, "Permet de gérer les factions.", permission, aliases);
 		this.addArgumentParser("FACTIONS", (player, arg) -> manager.getClans().stream().map(e -> e.getValue().getName()).collect(Collectors.toSet()),
-		                       arg -> manager.getByName(arg),
+		                       manager::getByName,
 		                       x -> String.format("&cLa faction &4%s&c n'existe pas.", x)
 		);
 		this.addArgumentParser("FACTION_ROLE", FactionRole.class, fr -> fr.name);
@@ -315,12 +315,12 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			return;
 
 		} else if (cmd.getArgument(0).equals("tuto")) {
-			String s = "§6Les permissions sont les suivantes :";
+			StringBuilder s = new StringBuilder("§6Les permissions sont les suivantes :");
 			for (FactionClaimPermLevel lvl : FactionClaimPermLevel.values()) {
-				s += "\n§a" + lvl + "§e→ Permissions : " + lvl.getDesc();
+				s.append("\n§a").append(lvl).append("§e→ Permissions : ").append(lvl.getDesc());
 			}
 
-			sendMessage(Prefix.FACTION, s);
+			sendMessage(Prefix.FACTION, s.toString());
 			return;
 		} else if (cmd.getArgumentsLength() < 3) {
 			sendHelp(getSender());

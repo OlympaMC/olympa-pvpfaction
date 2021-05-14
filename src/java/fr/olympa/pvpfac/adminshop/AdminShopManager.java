@@ -56,17 +56,17 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		config.save();
 	}
 
-	public List<AdminShopItem> getItemPage(int page, Boolean enableOrDisableorAll) {
+	public List<AdminShopItem> getItemPage(int page, Boolean enableOrDisableOrAll) {
 		Stream<AdminShopItem> stream;
-		if (enableOrDisableorAll == null) {
+		if (enableOrDisableOrAll == null) {
 			stream = items.stream().sorted(new Sorting<>(it -> it.isEnable() ? 1 : 0));
-		} else if (enableOrDisableorAll) {
-			stream = items.stream().filter(it -> it.isEnable());
+		} else if (enableOrDisableOrAll) {
+			stream = items.stream().filter(AdminShopItem::isEnable);
 		} else {
 			stream = items.stream().filter(it -> !it.isEnable());
 		}
 		if (page > 1) {
-			stream = stream.skip((page - 1) * getPageSize());
+			stream = stream.skip((long) (page - 1) * getPageSize());
 		}
 		return stream.limit(getPageSize()).collect(Collectors.toList());
 	}
@@ -152,7 +152,7 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 	}
 
 	public List<AdminShopItem> getItemsEnabled() {
-		return items.stream().filter(it -> it.isEnable()).collect(Collectors.toList());
+		return items.stream().filter(AdminShopItem::isEnable).collect(Collectors.toList());
 	}
 
 	public int getPageSize() {

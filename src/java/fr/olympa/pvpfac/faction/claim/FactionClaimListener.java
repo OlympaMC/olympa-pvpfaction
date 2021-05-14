@@ -112,9 +112,7 @@ public class FactionClaimListener implements Listener {
 		Entity target = e.getEntity();
 		Entity damager = e.getDamager();
 
-		if (damager instanceof Projectile) {
-			damager = (Entity) ((Projectile) damager).getShooter();
-		}
+		if (damager instanceof Projectile) damager = (Entity) ((Projectile) damager).getShooter();
 
 		if (damager.getType() != EntityType.PLAYER) return;
 
@@ -128,9 +126,10 @@ public class FactionClaimListener implements Listener {
 		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(e.getEntity().getLocation().getChunk());
 
 		if (target.getType() == EntityType.PLAYER) {
-			FactionPlayer targetFp = AccountProvider.get(target.getUniqueId());
+			FactionPlayer targetFactionPlayer = AccountProvider.get(target.getUniqueId());
 
-			if (targetFp.getClan() != null && (targetFp.getClan().equals(damagerFactionPlayer.getClan()) || targetFp.getClan().isAlly(damagerFactionPlayer.getClan()))) {
+			if (targetFactionPlayer.getClan() != null &&
+			    (targetFactionPlayer.getClan().equals(damagerFactionPlayer.getClan()) || targetFactionPlayer.getClan().isAlly(damagerFactionPlayer.getClan()))) {
 				Prefix.FACTION.sendMessage(damager, "§7On attaque pas le copain !");
 				e.setCancelled(true);
 			}
@@ -194,8 +193,13 @@ public class FactionClaimListener implements Listener {
 		Faction faction = ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getClan();
 
 		//if (faction != null && faction.getOnlineFactionPlayers().stream().filter(player -> SpigotUtils.playerisIn(player.getPlayer(), location)).findFirst().isPresent()) {
-		if (faction != null && Bukkit.getOnlinePlayers().stream().anyMatch(pl -> SpigotUtils.playerisIn(pl, location) &&
-		                                                                         faction.isAlly(((FactionPlayer) AccountProvider.get(pl.getUniqueId())).getClan()))) {
+		if (
+			faction != null && Bukkit.getOnlinePlayers().stream().anyMatch(
+				pl ->
+					SpigotUtils.playerisIn(pl, location) &&
+					faction.isAlly(((FactionPlayer) AccountProvider.get(pl.getUniqueId())).getClan())
+			)
+		) {
 			Prefix.FACTION.sendMessage(p, "Eh, brûle pas le collègue !");
 			e.setCancelled(true);
 			p.updateInventory();
@@ -215,7 +219,7 @@ public class FactionClaimListener implements Listener {
 			FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(e.getBlock().getLocation().getChunk());
 			if (!claim.getType().canPlaceContainers()) {
 				e.setCancelled(true);
-				Prefix.FACTION.sendMessage(e.getPlayer(), "§cTu peux peux pas utiliser de coffre dans les AP. §7Utilise des portes-armure à la place !");
+				Prefix.FACTION.sendMessage(e.getPlayer(), "§cTu ne peux pas utiliser de coffre dans les AP. §7Utilise des portes-armure à la place !");
 			}
 
 		}
@@ -315,8 +319,8 @@ public class FactionClaimListener implements Listener {
 		} else if (e.getRemover() instanceof Player) {
 			isActionCancelled(
 				e.getEntity().getLocation(), (Player) e.getRemover(), e,
-			                  FactionClaimPermLevel::canBuild,
-			                  "§cTu ne peux pas prendre cet item."
+				FactionClaimPermLevel::canBuild,
+				"§cTu ne peux pas prendre cet item."
 			);
 		}
 	}
@@ -330,8 +334,8 @@ public class FactionClaimListener implements Listener {
 	public void onInteractItemframe(HangingPlaceEvent e) {
 		isActionCancelled(
 			e.getEntity().getLocation(), e.getPlayer(), e,
-		                  FactionClaimPermLevel::canBuild,
-		                  "§cTu ne peux pas placer ça ici."
+			FactionClaimPermLevel::canBuild,
+			"§cTu ne peux pas placer ça ici."
 		);
 	}
 
@@ -343,7 +347,7 @@ public class FactionClaimListener implements Listener {
 	}
 
 	private boolean isModificationAllowed(List<Block> blocks) {
-		for (Chunk ch : blocks.stream().map(b -> b.getChunk()).collect(Collectors.toSet())) {
+		for (Chunk ch : blocks.stream().map(Block::getChunk).collect(Collectors.toSet())) {
 			if (PvPFaction.getInstance().getClaimsManager().ofChunk(ch).getType().isProtected()) return false;
 		}
 

@@ -123,10 +123,11 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	/**
 	 * Return true if fac is an ally or if same fac as this instance is used as parameter
+	 * **Not implemented for now.**
 	 *
-	 * @param fac
-	 *
-	 * @return
+	 * @param fac - The faction to test with.
+	 * @
+	 * @return True if the faction is an ally.
 	 */
 	public boolean isAlly(Faction fac) {
 		throw new UnsupportedOperationException("Gestion des factions alliées non encore implémentée !");
@@ -196,10 +197,10 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	@Override
-	protected void removedOnlinePlayer(ClanPlayerInterface<Faction, FactionPlayerData> oplayer) {
-		super.removedOnlinePlayer(oplayer);
+	protected void removedOnlinePlayer(ClanPlayerInterface<Faction, FactionPlayerData> clanPlayer) {
+		super.removedOnlinePlayer(clanPlayer);
 
-		PvPFaction.getInstance().scoreboards.refresh((FactionPlayer) oplayer);
+		PvPFaction.getInstance().scoreboards.refresh((FactionPlayer) clanPlayer);
 	}
 
 	@Override
