@@ -1,10 +1,5 @@
 package fr.olympa.pvpfac.faction;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.List;
-
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
 import fr.olympa.api.clans.gui.ClanManagementGUI;
@@ -18,9 +13,12 @@ import fr.olympa.pvpfac.faction.gui.FactionManagementGUI;
 import fr.olympa.pvpfac.player.FactionPlayerData;
 import fr.olympa.pvpfac.player.FactionPlayerData.FactionRole;
 
-public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.List;
 
-	public SQLColumn<FactionPlayerData> roleColumn;
+public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
 	protected SQLColumn<Faction> homeColumn;
 	protected SQLColumn<Faction> enemyColumn;
@@ -28,6 +26,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected SQLColumn<Faction> allyColumn;
 	protected SQLColumn<Faction> descriptionColumn;
 	protected SQLColumn<Faction> tagColumn;
+	public SQLColumn<FactionPlayerData> roleColumn;
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions");
@@ -76,9 +75,29 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringInventoryJoin = "Rejoindre une faction";
 		stringItemLeave = "Quitter la faction";
 		stringAddedMoney = "Tu viens d'ajouter %s à la cagnotte de la faction !";
-		stringItemLeaveChiefLore = new String[] { "§7§oPour pouvoir quitter votre faction,", "§7§ovous devez tout d'abord", "§7§otransmettre la direction de celle-ci", "§7§oà un autre membre." };
+		stringItemLeaveChiefLore = new String[]{ "§7§oPour pouvoir quitter votre faction,", "§7§ovous devez tout d'abord", "§7§otransmettre la direction de celle-ci", "§7§oà un autre membre." };
 		stringClanNameTooLong = "Le nom d'une faction ne peut pas excéder %d caractères !";
 		stringItemDisband = "§cDémanteler la faction";
+	}
+
+	public Faction get(String nameOrTagOrPlayer) throws SQLException {
+		Faction faction = getByName(nameOrTagOrPlayer);
+		if (faction == null) {
+			faction = getByTag(nameOrTagOrPlayer);
+		}
+		if (faction == null) {
+			ClanPlayerInterface<Faction, FactionPlayerData> target = AccountProvider.get(nameOrTagOrPlayer);
+			faction = target.getClan();
+		}
+		return faction;
+	}
+
+	public Faction getByName(String name) {
+		return getClans().stream().filter(c -> name.equalsIgnoreCase(c.getValue().getName())).map(c -> c.getValue()).findFirst().orElse(null);
+	}
+
+	public Faction getByTag(String tag) {
+		return getClans().stream().filter(c -> tag.equalsIgnoreCase(c.getValue().getTag())).map(c -> c.getValue()).findFirst().orElse(null);
 	}
 
 	@Override
@@ -105,7 +124,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	protected FactionPlayerData provideClanData(OlympaPlayerInformations informations, ResultSet resultSet) throws SQLException {
 		return new FactionPlayerData(informations, FactionRole.values()[resultSet.getInt("role")]);
 	}
-	
+
 	@Override
 	public int getMaxSize(ClanPlayerInterface<Faction, FactionPlayerData> p) {
 		return 10;
@@ -133,25 +152,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	@Override
 	public ClanManagementGUI<Faction, FactionPlayerData> provideManagementGUI(ClanPlayerInterface<Faction, FactionPlayerData> player) {
 		return new FactionManagementGUI(player, player.getClan(), this);
-	}
-
-	public Faction getByName(String name) {
-		return getClans().stream().filter(c -> name.equalsIgnoreCase(c.getValue().getName())).map(c -> c.getValue()).findFirst().orElse(null);
-	}
-
-	public Faction getByTag(String tag) {
-		return getClans().stream().filter(c -> tag.equalsIgnoreCase(c.getValue().getTag())).map(c -> c.getValue()).findFirst().orElse(null);
-	}
-
-	public Faction get(String nameOrTagOrPlayer) throws SQLException {
-		Faction faction = getByName(nameOrTagOrPlayer);
-		if (faction == null)
-			faction = getByTag(nameOrTagOrPlayer);
-		if (faction == null) {
-			ClanPlayerInterface<Faction, FactionPlayerData> target = AccountProvider.get(nameOrTagOrPlayer);
-			faction = target.getClan();
-		}
-		return faction;
 	}
 
 }

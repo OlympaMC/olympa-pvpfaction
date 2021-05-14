@@ -1,13 +1,5 @@
 package fr.olympa.pvpfac.faction;
 
-import java.sql.SQLException;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.entity.Player;
-
 import fr.olympa.api.chat.ColorUtils;
 import fr.olympa.api.clans.ClansCommand;
 import fr.olympa.api.command.complex.Cmd;
@@ -32,14 +24,22 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.entity.Player;
+
+import java.sql.SQLException;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
 	public FactionCommand(FactionManager manager, OlympaSpigotPermission permission, String... aliases) {
 		super(manager, "Permet de gérer les factions.", permission, aliases);
 		this.addArgumentParser("FACTIONS", (player, arg) -> manager.getClans().stream().map(e -> e.getValue().getName()).collect(Collectors.toSet()),
-				arg -> manager.getByName(arg),
-				x -> String.format("&cLa faction &4%s&c n'existe pas.", x));
+		                       arg -> manager.getByName(arg),
+		                       x -> String.format("&cLa faction &4%s&c n'existe pas.", x)
+		);
 		this.addArgumentParser("FACTION_ROLE", FactionRole.class, fr -> fr.name);
 		this.addArgumentParser("FACTION_CLAIM_TYPE", FactionClaimType.class);
 		this.addArgumentParser("CLAIM_PERM", FactionClaimPermLevel.class);
@@ -52,7 +52,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
 		}
-		faction.updateDescription(Utils.capitalize(cmd.getFrom(1).toString().replace("\n", "")));
+		faction.updateDescription(Utils.capitalize(cmd.getFrom(1).replace("\n", "")));
 		Prefix.FACTION.sendMessage(faction.getPlayers(), "&2%s&a a changer la description en &2%s&a.", player.getName(), faction.getDescription());
 	}
 
@@ -71,7 +71,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	@Cmd(player = true, aliases = { "p", "powers" }, args = { "PLAYERS", "INTEGER" })
 	public void power(CommandContext cmd) {
 		FactionPlayer fp;
-		if (cmd.getArgumentsLength() != 0)
+		if (cmd.getArgumentsLength() != 0) {
 			try {
 				fp = AccountProvider.get(cmd.getArgument(0, ""));
 				if (cmd.getArgumentsLength() != 1 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player) && cmd.getArgument(1) instanceof Integer) {
@@ -84,8 +84,9 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 				e.printStackTrace();
 				return;
 			}
-		else
+		} else {
 			fp = getOlympaPlayer();
+		}
 		sendMessage(Prefix.FACTION, "&2" + fp.getName() + "&a a &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + " de power.");
 	}
 
@@ -93,9 +94,9 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	public void promote(CommandContext cmd) {
 		FactionPlayerData player = cmd.getArgument(0);
 		FactionRole above = player.getRole().getAbove();
-		if (above == null)
+		if (above == null) {
 			sendError("Le joueur %s est déjà au rang maximal possible !", player.getPlayerInformations().getName());
-		else {
+		} else {
 			player.setRole(above);
 			sendSuccess("Tu as promu le joueur %s au rang %s!", player.getPlayerInformations().getName(), above.name);
 		}
@@ -110,7 +111,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
 		Chunk chunk = player.getLocation().getChunk();
 		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(chunk);
-		
+
 		if (cmd.getArgument(0) instanceof Faction) {
 			Faction faction = cmd.getArgument(0);
 			claim.setFaction(faction);
@@ -131,7 +132,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	@Cmd(player = true, aliases = "cl")
 	public void claim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
-		if (cmd.getArgumentsLength() > 0 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player))
+		if (cmd.getArgumentsLength() > 0 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player)) {
 			try {
 				faction = PvPFaction.getInstance().getFactionManager().get(cmd.getArgument(0));
 			} catch (SQLException e) {
@@ -139,6 +140,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 				sendError();
 				return;
 			}
+		}
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
@@ -161,10 +163,16 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		Faction claimOldFaction = (claimOldFaction = claim.getFaction()) != null ? claimOldFaction.clone() : null;
 
 		if (!claim.isOverClaimable()) {
-			TextComponent text = new TextComponent(TextComponent.fromLegacyText("§cImpossible de &lsur&cclaim le chunk de la faction §4%s&c."
-					.replace("%s", claim.getFaction() == null ? claim.getType().getName() : claim.getFaction().getNameColored(faction))));
+			TextComponent text = new TextComponent(
+				TextComponent.fromLegacyText("§cImpossible de &lsur&cclaim le chunk de la faction §4%s&c.".replace(
+					"%s",
+					claim.getFaction() == null
+					? claim.getType().getName()
+					: claim.getFaction().getNameColored(faction)
+				))
+			);
 			text.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(
-					"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entouré de claims §nuniquement§e de la même faction."))));
+				"§6TIPS §eCondition pour surclaim une faction:\n- La faction doit avoir moins de power que de claims\n- Le claim ne doit pas être entouré de claims §nuniquement§e de la même faction."))));
 			sendComponents(text);
 			return;
 		}
@@ -173,14 +181,15 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		if (claimOldFaction != null) {
 			sendMessage(claimOldFaction.getPlayers(), Prefix.FACTION, "&4Vous avez perdu un claim, une autre faction vous a &lsur&4claim.");
 			sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a &lsur&aclaim un chunk de &c%s&a.", player.getName(), claimOldFaction.getName());
-		} else
+		} else {
 			sendMessage(faction.getPlayers(), Prefix.FACTION, "&2%s&a a claim un chunk.", player.getName());
+		}
 	}
 
 	@Cmd(player = true, aliases = "ucl")
 	public void unclaim(CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
-		if (cmd.getArgumentsLength() > 0 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player))
+		if (cmd.getArgumentsLength() > 0 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player)) {
 			try {
 				faction = PvPFaction.getInstance().getFactionManager().get(cmd.getArgument(0));
 			} catch (SQLException e) {
@@ -188,6 +197,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 				sendError();
 				return;
 			}
+		}
 		if (FactionMsg.youHaveNoFaction(player, faction)) {
 			sendMessage(Prefix.FACTION, "&cTu n'a pas de faction. &4/f help&c pour plus d'informations.");
 			return;
@@ -244,8 +254,9 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 				return;
 			}
 			player.setChat(askChat);
-		} else
+		} else {
 			askChat = chat.getOther();
+		}
 		player.setChat(askChat);
 		sendMessage(Prefix.FACTION, "Tu parles désormais en chat &2" + askChat.getName() + "&a.");
 	}
@@ -277,11 +288,9 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		StringJoiner sj = new StringJoiner("\n");
 		sj.add("&e&m--------------&6 " + color + faction.getName() + " &e&m--------------&6");
 		String tag = faction.getTag();
-		if (tag != null && !tag.isBlank())
-			sj.add("&3Tag: &b" + tag);
+		if (tag != null && !tag.isBlank()) sj.add("&3Tag: &b" + tag);
 		String description = faction.getDescription();
-		if (description != null && !description.isBlank())
-			sj.add("&3Description: &b" + description);
+		if (description != null && !description.isBlank()) sj.add("&3Description: &b" + description);
 		long creationTime = faction.getCreationTime();
 		sj.add("&3Crée le : &b" + Utils.timestampToDate(creationTime) + "&3 (" + Utils.timestampToDuration(creationTime) + ")");
 		sj.add("&3Claims/Power/MaxPower : &b" + faction.getClaimsPowerMaxPower());
@@ -295,46 +304,50 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		}
 		player.sendMessage(ColorUtils.color(sj.toString()));
 	}
-	
 
-	@Cmd(player = true, aliases = "cp", args = {"set|info|tuto", "PLAYERS|FACTIONS", "CLAIM_PERM", "FACTION_ROLE"}, min = 1)
+
+	@Cmd(player = true, aliases = "cp", args = { "set|info|tuto", "PLAYERS|FACTIONS", "CLAIM_PERM", "FACTION_ROLE" }, min = 1)
 	public void claimperm(CommandContext cmd) {
 		FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(getPlayer().getLocation().getChunk());
-		
+
 		if (cmd.getArgument(0).equals("info")) {
 			sendMessage(Prefix.FACTION, "Todo !");
 			return;
-		
-		}else if (cmd.getArgument(0).equals("tuto")) {
+
+		} else if (cmd.getArgument(0).equals("tuto")) {
 			String s = "§6Les permissions sont les suivantes :";
-			for (FactionClaimPermLevel lvl : FactionClaimPermLevel.values())
+			for (FactionClaimPermLevel lvl : FactionClaimPermLevel.values()) {
 				s += "\n§a" + lvl + "§e→ Permissions : " + lvl.getDesc();
-			
+			}
+
 			sendMessage(Prefix.FACTION, s);
 			return;
-		}else if (cmd.getArgumentsLength() < 3) {
+		} else if (cmd.getArgumentsLength() < 3) {
 			sendHelp(getSender());
 			return;
 		}
 		FactionClaimPermLevel perm = cmd.getArgument(2);
-		
+
 		if (cmd.getArgument(1) instanceof Player) {
-			FactionPlayer fp = AccountProvider.get(((Player)cmd.getArgument(1)).getUniqueId());
-			if (claim.setPlayerLevel(fp, perm))
+			FactionPlayer fp = AccountProvider.get(((Player) cmd.getArgument(1)).getUniqueId());
+			if (claim.setPlayerLevel(fp, perm)) {
 				sendMessage(Prefix.FACTION, "Permission de %s définie sur %s.", fp.getName(), perm.toString().toLowerCase());
-			else
+			} else {
 				sendMessage(Prefix.FACTION, "§ePermission de %s déjà définie sur %s.", fp.getName(), perm.toString().toLowerCase());
-			
-		}else if (cmd.getArgument(1) instanceof Faction && cmd.getArgumentsLength() >= 4) {
+			}
+
+		} else if (cmd.getArgument(1) instanceof Faction && cmd.getArgumentsLength() >= 4) {
 			Faction fac = cmd.getArgument(1);
 			FactionRole role = cmd.getArgument(3);
-			if (claim.setFactionLevel(fac, role, perm))
+			if (claim.setFactionLevel(fac, role, perm)) {
 				sendMessage(Prefix.FACTION, "Permission du rôle %s de la faction %s définie sur %s.", role.name, fac.getName(), perm.toString().toLowerCase());
-			else
+			} else {
 				sendMessage(Prefix.FACTION, "§ePermission du rôle %s de la faction %s déjà définie sur %s.", role.name, fac.getName(), perm.toString().toLowerCase());
-				
-		}else
+			}
+
+		} else {
 			sendIncorrectSyntax();
+		}
 	}
 }
 

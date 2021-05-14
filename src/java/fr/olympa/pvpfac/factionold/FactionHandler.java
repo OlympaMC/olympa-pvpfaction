@@ -15,7 +15,7 @@ package fr.olympa.pvpfac.factionold;
 //import fr.olympa.pvpfac.PvPFaction;
 
 public class FactionHandler {
-	
+
 	//	private static List<OlympaFaction> cacheFactions = new ArrayList<>();
 	//	private static Map<OlympaFactionInvite, Player> invites = new HashMap<>();
 	//	private static List<Player> tryCreate = new ArrayList<>();

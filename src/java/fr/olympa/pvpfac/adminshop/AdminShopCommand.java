@@ -1,17 +1,16 @@
 package fr.olympa.pvpfac.adminshop;
 
-import java.util.List;
-
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
-
 import fr.olympa.api.command.complex.Cmd;
 import fr.olympa.api.command.complex.CommandContext;
 import fr.olympa.api.command.complex.ComplexCommand;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.adminshop.gui.AdminShopGui;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 public class AdminShopCommand extends ComplexCommand {
 
@@ -32,8 +31,9 @@ public class AdminShopCommand extends ComplexCommand {
 
 	@Override
 	public boolean noArguments(CommandSender sender) {
-		if (isConsole())
+		if (isConsole()) {
 			return false;
+		}
 		new AdminShopGui(player).create(player);
 		return true;
 	}
@@ -43,20 +43,23 @@ public class AdminShopCommand extends ComplexCommand {
 		Material material;
 		int amout = 1;
 		float value;
-		if (cmd.getArgumentsLength() > 0 && cmd.getArgument(0) instanceof Material)
+		if (cmd.getArgumentsLength() > 0 && cmd.getArgument(0) instanceof Material) {
 			material = cmd.getArgument(0);
-		else {
-			if (cmd.getArgumentsLength() > 0 && cmd.getArgument(0) instanceof Integer)
+		} else {
+			if (cmd.getArgumentsLength() > 0 && cmd.getArgument(0) instanceof Integer) {
 				amout = cmd.getArgument(0);
+			}
 			material = player.getInventory().getItemInMainHand().getType();
 		}
 		value = 1;
-		if (cmd.getArgumentsLength() > 1)
+		if (cmd.getArgumentsLength() > 1) {
 			value = cmd.getArgument(1);
-		if (((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(material, amout, value)))
+		}
+		if (((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(material, amout, value))) {
 			sendMessage(Prefix.FACTION, "&a%s&2 a été ajouté à l'AdminShop avec comme valeur &2%f&a.", material.name(), value);
-		else
+		} else {
 			sendMessage(Prefix.FACTION, "&cImpossible d'ajouter &4%d&c. Il doit sûrement déjà être dans le shop.", material.name());
+		}
 	}
 
 	@Cmd(min = 1, description = "Ajoute un item grace à son type", args = { "INTEGER" })

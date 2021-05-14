@@ -10,60 +10,52 @@ import fr.olympa.pvpfac.faction.claim.FactionClaimPermLevel;
 public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData> {
 
 	private final ObservableValue<FactionRole> role;
-	
+
 	public FactionPlayerData(OlympaPlayerInformations informations) {
 		this(informations, FactionRole.RECRUT);
 	}
-	
+
 	public FactionPlayerData(OlympaPlayerInformations informations, FactionRole role) {
 		super(informations);
 		this.role = new ObservableValue<>(role);
 		this.role.observe("updateSQL", () -> PvPFaction.getInstance().factionManager.roleColumn.updateAsync(this, this.role.get().ordinal(), null, null));
 	}
 
-	public FactionRole getRole() {
-		return role.get();
-	}
-	
-	public void setRole(FactionRole role) {
-		this.role.set(role);
-	}
-	
 	public enum FactionRole {
-		
+
 		//NE PAS RAJOUTER DE VALEUR ICI SI LE SERVEUR EST EN PRODUCTION !!
 		//ou retravailler la classe FactionClaim pour prendre en compte les nouveaux rôles dans l'array de ClaimPermLevel concernant les factions membres du claim
 		LEADER(3, 10, "Leader", "**", FactionClaimPermLevel.LVL_4),
 		OFFICER(2, 5, "Officier", "*", FactionClaimPermLevel.LVL_4),
 		MEMBER(1, 2, "Membre", "+", FactionClaimPermLevel.LVL_3),
 		RECRUT(0, 0, "Recrue", "-", FactionClaimPermLevel.LVL_1);
-		
+
 		public final int weight;
 		public final int power;
 		public final String name;
 		public final String prefix;
 		public final FactionClaimPermLevel claimLevel;
-		
-		private FactionRole(int weight, int power, String name, String prefix, FactionClaimPermLevel level) {
+
+		FactionRole(int weight, int power, String name, String prefix, FactionClaimPermLevel level) {
 			this.weight = weight;
 			this.power = power;
 			this.name = name;
 			this.prefix = prefix;
 			this.claimLevel = level;
 		}
-		
+
 		public FactionRole getAbove() {
 			try {
 				return values()[ordinal() - 1];
-			}catch (ArrayIndexOutOfBoundsException ex) {
+			} catch (ArrayIndexOutOfBoundsException ex) {
 				return null;
 			}
 		}
-		
+
 		public FactionRole getBelow() {
 			try {
 				return values()[ordinal() + 1];
-			}catch (ArrayIndexOutOfBoundsException ex) {
+			} catch (ArrayIndexOutOfBoundsException ex) {
 				return null;
 			}
 		}
@@ -71,7 +63,15 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 		public FactionClaimPermLevel getDefaultClaimLevel() {
 			return claimLevel;
 		}
-		
+
 	}
-	
+
+	public FactionRole getRole() {
+		return role.get();
+	}
+
+	public void setRole(FactionRole role) {
+		this.role.set(role);
+	}
+
 }

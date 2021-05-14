@@ -1,5 +1,11 @@
 package fr.olympa.pvpfac.faction.claim;
 
+import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.utils.Prefix;
+import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.pvpfac.PvPFaction;
+import fr.olympa.pvpfac.faction.Faction;
+import fr.olympa.pvpfac.player.FactionPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,14 +18,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
-import fr.olympa.api.chat.ColorUtils;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.utils.Prefix;
-import fr.olympa.api.utils.spigot.SpigotUtils;
-import fr.olympa.pvpfac.PvPFaction;
-import fr.olympa.pvpfac.faction.Faction;
-import fr.olympa.pvpfac.player.FactionPlayer;
-
 public class FactionPvPListener implements Listener {
 
 	@EventHandler
@@ -27,37 +25,35 @@ public class FactionPvPListener implements Listener {
 		Entity entityVictim = event.getEntity();
 		Entity entityAttacker = event.getDamager();
 		Faction victimFaction;
-		if (!(entityVictim instanceof Player))
-			return;
+		if (!(entityVictim instanceof Player)) return;
+
 		Player victim = (Player) entityVictim;
 		FactionPlayer victimFactionPlayer = AccountProvider.get(victim.getUniqueId());
 		victimFaction = victimFactionPlayer.getClan();
-		if (victimFaction == null)
-			return;
+		if (victimFaction == null) return;
+
 		Player attacker = null;
-		if (entityAttacker instanceof Player)
+		if (entityAttacker instanceof Player) {
 			attacker = (Player) entityAttacker;
-		else if (entityAttacker instanceof Projectile) {
+		} else if (entityAttacker instanceof Projectile) {
 			// Projectile = arrow, all potions ...
 			ProjectileSource shooter = ((Projectile) entityAttacker).getShooter();
-			if (shooter instanceof Player)
+			if (shooter instanceof Player) {
 				attacker = (Player) shooter;
+			}
 		}
-		if (attacker == null)
-			return;
+		if (attacker == null) return;
 
 		FactionPlayer attackerFactionPlayer = AccountProvider.get(attacker.getUniqueId());
 		Faction attackerFaction = attackerFactionPlayer.getClan();
-		if (attackerFaction == null)
-			return;
+		if (attackerFaction == null) return;
+
 		if (!victimFaction.isSameClan(attackerFaction)) {
 			Chunk victimChunk = victim.getLocation().getChunk();
 			FactionClaim factionClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(victimChunk);
 			if (factionClaim == null) {
 				Prefix.FACTION.sendMessage(attacker, "&4Impossible de charger le claim.");
 				event.setCancelled(false);
-				return;
-				
 				//Retiré car méthodes modifiées
 			}/* else if (factionClaim.getPlayerPerm(attackerFactionPlayer).canInteract()) {
 				Prefix.FACTION.sendMessage(attacker, "&cImpossible d'attaquer &4%s&c dans son claim.", victim.getName());
@@ -73,8 +69,8 @@ public class FactionPvPListener implements Listener {
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
 		Player player = event.getPlayer();
 		Material material = event.getBucket();
-		if (!material.equals(Material.LAVA_BUCKET))
-			return;
+		if (!material.equals(Material.LAVA_BUCKET)) return;
+
 		Location location = event.getBlockClicked().getLocation();
 		FactionPlayer attackerFactionPlayer = AccountProvider.get(player.getUniqueId());
 		Faction faction = attackerFactionPlayer.getClan();

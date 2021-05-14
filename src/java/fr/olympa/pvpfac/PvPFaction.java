@@ -1,7 +1,5 @@
 package fr.olympa.pvpfac;
 
-import org.bukkit.plugin.PluginManager;
-
 import fr.olympa.api.auctions.AuctionsManager;
 import fr.olympa.api.command.essentials.BackCommand;
 import fr.olympa.api.command.essentials.FeedCommand;
@@ -29,55 +27,20 @@ import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import fr.olympa.pvpfac.world.WorldsManager;
+import org.bukkit.plugin.PluginManager;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
 	private static PvPFaction instance;
-
-	public static PvPFaction getInstance() {
-		return instance;
-	}
-
+	private WorldsManager worldsManager;
+	private TaxManager taxManager;
+	private TradesManager<FactionPlayer> trades;
+	private AdminShopManager adminShop;
 	public ScoreboardManager<FactionPlayer> scoreboards;
 	public FactionManager factionManager;
 	public FactionClaimsManager claimsManager;
-	private WorldsManager worldsManager;
-	private TaxManager taxManager;
-
-	private TradesManager<FactionPlayer> trades;
-
-	private AdminShopManager adminShop;
-
-	public FactionManager getFactionManager() {
-		return factionManager;
-	}
-
-	public FactionClaimsManager getClaimsManager() {
-		return claimsManager;
-	}
-
-	public WorldsManager getWorldsManager() {
-		return worldsManager;
-	}
-
-	public TradesManager<FactionPlayer> getTradesManager() {
-		return trades;
-	}
-
-	public AdminShopManager getAdminShop() {
-		return adminShop;
-	}
-
 	public DynamicLine<Scoreboard<FactionPlayer>> lineMoney = new DynamicLine<>(x -> "§7Monnaie: §6" + x.getOlympaPlayer().getGameMoney().getFormatted());
 	public DynamicLine<Scoreboard<FactionPlayer>> lineGroup = new DynamicLine<>(x -> "§7Rang: §b" + x.getOlympaPlayer().getGroupNameColored());
-
-	@Override
-	public void onDisable() {
-		if (scoreboards != null)
-			scoreboards.unload();
-		adminShop.disable(this);
-		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactivé.");
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -131,17 +94,50 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 		// Not needed now ? OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
-				FixedLine.EMPTY_LINE,
-				lineMoney,
-				FixedLine.EMPTY_LINE,
-				lineGroup).addFooters(
-						FixedLine.EMPTY_LINE,
-						CyclingLine.olympaAnimation());
+			FixedLine.EMPTY_LINE,
+			lineMoney,
+			FixedLine.EMPTY_LINE,
+			lineGroup).addFooters(
+			FixedLine.EMPTY_LINE,
+			CyclingLine.olympaAnimation());
 
 		/*IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)
 			protocolSupport.disable1_8();*/
 		sendMessage("§2" + getDescription().getName() + "§a (" + getDescription().getVersion() + ") est activé.");
+	}
+
+	@Override
+	public void onDisable() {
+		if (scoreboards != null) {
+			scoreboards.unload();
+		}
+		adminShop.disable(this);
+		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactivé.");
+	}
+
+	public AdminShopManager getAdminShop() {
+		return adminShop;
+	}
+
+	public FactionClaimsManager getClaimsManager() {
+		return claimsManager;
+	}
+
+	public FactionManager getFactionManager() {
+		return factionManager;
+	}
+
+	public static PvPFaction getInstance() {
+		return instance;
+	}
+
+	public TradesManager<FactionPlayer> getTradesManager() {
+		return trades;
+	}
+
+	public WorldsManager getWorldsManager() {
+		return worldsManager;
 	}
 
 }

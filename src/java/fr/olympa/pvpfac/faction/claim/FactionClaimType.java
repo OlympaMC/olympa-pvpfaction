@@ -9,56 +9,54 @@ public enum FactionClaimType {
 	AP(true, true, false, false),
 	SPAWN(false, false, true, false),
 	;
-	
-	private boolean isClaimable;
-	private boolean canPvp;
-	
-	private boolean isProtected; //used for build, explosion and mob spawning (except CUSTOM)
-	private boolean canPlaceContainers;
-	
-	
-	private FactionClaimType(boolean isClaimable, boolean canPvp, boolean isProtected, boolean canPlaceContainers) {
+
+	private final boolean isClaimable;
+	private final boolean canPvp;
+
+	private final boolean isProtected; //used for build, explosion and mob spawning (except CUSTOM)
+	private final boolean canPlaceContainers;
+
+
+	FactionClaimType(boolean isClaimable, boolean canPvp, boolean isProtected, boolean canPlaceContainers) {
 		this.isClaimable = isClaimable;
 		this.canPvp = canPvp;
 		this.isProtected = isProtected;
 		this.canPlaceContainers = canPlaceContainers;
 	}
 
-	public boolean isClaimable() {
-		return isClaimable;
+	public static FactionClaimType fromString(String s) {
+		FactionClaimType obj = null;
+		for (FactionClaimType t : FactionClaimType.values()) {
+			if (t.toString().equals(s)) {
+				return t;
+			}
+		}
+
+		return NORMAL;
 	}
 
 	public boolean canPvp() {
 		return canPvp;
 	}
-	
-	
-	public boolean isProtected() {
-		return isProtected;
-	}
 
 	public boolean canPlaceContainers() {
 		return canPlaceContainers;
 	}
-	
-	public String getName() {
-		return this.toString().toLowerCase();
-	}
-	
-	public static FactionClaimType fromString(String s) {
-		FactionClaimType obj = null;
-		for (FactionClaimType t : FactionClaimType.values())
-			if (t.toString().equals(s))
-				return t;
-		
-		return NORMAL;
-	}
-
-	
-	
 
 	public void sendTitle(Player player) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	public String getName() {
+		return this.toString().toLowerCase();
+	}
+
+	public boolean isClaimable() {
+		return isClaimable;
+	}
+
+	public boolean isProtected() {
+		return isProtected;
 	}
 }

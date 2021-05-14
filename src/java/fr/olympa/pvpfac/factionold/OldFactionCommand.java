@@ -1,12 +1,11 @@
 package fr.olympa.pvpfac.factionold;
 
-import java.util.List;
-
+import fr.olympa.api.command.OlympaCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
-import fr.olympa.api.command.OlympaCommand;
+import java.util.List;
 
 public class OldFactionCommand extends OlympaCommand {
 
