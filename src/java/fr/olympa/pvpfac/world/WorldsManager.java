@@ -22,9 +22,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,9 +51,7 @@ public class WorldsManager {
 
 		configFile = new File(plugin.getDataFolder() + "/worlds.yml");
 		plugin.getDataFolder().mkdirs();
-		if (!configFile.createNewFile()) {
-			config.load(configFile);
-		} else {
+		if (configFile.createNewFile()) {
 			for (final WorldType type : WorldType.values()) {
 				config.set(type + ".reset_interval", type.getDefaultResetDays());
 				config.set(type + ".next_reset", 0);
@@ -61,6 +59,8 @@ public class WorldsManager {
 			}
 
 			config.save(configFile);
+		} else {
+			config.load(configFile);
 		}
 
 
@@ -71,7 +71,7 @@ public class WorldsManager {
 			if (System.currentTimeMillis() > config.getLong(type + ".next_reset") && config.getInt(type + ".reset_interval") > 0) {
 
 				if (worldFile.exists()) {
-					Stream.of(worldFile.listFiles()).forEach(f -> f.delete());
+					Stream.of(worldFile.listFiles()).forEach(File::delete);
 				}
 
 				worldFile.delete();
@@ -143,8 +143,7 @@ public class WorldsManager {
 		OVERWORLD("world", -1, Environment.NORMAL, false, true),
 		NETHER("nether", 7, Environment.NETHER, true, false),
 		END("end", 7, Environment.THE_END, true, false),
-		MINING("mining", 7, Environment.NORMAL, true, false),
-		;
+		MINING("mining", 7, Environment.NORMAL, true, false);
 
 
 		private final String worldName;
@@ -163,11 +162,9 @@ public class WorldsManager {
 			this.canPvp = canPvp;
 		}
 
-		public static WorldType fromString(final String s) {
+		public static @Nullable WorldType fromString(final String s) {
 			for (final WorldType w : WorldType.values()) {
-				if (w.getWorldName().equals(s)) {
-					return w;
-				}
+				if (w.getWorldName().equals(s)) return w;
 			}
 			return null;
 		}
@@ -189,12 +186,7 @@ public class WorldsManager {
 		}
 
 		public void teleportSpawn(final Player p) {
-			world.getChunkAtAsync(world.getSpawnLocation(), new Consumer<Chunk>() {
-				@Override
-				public void accept(final Chunk ch) {
-					p.teleport(world.getSpawnLocation());
-				}
-			});
+			world.getChunkAtAsync(world.getSpawnLocation(), (Consumer<Chunk>) ch -> p.teleport(world.getSpawnLocation()));
 		}
 
 		public void teleportRandom(final Player p, final int minRadiusChunk, final int radiusChunk) {
@@ -203,19 +195,16 @@ public class WorldsManager {
 			world.getChunkAtAsync(
 				r.nextBoolean() ? r.nextInt(minRadiusChunk, radiusChunk + 1) : -r.nextInt(minRadiusChunk, radiusChunk + 1),
 				r.nextBoolean() ? r.nextInt(minRadiusChunk, radiusChunk + 1) : -r.nextInt(minRadiusChunk, radiusChunk + 1),
-				new Consumer<Chunk>() {
-					@Override
-					public void accept(final Chunk ch) {
-						final int x = ch.getX() * 16 + r.nextInt(16);
-						final int z = ch.getZ() * 16 + r.nextInt(16);
-						final int y = ((CraftChunk) ch).getHandle().heightMap.get(Type.MOTION_BLOCKING).a(x & 0xF, z & 0xF);
+				(Consumer<Chunk>) ch -> {
+					final int x = ch.getX() * 16 + r.nextInt(16);
+					final int z = ch.getZ() * 16 + r.nextInt(16);
+					final int y = ((CraftChunk) ch).getHandle().heightMap.get(Type.MOTION_BLOCKING).a(x & 0xF, z & 0xF);
 
-						if (y > 100 || y < 30) {
-							teleportRandom(p, minRadiusChunk, radiusChunk);
-						} else {
-							p.teleport(new Location(world, x + 0.5, y + 1, z + 0.5));
-							p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100, 1, true, false, false));
-						}
+					if (y > 100 || y < 30) {
+						teleportRandom(p, minRadiusChunk, radiusChunk);
+					} else {
+						p.teleport(new Location(world, x + 0.5, y + 1, z + 0.5));
+						p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 100, 1, true, false, false));
 					}
 				}
 			);

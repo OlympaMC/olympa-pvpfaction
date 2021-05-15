@@ -11,7 +11,7 @@ public class OreListener implements Listener {
 
 	@EventHandler
 	public void onChunkPopulate(final ChunkPopulateEvent event) {
-		if (!event.getWorld().getName().equals("world")) return;
+		if (!"world".equals(event.getWorld().getName())) return;
 		final Chunk chunk = event.getChunk();
 		final long time = System.currentTimeMillis();
 		//PvPFaction.getInstance().getTask().runTaskAsynchronously(() -> {

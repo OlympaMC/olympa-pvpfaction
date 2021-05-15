@@ -51,9 +51,7 @@ public class WorldCommand extends ComplexCommand {
 
 	@Cmd(player = true, args = "world|nether|end|mining", min = 1)
 	public void setportal(final CommandContext cmd) {
-		if (!PvPFactionPermission.WORLD_COMMAND_ADMIN.hasPermissionWithMsg(getOlympaPlayer())) {
-			return;
-		}
+		if (!PvPFactionPermission.WORLD_COMMAND_ADMIN.hasPermissionWithMsg(getOlympaPlayer())) return;
 
 		final WorldType world = WorldType.fromString(cmd.getArgument(0));
 
