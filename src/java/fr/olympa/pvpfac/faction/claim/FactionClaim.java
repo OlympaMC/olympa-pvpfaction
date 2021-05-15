@@ -8,6 +8,7 @@ import fr.olympa.pvpfac.player.FactionPlayer;
 import fr.olympa.pvpfac.player.FactionPlayerData.FactionRole;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
@@ -24,7 +25,7 @@ public class FactionClaim {
 	private Faction faction;
 	private FactionClaimType type;
 
-	public FactionClaim(ClaimId id, FactionClaimType type, Integer factionId, String playersMembersAsJson, String factionsMembersAsJson) {
+	public FactionClaim(final ClaimId id, final FactionClaimType type, final Integer factionId, final String playersMembersAsJson, final String factionsMembersAsJson) {
 		this.claimId = id;
 
 		this.type = type;
@@ -45,7 +46,7 @@ public class FactionClaim {
 			                       .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 	}
 
-	public void sendTitle(Player player) {
+	public void sendTitle(final Player player) {
 		if (faction != null) {
 			player.sendTitle(faction.getNameColored(player.getUniqueId()), "§7" + faction.getDescription(), 0, 20, 20);
 		} else {
@@ -54,7 +55,7 @@ public class FactionClaim {
 
 	}
 
-	public boolean hasSameFaction(FactionClaim claim) {
+	public boolean hasSameFaction(final FactionClaim claim) {
 		return faction == null ?
 		       claim.getFaction() == null :
 		       claim.getFaction() != null && faction.getID() == claim.getFaction().getID();
@@ -64,7 +65,7 @@ public class FactionClaim {
 		return faction;
 	}
 
-	public void setFaction(Faction faction) {
+	public void setFaction(final Faction faction) {
 		if (!type.isClaimable()) {
 			return;
 		}
@@ -80,7 +81,7 @@ public class FactionClaim {
 		PvPFaction.getInstance().getClaimsManager().updateClaim(this);
 	}
 
-	public boolean setPlayerLevel(FactionPlayer pf, FactionClaimPermLevel level) {
+	public boolean setPlayerLevel(final FactionPlayer pf, final FactionClaimPermLevel level) {
 		if (membersPlayers.containsKey(pf.getId()) ? membersPlayers.get(pf.getId()) == level : level == FactionClaimPermLevel.NONE) return false;
 
 		if (level == FactionClaimPermLevel.NONE) {
@@ -93,7 +94,7 @@ public class FactionClaim {
 		return true;
 	}
 
-	public boolean setFactionLevel(Faction f, FactionRole role, FactionClaimPermLevel level) {
+	public boolean setFactionLevel(final Faction f, final FactionRole role, final FactionClaimPermLevel level) {
 		if (membersFactions.containsKey(f.getID()) ? membersFactions.get(f.getID())[role.weight] == level : level == FactionClaimPermLevel.NONE) return false;
 
 		//on ajoute les permissions par défaut à tous les grades de la faction elle n'est pas encore dans la liste
@@ -104,7 +105,7 @@ public class FactionClaim {
 			}
 		}
 
-		FactionClaimPermLevel[] perms = membersFactions.get(f.getID());
+		final FactionClaimPermLevel[] perms = membersFactions.get(f.getID());
 		perms[role.weight] = level;
 
 		//fais en sorte que les rôles inférieurs n'aient pas plus de permission que le rôle en cours d'édition, et vice-versa
@@ -123,15 +124,15 @@ public class FactionClaim {
 		return true;
 	}
 
-	public FactionClaimPermLevel getPlayerPerm(FactionPlayer pf) {
+	public FactionClaimPermLevel getPlayerPerm(final FactionPlayer pf) {
 		if (!type.isClaimable()) {
 			return FactionClaimPermLevel.LVL_1;
 		} else if (faction == null) {
 			return FactionClaimPermLevel.LVL_4;
 		} else if (pf.getClan() != null && membersFactions.containsKey(pf.getClan().getID())) {
 			return membersFactions.get(pf.getClan().getID())[pf.getClan().getMember(pf.getInformation()).getRole().weight];
-		} else if (membersPlayers.size() > 0) {
-			return membersPlayers.containsKey(pf.getId()) ? membersPlayers.get(pf.getId()) : FactionClaimPermLevel.NONE;
+		} else if (!membersPlayers.isEmpty()) {
+			return membersPlayers.getOrDefault(pf.getId(), FactionClaimPermLevel.NONE);
 		} else if (pf.getClan() != null && pf.getClan().equals(faction)) {
 			return faction.getMember(pf.getInformation()).getRole().getDefaultClaimLevel();
 		} else {
@@ -150,18 +151,18 @@ public class FactionClaim {
 		private final int x;
 		private final int z;
 
-		public ClaimId(long id, Chunk ch) {
+		public ClaimId(final long id, final Chunk ch) {
 			this(id, ch.getX(), ch.getZ());
 		}
 
-		public ClaimId(long id, int x, int z) {
+		public ClaimId(final long id, final int x, final int z) {
 			this.id = id;
 			this.x = x;
 			this.z = z;
 		}
 
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(final Object o) {
 			return o instanceof ClaimId ? ((ClaimId) o).id == this.id :
 			       o instanceof Chunk && ((Chunk) o).getX() == this.x && ((Chunk) o).getZ() == this.z;
 		}
@@ -189,10 +190,10 @@ public class FactionClaim {
 	}
 
 	//for database saving only
-	public String getFactionMembersAsJson() {
-		return membersFactions.size() == 0 ? null : new Gson().toJson(
+	public @Nullable String getFactionMembersAsJson() {
+		return membersFactions.isEmpty() ? null : new Gson().toJson(
 			membersFactions.entrySet().stream()
-				.map(e -> new AbstractMap.SimpleEntry<Integer, Integer[]>(
+				.map(e -> new AbstractMap.SimpleEntry<>(
 					e.getKey(),
 					Stream.of(e.getValue())
 						.map(FactionClaimPermLevel::getLevel)
@@ -203,10 +204,10 @@ public class FactionClaim {
 	}
 
 	//for database saving only
-	public String getPlayersMembersAsJson() {
-		return membersPlayers.size() == 0 ? null : new Gson().toJson(
+	public @Nullable String getPlayersMembersAsJson() {
+		return membersPlayers.isEmpty() ? null : new Gson().toJson(
 			membersPlayers.entrySet().stream()
-				.map(e -> new AbstractMap.SimpleEntry<Long, Integer>(e.getKey(), e.getValue().getLevel()))
+				.map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue().getLevel()))
 				.collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)));//, new TypeToken<Map<Long, Integer>>(){}.getType());
 	}
 
@@ -214,7 +215,7 @@ public class FactionClaim {
 		return type;
 	}
 
-	public void setType(FactionClaimType type) {
+	public void setType(final FactionClaimType type) {
 		if (this.type == type) {
 			return;
 		}

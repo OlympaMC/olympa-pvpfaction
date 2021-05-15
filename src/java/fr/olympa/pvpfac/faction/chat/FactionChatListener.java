@@ -15,15 +15,15 @@ import java.util.Set;
 public class FactionChatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerChat(AsyncPlayerChatEvent event) {
-		Player player = event.getPlayer();
-		FactionPlayer factionPlayer = AccountProvider.get(player.getUniqueId());
+	public void onPlayerChat(final AsyncPlayerChatEvent event) {
+		final Player player = event.getPlayer();
+		final FactionPlayer factionPlayer = AccountProvider.get(player.getUniqueId());
 		if (factionPlayer == null) return;
 
-		FactionChat chat = factionPlayer.getChat();
+		final FactionChat chat = factionPlayer.getChat();
 		switch (chat) {
 			case FACTION:
-				Set<Player> onlinePlayers = factionPlayer.getClan().getPlayers();
+				final Set<Player> onlinePlayers = factionPlayer.getClan().getPlayers();
 				if (onlinePlayers.size() == 1) {
 					player.sendMessage(Prefix.FACTION + ColorUtils.color("&cTu es seul connecté de ta faction."));
 				}

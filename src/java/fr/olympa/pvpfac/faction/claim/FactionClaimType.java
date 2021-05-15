@@ -18,19 +18,17 @@ public enum FactionClaimType {
 	private final boolean canPlaceContainers;
 
 
-	FactionClaimType(boolean isClaimable, boolean canPvp, boolean isProtected, boolean canPlaceContainers) {
+	FactionClaimType(final boolean isClaimable, final boolean canPvp, final boolean isProtected, final boolean canPlaceContainers) {
 		this.isClaimable = isClaimable;
 		this.canPvp = canPvp;
 		this.isProtected = isProtected;
 		this.canPlaceContainers = canPlaceContainers;
 	}
 
-	public static FactionClaimType fromString(String s) {
-		FactionClaimType obj = null;
-		for (FactionClaimType t : FactionClaimType.values()) {
-			if (t.toString().equals(s)) {
-				return t;
-			}
+	public static FactionClaimType fromString(final String s) {
+		final FactionClaimType obj = null;
+		for (final FactionClaimType t : FactionClaimType.values()) {
+			if (t.toString().equals(s)) return t;
 		}
 
 		return NORMAL;
@@ -44,7 +42,7 @@ public enum FactionClaimType {
 		return canPlaceContainers;
 	}
 
-	public void sendTitle(Player player) {
+	public void sendTitle(final Player player) {
 		// TODO Auto-generated method stub
 
 	}

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class AdminShopCommand extends ComplexCommand {
 
-	public AdminShopCommand(Plugin plugin) {
+	public AdminShopCommand(final Plugin plugin) {
 		super(plugin, "adminshop", "Boutique pour vendre/acheter des objets.", null, "boutique");
 		addArgumentParser("MATERIAL", Material.class);
 		/*addArgumentParser("MATERIAL_TRANSLATED", (sender, string) -> {
@@ -30,15 +30,15 @@ public class AdminShopCommand extends ComplexCommand {
 	}
 
 	@Override
-	public boolean noArguments(CommandSender sender) {
+	public boolean noArguments(final CommandSender sender) {
 		if (isConsole()) return false;
 		new AdminShopGui(player).create(player);
 		return true;
 	}
 
 	@Cmd(description = "Ajoute un item grace à son type", args = { "MATERIAL|INTEGER", "FLOAT" })
-	public void addItem(CommandContext cmd) {
-		Material material;
+	public void addItem(final CommandContext cmd) {
+		final Material material;
 		int amout = 1;
 		float value;
 		if (cmd.getArgumentsLength() > 0 && cmd.getArgument(0) instanceof Material) {
@@ -50,9 +50,7 @@ public class AdminShopCommand extends ComplexCommand {
 			material = player.getInventory().getItemInMainHand().getType();
 		}
 		value = 1;
-		if (cmd.getArgumentsLength() > 1) {
-			value = cmd.getArgument(1);
-		}
+		if (cmd.getArgumentsLength() > 1) value = cmd.getArgument(1);
 		if (((PvPFaction) plugin).getAdminShop().addItem(new AdminShopItem(material, amout, value))) {
 			sendMessage(Prefix.FACTION, "&a%s&2 a été ajouté à l'AdminShop avec comme valeur &2%f&a.", material.name(), value);
 		} else {
@@ -61,11 +59,11 @@ public class AdminShopCommand extends ComplexCommand {
 	}
 
 	@Cmd(min = 1, description = "Ajoute un item grace à son type", args = { "INTEGER" })
-	public void enableItem(CommandContext cmd) {
-		AdminShopManager adminShop = ((PvPFaction) plugin).getAdminShop();
-		int index = cmd.getArgument(0);
-		List<AdminShopItem> allItem = adminShop.getAllItems();
-		AdminShopItem item;
+	public void enableItem(final CommandContext cmd) {
+		final AdminShopManager adminShop = ((PvPFaction) plugin).getAdminShop();
+		final int index = cmd.getArgument(0);
+		final List<AdminShopItem> allItem = adminShop.getAllItems();
+		final AdminShopItem item;
 		if (allItem.isEmpty() || index < 0 || allItem.size() - 1 < index) {
 			sendMessage(Prefix.FACTION, "&cL'index &4%d&c n'existe pas.", index);
 			return;
@@ -80,11 +78,11 @@ public class AdminShopCommand extends ComplexCommand {
 	}
 
 	@Cmd(min = 1, description = "Désactiver un item grace à son type", args = { "INTEGER" })
-	public void disableItem(CommandContext cmd) {
-		AdminShopManager adminShop = ((PvPFaction) plugin).getAdminShop();
-		int index = cmd.getArgument(0);
-		List<AdminShopItem> allItem = adminShop.getAllItems();
-		AdminShopItem item;
+	public void disableItem(final CommandContext cmd) {
+		final AdminShopManager adminShop = ((PvPFaction) plugin).getAdminShop();
+		final int index = cmd.getArgument(0);
+		final List<AdminShopItem> allItem = adminShop.getAllItems();
+		final AdminShopItem item;
 		if (allItem.isEmpty() || index < 0 || allItem.size() - 1 < index) {
 			sendMessage(Prefix.FACTION, "&cL'index &4%d&c n'existe pas.", index);
 			return;

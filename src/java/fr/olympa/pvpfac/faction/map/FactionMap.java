@@ -27,27 +27,30 @@ public class FactionMap {
 	private static final List<String> SYMBOLES = Arrays.asList("#", "%", "&", "$", "@", "=", "+", "A", "B", "C", "D", "E", "G", "0", "7");
 	protected static List<Player> autoMapPlayers = new ArrayList<>();
 
-	public static void sendMap(Player player, Faction playerFaction) {
+	public static void sendMap(final Player player, final Faction playerFaction) {
 		player.sendMessage(getMap(player.getLocation(), playerFaction));
 	}
 
-	public static String getMap(Location location, Faction playerFaction) {
-		Chunk chunk = location.getChunk();
-		World world = chunk.getWorld();
-		int chunkX = chunk.getX();
-		int chunkZ = chunk.getZ();
-		int mapRadiusSize = 4;
-		int sidesCoeff = 2;
-		int startX, startZ, endX, endZ;
-		String facingName;
-		BlockFace facing = SpigotUtils.yawToFace(location.getYaw(), false);
-		FactionClaimsManager manager = PvPFaction.getInstance().getClaimsManager();
-		Map<Faction, String> factions = new HashMap<>();
+	public static String getMap(final Location location, final Faction playerFaction) {
+		final Chunk chunk = location.getChunk();
+		final World world = chunk.getWorld();
+		final int chunkX = chunk.getX();
+		final int chunkZ = chunk.getZ();
+		final int mapRadiusSize = 4;
+		final int sidesCoeff = 2;
+		final int startX;
+		final int startZ;
+		final int endX;
+		final int endZ;
+		final String facingName;
+		final BlockFace facing = SpigotUtils.yawToFace(location.getYaw(), false);
+		final FactionClaimsManager manager = PvPFaction.getInstance().getClaimsManager();
+		final Map<Faction, String> factions = new HashMap<>();
 		int indexSymbole = 0;
-		StringJoiner sj = new StringJoiner("\n");
+		final StringJoiner sj = new StringJoiner("\n");
 
 		sj.add("&6MAP %s %co".replace("%co", location.getBlockX() + " " + location.getBlockZ()));
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		switch (facing) {
 			default:
 			case NORTH:
@@ -111,12 +114,12 @@ public class FactionMap {
 		return ColorUtils.color(String.format(sj.toString(), facingName));
 	}
 
-	public static String getChunkLetter(FactionClaim factionClaim, Map<Faction, String> factions, int indexSymbole, Faction targetFaction, boolean isCenter) {
-		Faction claimFaction = factionClaim.getFaction();
+	public static String getChunkLetter(final FactionClaim factionClaim, final Map<Faction, String> factions, final int indexSymbole, final Faction targetFaction, final boolean isCenter) {
+		final Faction claimFaction = factionClaim.getFaction();
 		if (claimFaction == null) {
 			return /*factionClaim.getColor() + */(isCenter ? "§m" : "") + "-";
 		}
-		String symbol = factions.computeIfAbsent(claimFaction, k -> SYMBOLES.get(indexSymbole));
+		final String symbol = factions.computeIfAbsent(claimFaction, k -> SYMBOLES.get(indexSymbole));
 		ChatColor color = ChatColor.RED;
 		if (targetFaction != null && targetFaction.getID() == claimFaction.getID()) {
 			color = ChatColor.GREEN;
@@ -124,13 +127,13 @@ public class FactionMap {
 		return color + (isCenter ? "§m" : "") + symbol;
 	}
 
-	public static void toggleAutoMap(Player player) {
-		if (!autoMapPlayers.contains(player)) {
-			autoMapPlayers.add(player);
-			Prefix.FACTION.sendMessage(player, "AutoMap activée.");
-		} else {
+	public static void toggleAutoMap(final Player player) {
+		if (autoMapPlayers.contains(player)) {
 			autoMapPlayers.remove(player);
 			Prefix.FACTION.sendMessage(player, "&cAutoMap désactivée.");
+		} else {
+			autoMapPlayers.add(player);
+			Prefix.FACTION.sendMessage(player, "AutoMap activée.");
 		}
 	}
 }

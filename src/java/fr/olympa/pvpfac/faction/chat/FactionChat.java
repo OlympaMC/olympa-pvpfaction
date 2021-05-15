@@ -1,6 +1,7 @@
 package fr.olympa.pvpfac.faction.chat;
 
 import fr.olympa.api.utils.Utils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,12 +14,13 @@ public enum FactionChat {
 
 	String name;
 	List<String> surname;
-	FactionChat(String name, String... surname) {
+
+	FactionChat(final String name, final String... surname) {
 		this.name = name;
 		this.surname = Arrays.asList(surname);
 	}
 
-	public static FactionChat get(String name) {
+	public static FactionChat get(final String name) {
 		return Arrays.stream(FactionChat.values()).filter(chat -> Utils.equalsIgnoreAccents(chat.getName(), name) || chat.hasSurname(name)).findFirst().orElse(null);
 	}
 
@@ -26,11 +28,11 @@ public enum FactionChat {
 		return name;
 	}
 
-	public boolean hasSurname(String surname) {
+	public boolean hasSurname(final String surname) {
 		return this.surname.stream().anyMatch(sur -> Utils.equalsIgnoreAccents(surname, sur));
 	}
 
-	public FactionChat getOther() {
+	public @Nullable FactionChat getOther() {
 		switch (this) {
 			case GENERAL:
 				return FactionChat.FACTION;

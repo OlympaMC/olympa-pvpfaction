@@ -19,15 +19,15 @@ public enum FactionClaimPermLevel {
 	;
 
 	private final int level;
-	private String name;
 	private final String desc;
 	private final boolean canInteractDoors;
 	private final boolean canDamageEntities;
 	private final boolean canInteractContainers;
 	private final boolean canBuild;
 	private final boolean canManageMembers;
+	private String name;
 
-	FactionClaimPermLevel(int level, String desc, boolean canDamageEntities, boolean canInteractDoors, boolean canInteractContainers, boolean canBuild, boolean canManageMembers) {
+	FactionClaimPermLevel(final int level, final String desc, final boolean canDamageEntities, final boolean canInteractDoors, final boolean canInteractContainers, final boolean canBuild, final boolean canManageMembers) {
 		this.level = level;
 		this.desc = desc;
 		this.canDamageEntities = canDamageEntities;
@@ -37,8 +37,8 @@ public enum FactionClaimPermLevel {
 		this.canManageMembers = canManageMembers;
 	}
 
-	public static FactionClaimPermLevel fromLevel(int level) {
-		for (FactionClaimPermLevel perm : FactionClaimPermLevel.values()) {
+	public static FactionClaimPermLevel fromLevel(final int level) {
+		for (final FactionClaimPermLevel perm : FactionClaimPermLevel.values()) {
 			if (perm.getLevel() == level) {
 				return perm;
 			}

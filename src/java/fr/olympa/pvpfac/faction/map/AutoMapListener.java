@@ -13,16 +13,16 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class AutoMapListener implements Listener {
 
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
+	public void onPlayerQuit(final PlayerQuitEvent event) {
+		final Player player = event.getPlayer();
 		FactionMap.autoMapPlayers.remove(player);
 	}
 
 	@EventHandler
-	public void onPlayerMove(PlayerMoveEvent event) {
-		Location from = event.getFrom();
-		Location to = event.getTo();
-		Player player = event.getPlayer();
+	public void onPlayerMove(final PlayerMoveEvent event) {
+		final Location from = event.getFrom();
+		final Location to = event.getTo();
+		final Player player = event.getPlayer();
 		if (!FactionMap.autoMapPlayers.contains(player) || SpigotUtils.isSameChunk(from.getChunk(), to.getChunk())) return;
 		FactionMap.sendMap(player, ((FactionPlayer) AccountProvider.get(player.getUniqueId())).getClan());
 	}

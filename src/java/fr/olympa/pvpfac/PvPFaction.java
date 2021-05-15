@@ -57,11 +57,11 @@ public class PvPFaction extends OlympaAPIPlugin {
 		try {
 			taxManager = new TaxManager(this, PvPFactionPermission.TAX_COMMAND, "pvpfac_tax", 0);
 			new AuctionsManager(this, "pvpfac_auctions", taxManager);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 
-		PluginManager pluginManager = getServer().getPluginManager();
+		final PluginManager pluginManager = getServer().getPluginManager();
 		try {
 			//pluginManager.registerEvents(new OreListener(), this);
 			pluginManager.registerEvents(new FactionChatListener(), this);
@@ -76,12 +76,20 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
 
 			worldsManager = new WorldsManager(this);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 			getLogger().severe("Une erreur est survenue lors de l'initialisation du système de faction.");
 		}
 
-		new MoneyCommand<FactionPlayer>(this, "money", "Gérer son porte-monnaie.", PvPFactionPermission.MONEY_COMMAND, PvPFactionPermission.MONEY_COMMAND_OTHER, PvPFactionPermission.MONEY_COMMAND_MANAGE, "monnaie").register();
+		new MoneyCommand<FactionPlayer>(
+			this,
+			"money",
+			"Gérer son porte-monnaie.",
+			PvPFactionPermission.MONEY_COMMAND,
+			PvPFactionPermission.MONEY_COMMAND_OTHER,
+			PvPFactionPermission.MONEY_COMMAND_MANAGE,
+			"monnaie"
+		).register();
 		trades = new TradesManager<>(this, 10);
 
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
@@ -97,9 +105,11 @@ public class PvPFaction extends OlympaAPIPlugin {
 			FixedLine.EMPTY_LINE,
 			lineMoney,
 			FixedLine.EMPTY_LINE,
-			lineGroup).addFooters(
+			lineGroup
+		).addFooters(
 			FixedLine.EMPTY_LINE,
-			CyclingLine.olympaAnimation());
+			CyclingLine.olympaAnimation()
+		);
 
 		/*IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)

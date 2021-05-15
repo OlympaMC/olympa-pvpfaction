@@ -9,34 +9,36 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class AdminShopGui extends OlympaGUI {
 
 	int page = 1;
 
-	public AdminShopGui(Player player) {
+	public AdminShopGui(final Player player) {
 		super("&6Admin Shop ", PvPFaction.getInstance().getAdminShop().getGuiRows());
 		updateInventory(player);
 	}
 
-	public void updateInventory(Player player) {
+	public void updateInventory(final Player player) {
 		inv.clear();
-		AdminShopManager adminShopHandler = PvPFaction.getInstance().getAdminShop();
+		final AdminShopManager adminShopHandler = PvPFaction.getInstance().getAdminShop();
 		if (PvPFactionPermission.ADMINSHOP_ADMIN.hasSenderPermission(player)) {
-			for (AdminShopItem item : adminShopHandler.getItemPage(1, null)) {
+			for (final AdminShopItem item : adminShopHandler.getItemPage(1, null)) {
 				inv.addItem(item.getItemStackAdmin());
 			}
 		} else {
-			for (AdminShopItem item : adminShopHandler.getItemPage(1, true)) {
-				inv.addItem(item.getItemStackPlayer());
+			for (final AdminShopItem item : adminShopHandler.getItemPage(1, true)) {
+				inv.addItem(Objects.requireNonNull(item.getItemStackPlayer()));
 			}
 		}
 
 	}
 
 	@Override
-	public boolean onClick(Player player, ItemStack current, int slot, ClickType click) {
+	public boolean onClick(final Player player, final ItemStack current, final int slot, final ClickType click) {
 		player.sendMessage("slot " + slot);
-		AdminShopItem adminShopItem = PvPFaction.getInstance().getAdminShop().getAdminShopItem(current);
+		final AdminShopItem adminShopItem = PvPFaction.getInstance().getAdminShop().getAdminShopItem(current);
 		if (adminShopItem != null) {
 			switch (click) {
 				case LEFT:
@@ -68,13 +70,13 @@ public class AdminShopGui extends OlympaGUI {
 	}
 
 	@Override
-	public boolean onClickCursor(Player player, ItemStack current, ItemStack cursor, int slot) {
+	public boolean onClickCursor(final Player player, final ItemStack current, final ItemStack cursor, final int slot) {
 		player.sendMessage("slot " + slot);
 		return false;
 	}
 
 	@Override
-	public boolean onClose(Player p) {
+	public boolean onClose(final Player p) {
 		return super.onClose(p);
 	}
 }

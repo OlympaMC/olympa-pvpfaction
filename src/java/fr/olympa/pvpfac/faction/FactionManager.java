@@ -80,23 +80,23 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringItemDisband = "§cDémanteler la faction";
 	}
 
-	public Faction get(String nameOrTagOrPlayer) throws SQLException {
+	public Faction get(final String nameOrTagOrPlayer) throws SQLException {
 		Faction faction = getByName(nameOrTagOrPlayer);
 		if (faction == null) {
 			faction = getByTag(nameOrTagOrPlayer);
 		}
 		if (faction == null) {
-			ClanPlayerInterface<Faction, FactionPlayerData> target = AccountProvider.get(nameOrTagOrPlayer);
+			final ClanPlayerInterface<Faction, FactionPlayerData> target = AccountProvider.get(nameOrTagOrPlayer);
 			faction = target.getClan();
 		}
 		return faction;
 	}
 
-	public Faction getByName(String name) {
+	public Faction getByName(final String name) {
 		return getClans().stream().filter(c -> name.equalsIgnoreCase(c.getValue().getName())).map(c -> c.getValue()).findFirst().orElse(null);
 	}
 
-	public Faction getByTag(String tag) {
+	public Faction getByTag(final String tag) {
 		return getClans().stream().filter(c -> tag.equalsIgnoreCase(c.getValue().getTag())).map(c -> c.getValue()).findFirst().orElse(null);
 	}
 
@@ -106,27 +106,38 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	}
 
 	@Override
-	protected Faction createClan(int id, String name, String tag, OlympaPlayerInformations chief, int maxSize) {
+	protected Faction createClan(final int id, final String name, final String tag, final OlympaPlayerInformations chief, final int maxSize) {
 		return new Faction(this, id, name, tag, chief, maxSize);
 	}
 
 	@Override
-	protected Faction provideClan(int id, String name, String tag, OlympaPlayerInformations chief, int maxSize, double money, long created, ResultSet resultSet) throws SQLException {
-		return new Faction(this, id, name, chief, maxSize, money, created, resultSet.getString("tag"), resultSet.getString("description"), SpigotUtils.convertStringToLocation(resultSet.getString("home")));
+	protected Faction provideClan(final int id, final String name, final String tag, final OlympaPlayerInformations chief, final int maxSize, final double money, final long created, final ResultSet resultSet) throws SQLException {
+		return new Faction(
+			this,
+			id,
+			name,
+			chief,
+			maxSize,
+			money,
+			created,
+			resultSet.getString("tag"),
+			resultSet.getString("description"),
+			SpigotUtils.convertStringToLocation(resultSet.getString("home"))
+		);
 	}
 
 	@Override
-	protected FactionPlayerData createClanData(OlympaPlayerInformations informations) {
+	protected FactionPlayerData createClanData(final OlympaPlayerInformations informations) {
 		return new FactionPlayerData(informations);
 	}
 
 	@Override
-	protected FactionPlayerData provideClanData(OlympaPlayerInformations informations, ResultSet resultSet) throws SQLException {
+	protected FactionPlayerData provideClanData(final OlympaPlayerInformations informations, final ResultSet resultSet) throws SQLException {
 		return new FactionPlayerData(informations, FactionRole.values()[resultSet.getInt("role")]);
 	}
 
 	@Override
-	public int getMaxSize(ClanPlayerInterface<Faction, FactionPlayerData> p) {
+	public int getMaxSize(final ClanPlayerInterface<Faction, FactionPlayerData> p) {
 		return 10;
 	}
 
@@ -150,7 +161,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 	}
 
 	@Override
-	public ClanManagementGUI<Faction, FactionPlayerData> provideManagementGUI(ClanPlayerInterface<Faction, FactionPlayerData> player) {
+	public ClanManagementGUI<Faction, FactionPlayerData> provideManagementGUI(final ClanPlayerInterface<Faction, FactionPlayerData> player) {
 		return new FactionManagementGUI(player, player.getClan(), this);
 	}
 

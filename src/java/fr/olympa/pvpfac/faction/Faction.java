@@ -19,6 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -54,39 +55,39 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	String description;
 	Location home;
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, String tag, OlympaPlayerInformations chief, int maxSize) {
+	public Faction(final ClansManager<Faction, FactionPlayerData> manager, final int id, final String name, final String tag, final OlympaPlayerInformations chief, final int maxSize) {
 		super(manager, id, name, tag, chief, maxSize);
 	}
 
-	public Faction(ClansManager<Faction, FactionPlayerData> manager, int id, String name, OlympaPlayerInformations chief, int maxSize, double money, long created, String tag, String description, Location home) {
+	public Faction(final ClansManager<Faction, FactionPlayerData> manager, final int id, final String name, final OlympaPlayerInformations chief, final int maxSize, final double money, final long created, final String tag, final String description, final Location home) {
 		super(manager, id, name, tag, chief, maxSize, money, created);
 		this.tag = tag;
 		this.description = description;
 		this.home = home;
 	}
 
-	public boolean hasClaim(Chunk chunk) {
+	public boolean hasClaim(final Chunk chunk) {
 		return hasClaim(PvPFaction.getInstance().getClaimsManager().ofChunk(chunk));
 	}
 
-	public boolean hasClaim(FactionClaim chunk) {
-		Faction faction = chunk.getFaction();
+	public boolean hasClaim(final FactionClaim chunk) {
+		final Faction faction = chunk.getFaction();
 		return faction != null && faction.getID() == getID();
 	}
 
-	public void claim(FactionClaim factionClaim) throws SQLException {
-		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+	public void claim(final FactionClaim factionClaim) throws SQLException {
+		final FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
 		factionClaim.setFaction(this);
 		claimManager.updateClaim(factionClaim);
 	}
 
-	public void unclaim(FactionClaim factionClaim) throws SQLException {
-		FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
+	public void unclaim(final FactionClaim factionClaim) throws SQLException {
+		final FactionClaimsManager claimManager = PvPFaction.getInstance().getClaimsManager();
 		factionClaim.setFaction(null);
 		claimManager.updateClaim(factionClaim);
 	}
 
-	public void updateHome(Location home) {
+	public void updateHome(final Location home) {
 		getFactionManager().homeColumn.updateAsync(this, SpigotUtils.convertLocationToString(home), null, null);
 		this.home = home;
 	}
@@ -95,7 +96,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return getClansManager();
 	}
 
-	public boolean updateTag(String tag) {
+	public boolean updateTag(final String tag) {
 		if (tag.length() == 1 || tag.length() > 6 || Pattern.compile("[^a-zA-Z]").matcher(tag).find()) {
 			return false;
 		}
@@ -104,7 +105,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return true;
 	}
 
-	public boolean updateDescription(String description) {
+	public boolean updateDescription(final String description) {
 		if (description.length() < 3 || description.length() > 100 || Pattern.compile("[^a-zA-Z]").matcher(description).find()) {
 			return false;
 		}
@@ -113,11 +114,11 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return true;
 	}
 
-	public String getNameColored(UUID uuid) {
+	public String getNameColored(final UUID uuid) {
 		return getNameColored(((FactionPlayer) AccountProvider.get(uuid)).getClan());
 	}
 
-	public String getNameColored(Faction clan) {
+	public String getNameColored(final Faction clan) {
 		return (clan != null && clan.getID() == id ? ChatColor.GREEN : ChatColor.RED) + getName();
 	}
 
@@ -126,24 +127,26 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	 * **Not implemented for now.**
 	 *
 	 * @param fac - The faction to test with.
-	 * @
+	 *
 	 * @return True if the faction is an ally.
+	 *
+	 * @
 	 */
-	public boolean isAlly(Faction fac) {
+	public boolean isAlly(final Faction fac) {
 		throw new UnsupportedOperationException("Gestion des factions alliées non encore implémentée !");
 		//return false;//TODO
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		return o instanceof Faction && ((Faction) o).getID() == getID();
 	}
 
 	@Override
-	public Faction clone() {
+	public @Nullable Faction clone() {
 		try {
 			return (Faction) super.clone();
-		} catch (CloneNotSupportedException e) {
+		} catch (final CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -151,6 +154,15 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	public String getClaimsPowerMaxPower() {
 		return getClaims().size() + "/" + getPower() + "/" + getMaxPower();
+	}
+
+	// TODO Optimize getByFaction
+	public Set<FactionClaim> getClaims() {
+		return PvPFaction.getInstance().getClaimsManager().ofFaction(this);
+	}
+
+	public int getPower() {
+		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getPower()).sum();
 	}
 
 	public int getMaxPower() {
@@ -161,7 +173,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -187,38 +199,29 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void memberJoin(ClanPlayerInterface<Faction, FactionPlayerData> member) {
+	public void memberJoin(final ClanPlayerInterface<Faction, FactionPlayerData> member) {
 		super.memberJoin(member);
 
-		Scoreboard<FactionPlayer> scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard((FactionPlayer) member);
+		final Scoreboard<FactionPlayer> scoreboard = PvPFaction.getInstance().scoreboards.getPlayerScoreboard((FactionPlayer) member);
 		scoreboard.addLine(FixedLine.EMPTY_LINE);
 		scoreboard.addLine(header);
 		scoreboard.addLine(players);
 	}
 
 	@Override
-	protected void removedOnlinePlayer(ClanPlayerInterface<Faction, FactionPlayerData> clanPlayer) {
+	protected void removedOnlinePlayer(final ClanPlayerInterface<Faction, FactionPlayerData> clanPlayer) {
 		super.removedOnlinePlayer(clanPlayer);
 
 		PvPFaction.getInstance().scoreboards.refresh((FactionPlayer) clanPlayer);
 	}
 
 	@Override
-	public void setTag(String tag) {
+	public void setTag(final String tag) {
 		this.tag = tag;
 	}
 
 	public boolean isOverClaimable() {
 		return getClaims().size() > getPower();
-	}
-
-	// TODO Optimize getByFaction
-	public Set<FactionClaim> getClaims() {
-		return PvPFaction.getInstance().getClaimsManager().ofFaction(this);
-	}
-
-	public int getPower() {
-		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getPower()).sum();
 	}
 
 }

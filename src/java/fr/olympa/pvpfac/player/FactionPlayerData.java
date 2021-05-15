@@ -6,16 +6,17 @@ import fr.olympa.api.utils.observable.ObservableValue;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.claim.FactionClaimPermLevel;
+import org.jetbrains.annotations.Nullable;
 
 public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData> {
 
 	private final ObservableValue<FactionRole> role;
 
-	public FactionPlayerData(OlympaPlayerInformations informations) {
+	public FactionPlayerData(final OlympaPlayerInformations informations) {
 		this(informations, FactionRole.RECRUT);
 	}
 
-	public FactionPlayerData(OlympaPlayerInformations informations, FactionRole role) {
+	public FactionPlayerData(final OlympaPlayerInformations informations, final FactionRole role) {
 		super(informations);
 		this.role = new ObservableValue<>(role);
 		this.role.observe("updateSQL", () -> PvPFaction.getInstance().factionManager.roleColumn.updateAsync(this, this.role.get().ordinal(), null, null));
@@ -36,7 +37,7 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 		public final String prefix;
 		public final FactionClaimPermLevel claimLevel;
 
-		FactionRole(int weight, int power, String name, String prefix, FactionClaimPermLevel level) {
+		FactionRole(final int weight, final int power, final String name, final String prefix, final FactionClaimPermLevel level) {
 			this.weight = weight;
 			this.power = power;
 			this.name = name;
@@ -44,18 +45,18 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 			this.claimLevel = level;
 		}
 
-		public FactionRole getAbove() {
+		public @Nullable FactionRole getAbove() {
 			try {
 				return values()[ordinal() - 1];
-			} catch (ArrayIndexOutOfBoundsException ex) {
+			} catch (final ArrayIndexOutOfBoundsException ex) {
 				return null;
 			}
 		}
 
-		public FactionRole getBelow() {
+		public @Nullable FactionRole getBelow() {
 			try {
 				return values()[ordinal() + 1];
-			} catch (ArrayIndexOutOfBoundsException ex) {
+			} catch (final ArrayIndexOutOfBoundsException ex) {
 				return null;
 			}
 		}
@@ -70,7 +71,7 @@ public class FactionPlayerData extends ClanPlayerData<Faction, FactionPlayerData
 		return role.get();
 	}
 
-	public void setRole(FactionRole role) {
+	public void setRole(final FactionRole role) {
 		this.role.set(role);
 	}
 

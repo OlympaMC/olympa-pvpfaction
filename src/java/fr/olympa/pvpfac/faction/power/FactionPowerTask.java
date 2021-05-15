@@ -9,7 +9,7 @@ public class FactionPowerTask extends BukkitRunnable {
 
 	FactionPlayer fp;
 
-	public FactionPowerTask(FactionPlayer fp) {
+	public FactionPowerTask(final FactionPlayer fp) {
 		this.fp = fp;
 	}
 

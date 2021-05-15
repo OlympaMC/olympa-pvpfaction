@@ -30,18 +30,19 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	private static final SQLColumn<FactionPlayer> COLUMN_MONEY = new SQLColumn<FactionPlayer>("money", "DOUBLE NULL DEFAULT 0", Types.DOUBLE).setUpdatable();
 	private static final SQLColumn<FactionPlayer> COLUMN_TRADE_BAG = new SQLColumn<FactionPlayer>("trade_bag", "VARBINARY(8000) NULL", Types.VARBINARY).setUpdatable();
 	private final ObservableInt power = new ObservableInt(0);
-	private ItemStack[] enderChestContents;
 	private final OlympaMoney money = new OlympaMoney(0);
 	private final TradeBag<FactionPlayer> tradeBag = new TradeBag<>(this);
+	private ItemStack[] enderChestContents;
 	private Faction faction;
 	FactionChat chat = FactionChat.GENERAL;
 	public static final List<SQLColumn<FactionPlayer>> COLUMNS = Arrays.asList(COLUMN_POWER, COLUMN_ENDER_CHEST, COLUMN_MONEY, COLUMN_TRADE_BAG);
 	public static int POWER_MAX = 5;
-	public FactionPlayer(UUID uuid, String name, String ip) {
+
+	public FactionPlayer(final UUID uuid, final String name, final String ip) {
 		super(uuid, name, ip);
 	}
 
-	public static FactionPlayer get(Player p) {
+	public static FactionPlayer get(final Player p) {
 		return AccountProvider.get(p.getUniqueId());
 	}
 
@@ -68,13 +69,13 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	}
 
 	@Override
-	public void loadDatas(ResultSet resultSet) throws SQLException {
+	public void loadDatas(final ResultSet resultSet) throws SQLException {
 		try {
 			power.set(resultSet.getInt("power"));
 			enderChestContents = ItemUtils.deserializeItemsArray(resultSet.getBytes("ender_chest"));
 			money.set(resultSet.getDouble("money"));
 			tradeBag.setItems(ItemUtils.deserializeItemsArray(resultSet.getBytes("trade_bag")));
-		} catch (ClassNotFoundException | IOException e) {
+		} catch (final ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -87,7 +88,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 		tradeBag.observe("datas", () -> COLUMN_TRADE_BAG.updateAsync(this, ItemUtils.serializeItemsArray(tradeBag.getItems().toArray(new ItemStack[tradeBag.getItems().size()])), null, null));
 	}
 
-	public void removeChat(FactionChat chat) {
+	public void removeChat(final FactionChat chat) {
 		this.chat = chat;
 	}
 
@@ -95,7 +96,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 		return chat;
 	}
 
-	public void setChat(FactionChat chat) {
+	public void setChat(final FactionChat chat) {
 		this.chat = chat;
 	}
 
@@ -105,7 +106,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	}
 
 	@Override
-	public void setClan(Faction faction) {
+	public void setClan(final Faction faction) {
 		this.faction = faction;
 	}
 
@@ -115,11 +116,11 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	}
 
 	@Override
-	public void setEnderChestContents(ItemStack[] contents) {
+	public void setEnderChestContents(final ItemStack[] contents) {
 		this.enderChestContents = contents;
 		try {
 			COLUMN_ENDER_CHEST.updateAsync(this, ItemUtils.serializeItemsArray(enderChestContents), null, null);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -138,7 +139,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 		return power.get();
 	}
 
-	public void setPower(int power) {
+	public void setPower(final int power) {
 		this.power.set(power);
 	}
 

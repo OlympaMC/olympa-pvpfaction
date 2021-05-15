@@ -19,28 +19,28 @@ import java.util.concurrent.TimeUnit;
 public class FactionPowerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		UUID uuid = player.getUniqueId();
-		FactionPlayer fp = AccountProvider.get(uuid);
+	public void onPlayerJoin(final PlayerJoinEvent event) {
+		final Player player = event.getPlayer();
+		final UUID uuid = player.getUniqueId();
+		final FactionPlayer fp = AccountProvider.get(uuid);
 		PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30, 60, TimeUnit.MINUTES);
 	}
 
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		UUID uuid = player.getUniqueId();
+	public void onPlayerQuit(final PlayerQuitEvent event) {
+		final Player player = event.getPlayer();
+		final UUID uuid = player.getUniqueId();
 		PvPFaction.getInstance().getTask().cancelTaskByName("pvpfac_power_" + uuid);
 	}
 
 	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent event) {
-		Player player = event.getEntity();
-		UUID uuid = player.getUniqueId();
-		FactionPlayer fp = AccountProvider.get(uuid);
+	public void onPlayerDeath(final PlayerDeathEvent event) {
+		final Player player = event.getEntity();
+		final UUID uuid = player.getUniqueId();
+		final FactionPlayer fp = AccountProvider.get(uuid);
 		if (!fp.removePower()) return;
 
-		OlympaTask task = PvPFaction.getInstance().getTask();
+		final OlympaTask task = PvPFaction.getInstance().getTask();
 		if (!task.taskExist("pvpfac_power_" + uuid)) {
 			PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30, 60, TimeUnit.MINUTES);
 		}

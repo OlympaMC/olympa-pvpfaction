@@ -12,12 +12,12 @@ public class AdminShopGuiBuy extends OlympaGUI {
 	}
 
 	@Override
-	public boolean onClick(Player p, ItemStack current, int slot, ClickType click) {
+	public boolean onClick(final Player p, final ItemStack current, final int slot, final ClickType click) {
 		return true;
 	}
 
 	@Override
-	public boolean onClose(Player p) {
+	public boolean onClose(final Player p) {
 		return super.onClose(p);
 	}
 }

@@ -8,9 +8,9 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class ArmorStandWithHandListener implements Listener {
 	@EventHandler
-	public void onCreatureSpawn(CreatureSpawnEvent event) {
+	public void onCreatureSpawn(final CreatureSpawnEvent event) {
 		if (event.isCancelled() || event.getEntityType() != EntityType.ARMOR_STAND) return;
-		ArmorStand armorStand = (ArmorStand) event.getEntity();
+		final ArmorStand armorStand = (ArmorStand) event.getEntity();
 		armorStand.setArms(true);
 	}
 }

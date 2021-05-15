@@ -63,14 +63,14 @@ public class FactionClaimsManager implements Listener {
 				"  `members_factions` VARCHAR(400)," +
 				"  PRIMARY KEY (`claim_id`))"
 			);
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			PvPFaction.getInstance().getLogger().severe("Unable to create " + tableName + " table!!");
 			e.printStackTrace();
 		}
 	}
 
-	public void updateClaim(FactionClaim claim) {
-		try (PreparedStatement statement = UPDATE_CLAIM.createStatement()) {
+	public void updateClaim(final FactionClaim claim) {
+		try (final PreparedStatement statement = UPDATE_CLAIM.createStatement()) {
 			int i = 1;
 			statement.setString(i++, claim.getType().toString());
 			statement.setObject(i++, claim.getFaction() == null ? null : claim.getFaction().getID());
@@ -80,30 +80,30 @@ public class FactionClaimsManager implements Listener {
 			statement.setLong(i++, claim.getClaimId().getId());
 
 			statement.executeUpdate();
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.addSuppressed(new Throwable("§cFailed to SAVE chunk " + claim.getClaimId() + "as claim of " + (claim.getFaction() == null ? "§4NONE" : claim.getFaction().getName())));
 			e.printStackTrace();
 		}
 	}
 
-	public FactionClaim ofChunk(Chunk chunk) {
+	public FactionClaim ofChunk(final Chunk chunk) {
 		FactionClaim claim = claims.getIfPresent(chunk);
 		if (claim != null) {
 			return claim;
 		}
 
-		try (PreparedStatement statement = SELECT_CLAIM_BY_CHUNK.createStatement()) {
+		try (final PreparedStatement statement = SELECT_CLAIM_BY_CHUNK.createStatement()) {
 			int i = 1;
 			statement.setInt(i++, chunk.getX());
 			statement.setInt(i++, chunk.getZ());
-			ResultSet resultSet = statement.executeQuery();
+			final ResultSet resultSet = statement.executeQuery();
 
 			if (resultSet.next())
 			//System.out.println("retrieved claim " + getFactionClaim(resultSet) + " from database");
 			{
 				return getFactionClaim(resultSet);
 			} else {
-				PreparedStatement insert = CREATE_CLAIM.createStatement();
+				final PreparedStatement insert = CREATE_CLAIM.createStatement();
 				int j = 1;
 
 				insert.setInt(j++, chunk.getX());
@@ -115,7 +115,7 @@ public class FactionClaimsManager implements Listener {
 
 				insert.executeUpdate();
 
-				ResultSet inserted = insert.getGeneratedKeys();
+				final ResultSet inserted = insert.getGeneratedKeys();
 				if (inserted.next()) {
 					claim = new FactionClaim(new ClaimId(inserted.getInt("claim_id"), chunk), FactionClaimType.NORMAL, null, null, null);
 					claims.put(chunk, claim);
@@ -128,15 +128,15 @@ public class FactionClaimsManager implements Listener {
 				}
 			}
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			PvPFaction.getInstance().getLogger().warning("Failed to LOAD claim at " + chunk.getX() + ", " + chunk.getZ());
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	private FactionClaim getFactionClaim(ResultSet resultSet) throws SQLException {
-		FactionClaim claim = new FactionClaim(
+	private FactionClaim getFactionClaim(final ResultSet resultSet) throws SQLException {
+		final FactionClaim claim = new FactionClaim(
 			new ClaimId(resultSet.getInt("claim_id"), resultSet.getInt("x"), resultSet.getInt("z")),
 			FactionClaimType.fromString(resultSet.getString("claim_type")),
 			resultSet.getObject("faction_id") == null ? null : resultSet.getInt("faction_id"),
@@ -148,18 +148,18 @@ public class FactionClaimsManager implements Listener {
 		return claim;
 	}
 
-	public Set<FactionClaim> ofFaction(Faction faction) {
-		try (PreparedStatement statement = SELECT_CLAIMS_BY_FACTION.createStatement()) {
+	public Set<FactionClaim> ofFaction(final Faction faction) {
+		try (final PreparedStatement statement = SELECT_CLAIMS_BY_FACTION.createStatement()) {
 			statement.setInt(1, faction.getID());
-			ResultSet resultSet = statement.executeQuery();
+			final ResultSet resultSet = statement.executeQuery();
 
-			Set<FactionClaim> factionClaims = new HashSet<>();
+			final Set<FactionClaim> factionClaims = new HashSet<>();
 			while (resultSet.next()) {
 				factionClaims.add(getFactionClaim(resultSet));
 			}
 			return factionClaims;
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			PvPFaction.getInstance().getLogger().warning("Failed to LOAD claims of " + faction.getName());
 			e.printStackTrace();
 			return null;
@@ -167,7 +167,7 @@ public class FactionClaimsManager implements Listener {
 	}
 
 	@EventHandler
-	public void onChunkUnload(ChunkUnloadEvent event) {
+	public void onChunkUnload(final ChunkUnloadEvent event) {
 		claims.invalidate(event.getChunk());
 	}
 

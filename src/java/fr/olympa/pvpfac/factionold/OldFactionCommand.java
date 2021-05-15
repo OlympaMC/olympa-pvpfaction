@@ -9,14 +9,14 @@ import java.util.List;
 
 public class OldFactionCommand extends OlympaCommand {
 
-	public OldFactionCommand(Plugin plugin) {
+	public OldFactionCommand(final Plugin plugin) {
 		super(plugin, "faction", "f", "factions");
 		addArgs(true, "create", "invite", "join", "who", "claim", "autoclaim", "map", "automap", "promote", "demote", "chat", "power");
 		addArgs(false, "joueur");
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
 		return false;
 		/*if (player != null) {
 			FactionPlayer fp = AccountProvider.get(player.getUniqueId());
@@ -549,7 +549,7 @@ public class OldFactionCommand extends OlympaCommand {
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+	public List<String> onTabComplete(final CommandSender sender, final Command cmd, final String label, final String[] args) {
 		// TODO Auto-generated method stub
 		return null;
 	}

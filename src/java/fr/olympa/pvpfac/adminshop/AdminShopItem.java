@@ -9,8 +9,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class AdminShopItem {
 
@@ -31,11 +33,11 @@ public class AdminShopItem {
 
 	boolean enable;
 
-	public AdminShopItem(Material material, double value) {
+	public AdminShopItem(final Material material, final double value) {
 		this(material, 1, value);
 	}
 
-	public AdminShopItem(Material material, int amont, double value) {
+	public AdminShopItem(final Material material, final int amont, final double value) {
 		this.amont = amont;
 		this.material = material;
 		name = new TranslatableComponent(material.getTranslationKey());
@@ -48,7 +50,7 @@ public class AdminShopItem {
 		itemBuilder.resetLore().lore(SEP, "", "&6Valeur &2" + value, "&6Nombre &2" + amont, "", SEP, "", "&7Clique &2Gauche &7> &aAchète", "&7Clique &cDroit &7> &cVends", "", SEP);
 	}
 
-	public AdminShopItem(ItemStack itemStack, double value) {
+	public AdminShopItem(final ItemStack itemStack, final double value) {
 		item = itemStack;
 		material = itemStack.getType();
 		amont = itemStack.getAmount();
@@ -68,12 +70,12 @@ public class AdminShopItem {
 		return this;
 	}
 
-	public boolean hasItemOnInv(Player player) {
+	public boolean hasItemOnInv(final Player player) {
 		return player.getInventory().contains(material);
 	}
 
-	public void sold(Player p) {
-		ItemStack it = getRepresentItemStack();
+	public void sold(final Player p) {
+		final ItemStack it = getRepresentItemStack();
 		if (SpigotUtils.containsItems(p.getInventory(), it, amont)) {
 			SpigotUtils.removeItems(p.getInventory(), it, amont);
 			soldToday += amont;
@@ -84,12 +86,10 @@ public class AdminShopItem {
 	}
 
 	public ItemStack getRepresentItemStack() {
-		ItemStack it = getItemStackOriginal();
-		if (it != null) {
-			return it;
-		}
-		it = new ItemStack(material, amont);
-		return it;
+		ItemStack itemStack = getItemStackOriginal();
+		if (itemStack != null) return itemStack;
+		itemStack = new ItemStack(material, amont);
+		return itemStack;
 	}
 
 	public String getClearId() {
@@ -104,8 +104,8 @@ public class AdminShopItem {
 		return material.name().replace("_", "") + (amont != 1 ? "x" + amont : "");
 	}
 
-	public void buy(Player p) {
-		ItemStack it = getRepresentItemStack();
+	public void buy(final Player p) {
+		final ItemStack it = getRepresentItemStack();
 		if (SpigotUtils.hasEnoughPlace(p.getInventory(), it)) {
 			Prefix.FACTION.sendMessage(p, "&aTu as acheté &2%s&a au prix de %s.", getClearId(), Double.toString(value));
 			SpigotUtils.giveItems(p, it);
@@ -116,36 +116,27 @@ public class AdminShopItem {
 
 	}
 
-	public boolean consumeItem(Player player, int count) {
-		Map<Integer, ? extends ItemStack> ammo;
+	public boolean consumeItem(final Player player, int count) {
+		final Map<Integer, ? extends ItemStack> ammo = item != null ? player.getInventory().all(item) : player.getInventory().all(material);
 		int found = 0;
-		if (item != null) {
-			ammo = player.getInventory().all(item);
-		} else {
-			ammo = player.getInventory().all(material);
-		}
-		for (ItemStack stack : ammo.values()) {
+		for (final ItemStack stack : ammo.values()) {
 			found += stack.getAmount();
 		}
-		if (count > found) {
-			return false;
-		}
+		if (count > found) return false;
 
-		for (Integer index : ammo.keySet()) {
-			ItemStack stack = ammo.get(index);
+		for (final Entry<Integer, ? extends ItemStack> entry : ammo.entrySet()) {
+			final ItemStack stack = entry.getValue();
 
-			int removed = Math.min(count, stack.getAmount());
+			final int removed = Math.min(count, stack.getAmount());
 			count -= removed;
 
 			if (stack.getAmount() == removed) {
-				player.getInventory().setItem(index, null);
+				player.getInventory().setItem(entry.getKey(), null);
 			} else {
 				stack.setAmount(stack.getAmount() - removed);
 			}
 
-			if (count <= 0) {
-				break;
-			}
+			if (count <= 0) break;
 		}
 
 		player.updateInventory();
@@ -161,7 +152,7 @@ public class AdminShopItem {
 	}
 
 	public ItemStack getItemStackAdmin() {
-		OlympaItemBuild itemAdmin = itemBuilder.clone();
+		final OlympaItemBuild itemAdmin = itemBuilder.clone();
 		if (!isEnable()) {
 			itemAdmin.size(-1);
 			itemAdmin.addLoreBefore("&4&lOBJET DESACTIVÉ");
@@ -171,18 +162,18 @@ public class AdminShopItem {
 		return itemAdmin.build();
 	}
 
-	public ItemStack getItemStackPlayer() {
+	public boolean isEnable() {
+		return enable;
+	}
+
+	public @Nullable ItemStack getItemStackPlayer() {
 		if (!isEnable()) {
 			return null;
 		}
-		ItemStack itemStack = itemBuilder.build();
+		final ItemStack itemStack = itemBuilder.build();
 		//TranslatableComponent translatable = new TranslatableComponent(material.getTranslationKey());
 		//itemStack.getItemMeta().setLocalizedName(translatable.toLegacyText());
 		return itemStack;
-	}
-
-	public boolean isEnable() {
-		return enable;
 	}
 
 	public @NotNull Material getMaterial() {
@@ -209,7 +200,7 @@ public class AdminShopItem {
 		return value;
 	}
 
-	public void setValue(float value) {
+	public void setValue(final float value) {
 		this.value = value;
 		updateLore();
 	}

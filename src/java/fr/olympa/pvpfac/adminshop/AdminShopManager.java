@@ -20,32 +20,32 @@ import java.util.stream.Stream;
 
 public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 
-	private CustomConfig config;
 	private final OlympaAPIPlugin pl;
+	private CustomConfig config;
 	protected static final AdminShopItem GRASS = new AdminShopItem(Material.GRASS, 64, 1f);
 	protected static final AdminShopItem DIRT = new AdminShopItem(Material.DIRT, 0.5f);
 	protected List<AdminShopItem> items;
 
-	public AdminShopManager(OlympaAPIPlugin pl) {
+	public AdminShopManager(final OlympaAPIPlugin pl) {
 		this.pl = pl;
 		try {
-			OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
+			final OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
 				.cmd(AdminShopCommand.class);
 			adminShopModule.enableModule();
 			adminShopModule.registerModule();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void writeToConfig() {
-		for (AdminShopItem item : items) {
+		for (final AdminShopItem item : items) {
 			addItemToConfig(item);
 		}
 		config.save();
 	}
 
-	public void addItemToConfig(AdminShopItem item) {
+	public void addItemToConfig(final AdminShopItem item) {
 		config.set("items." + item.getId() + ".material", item.getMaterial());
 		config.set("items." + item.getId() + ".amont", item.getMaterial());
 		config.set("items." + item.getId() + ".value", item.getMaterial());
@@ -56,7 +56,7 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		config.save();
 	}
 
-	public List<AdminShopItem> getItemPage(int page, Boolean enableOrDisableOrAll) {
+	public List<AdminShopItem> getItemPage(final int page, final Boolean enableOrDisableOrAll) {
 		Stream<AdminShopItem> stream;
 		if (enableOrDisableOrAll == null) {
 			stream = items.stream().sorted(new Sorting<>(it -> it.isEnable() ? 1 : 0));
@@ -65,24 +65,31 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		} else {
 			stream = items.stream().filter(it -> !it.isEnable());
 		}
-		if (page > 1) {
-			stream = stream.skip((long) (page - 1) * getPageSize());
-		}
+
+		if (page > 1) stream = stream.skip((long) (page - 1) * getPageSize());
 		return stream.limit(getPageSize()).collect(Collectors.toList());
 	}
 
-	public AdminShopItem getAdminShopItem(ItemStack item) {
+	public int getPageSize() {
+		return getGuiRows() * 9;
+	}
+
+	public int getGuiRows() {
+		return 6;
+	}
+
+	public AdminShopItem getAdminShopItem(final ItemStack item) {
 		return items.stream().filter(it -> it.getMaterial().equals(item.getType())).findFirst().orElse(null);
 	}
 
 	@Override
-	public boolean disable(OlympaAPIPlugin plugin) {
+	public boolean disable(final OlympaAPIPlugin plugin) {
 		//writeToConfig();
 		return false;
 	}
 
 	@Override
-	public boolean enable(OlympaAPIPlugin plugin) {
+	public boolean enable(final OlympaAPIPlugin plugin) {
 		items = new ArrayList<>();
 		loadFromConfig();
 		addItem(GRASS.enable());
@@ -94,10 +101,10 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		items.clear();
 		config = new CustomConfig(pl, "adminshop");
 		@Nullable
-		ConfigurationSection configSectionItems = config.getConfigurationSection("items");
+		final ConfigurationSection configSectionItems = config.getConfigurationSection("items");
 		if (configSectionItems != null) {
 			AdminShopItem item;
-			for (String key : configSectionItems.getKeys(true)) {
+			for (final String key : configSectionItems.getKeys(true)) {
 				item = new AdminShopItem(
 					config.getMaterial(configSectionItems.getCurrentPath() + "." + key + ".material"),
 					configSectionItems.getInt(key + ".amont"),
@@ -112,7 +119,7 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		}
 	}
 
-	public boolean addItem(AdminShopItem item) {
+	public boolean addItem(final AdminShopItem item) {
 		if (getItemById(item.getId()) != null) {
 			return false;
 		}
@@ -121,12 +128,12 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		return true;
 	}
 
-	public AdminShopItem getItemById(String id) {
+	public AdminShopItem getItemById(final String id) {
 		return items.stream().filter(it -> it.getId().equals(id)).findFirst().orElse(null);
 	}
 
 	@Override
-	public boolean setToPlugin(OlympaAPIPlugin plugin) {
+	public boolean setToPlugin(final OlympaAPIPlugin plugin) {
 		return false;
 	}
 
@@ -153,13 +160,5 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 
 	public List<AdminShopItem> getItemsEnabled() {
 		return items.stream().filter(AdminShopItem::isEnable).collect(Collectors.toList());
-	}
-
-	public int getPageSize() {
-		return getGuiRows() * 9;
-	}
-
-	public int getGuiRows() {
-		return 6;
 	}
 }
