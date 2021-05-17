@@ -249,7 +249,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			if (askChat == null) {
 				sendMessage(Prefix.FACTION, "&cLe chat &4" + cmd.getArgument(0) + "&c n'existe pas.");
 				return;
-			} else if (chat != null && chat.equals(askChat)) {
+			} else if (chat != null && chat == askChat) {
 				sendMessage(Prefix.FACTION, "&cTu utilise déjà le chat &4" + chat.getName() + "&c.");
 				return;
 			}

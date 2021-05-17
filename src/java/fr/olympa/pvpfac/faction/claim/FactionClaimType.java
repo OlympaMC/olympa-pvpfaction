@@ -7,8 +7,7 @@ public enum FactionClaimType {
 	NORMAL(true, true, false, true),
 	WARZONE(false, true, true, false),
 	AP(true, true, false, false),
-	SPAWN(false, false, true, false),
-	;
+	SPAWN(false, false, true, false);
 
 	private final boolean isClaimable;
 	private final boolean canPvp;

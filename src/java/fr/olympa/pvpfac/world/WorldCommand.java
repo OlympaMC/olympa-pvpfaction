@@ -67,6 +67,7 @@ public class WorldCommand extends ComplexCommand {
 			}
 
 			plugin.getWorldsManager().setPortal(world, (Cuboid) region);
+			plugin.getWorldsManager().savePortal(world, (Cuboid) region);
 			Prefix.FACTION.sendMessage(getPlayer(), "§aPortail vers le monde " + world.getWorldName() + " mis à jour avec succès.");
 
 		}).enterOrLeave();

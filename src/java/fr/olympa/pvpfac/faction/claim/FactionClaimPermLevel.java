@@ -15,8 +15,7 @@ public enum FactionClaimPermLevel {
 		true,
 		true,
 		true
-	),
-	;
+	);
 
 	private final int level;
 	private final String desc;

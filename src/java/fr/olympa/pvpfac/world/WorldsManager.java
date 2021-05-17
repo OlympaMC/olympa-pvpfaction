@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 public class WorldsManager {
 
 	private static final int loadChunks = 15;
-	private final Map<World, WorldType> worlds = new HashMap<World, WorldsManager.WorldType>();
+	private final Map<World, WorldType> worlds = new HashMap<>();
 	private final PvPFaction plugin;
 	private final YamlConfiguration config = new YamlConfiguration();
 	private final File configFile;
@@ -105,17 +105,7 @@ public class WorldsManager {
 
 			//manage portals
 			if (config.get(type + ".portal", null) != null) {
-				OlympaCore.getInstance().getRegionManager().registerRegion((Cuboid) config.get(type + ".portal"), "portal_world_" + type.toString().toLowerCase(), EventPriority.HIGHEST,
-				                                                           new Flag() {
-					                                                           @Override
-					                                                           public ActionResult enters(final Player p, final Set<TrackedRegion> to) {
-						                                                           super.enters(p, to);
-						                                                           type.teleport(p);
-						                                                           Prefix.FACTION.sendMessage(p, "§aTu vas être téléporté vers le monde " + type.getWorldName() + "...");
-						                                                           return ActionResult.TELEPORT_ELSEWHERE;
-					                                                           }
-				                                                           }
-				);
+				setPortal(type, (Cuboid) config.get(type + ".portal"));
 			}
 		}
 	}
@@ -128,7 +118,7 @@ public class WorldsManager {
 		return worlds.get(w);
 	}
 
-	public void setPortal(final WorldType world, final Cuboid region) {
+	public void savePortal(final WorldType world, final Cuboid region) {
 		config.set(world + ".portal", region);
 
 		try {
@@ -137,6 +127,23 @@ public class WorldsManager {
 			plugin.getLogger().warning("§cFailed to save new portal loc for world " + world);
 			e.printStackTrace();
 		}
+	}
+
+	public void setPortal(final WorldType world, final Cuboid region) {
+		OlympaCore.getInstance().getRegionManager().registerRegion(
+			region,
+			"portal_world_" + world.toString().toLowerCase(),
+			EventPriority.HIGHEST,
+			new Flag() {
+				@Override
+				public ActionResult enters(final Player p, final Set<TrackedRegion> to) {
+					super.enters(p, to);
+					world.teleport(p);
+					Prefix.FACTION.sendMessage(p, "§aTu vas être téléporté vers le monde " + world.getWorldName() + "...");
+					return ActionResult.TELEPORT_ELSEWHERE;
+				}
+			}
+		);
 	}
 
 	public enum WorldType {
