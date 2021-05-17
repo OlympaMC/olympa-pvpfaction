@@ -21,7 +21,7 @@ public class WorldCommand extends ComplexCommand {
 	}
 
 
-	@Cmd(player = true, args = "world|nether|end|mining", min = 1)
+	@Cmd(player = true, args = "world|nether|end|mining", min = 1, description = "Permet de se téléporter d'un monde à un autre.")
 	public void tp(final CommandContext cmd) {
 		final WorldType w = WorldType.fromString(cmd.getArgument(0));
 		if (w == null) {
@@ -34,7 +34,7 @@ public class WorldCommand extends ComplexCommand {
 	}
 
 
-	@Cmd(player = true, args = "world|nether|end|mining", min = 1)
+	@Cmd(player = true, args = "world|nether|end|mining", min = 1, description = "Permet d'obtenir des informations sur un monde.")
 	public void info(final CommandContext cmd) {
 		final WorldType w = WorldType.fromString(cmd.getArgument(0));
 		if (w == null) {
@@ -49,7 +49,7 @@ public class WorldCommand extends ComplexCommand {
 		);
 	}
 
-	@Cmd(player = true, args = "world|nether|end|mining", min = 1)
+	@Cmd(player = true, args = "world|nether|end|mining", min = 1, description = "Permet de définir un portail vers un monde.")
 	public void setportal(final CommandContext cmd) {
 		if (!PvPFactionPermission.WORLD_COMMAND_ADMIN.hasPermissionWithMsg(getOlympaPlayer())) return;
 
