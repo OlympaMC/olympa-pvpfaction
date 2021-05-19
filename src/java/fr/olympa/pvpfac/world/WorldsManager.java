@@ -1,13 +1,13 @@
 package fr.olympa.pvpfac.world;
 
-import fr.olympa.api.region.shapes.Cuboid;
-import fr.olympa.api.region.tracking.ActionResult;
-import fr.olympa.api.region.tracking.TrackedRegion;
-import fr.olympa.api.region.tracking.flags.Flag;
-import fr.olympa.api.utils.Prefix;
-import fr.olympa.core.spigot.OlympaCore;
-import fr.olympa.pvpfac.PvPFaction;
-import net.minecraft.server.v1_16_R3.HeightMap.Type;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameRule;
@@ -24,14 +24,14 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
+import fr.olympa.api.region.shapes.Cuboid;
+import fr.olympa.api.region.tracking.ActionResult;
+import fr.olympa.api.region.tracking.RegionEvent.EntryEvent;
+import fr.olympa.api.region.tracking.flags.Flag;
+import fr.olympa.api.utils.Prefix;
+import fr.olympa.core.spigot.OlympaCore;
+import fr.olympa.pvpfac.PvPFaction;
+import net.minecraft.server.v1_16_R3.HeightMap.Type;
 
 public class WorldsManager {
 
@@ -136,10 +136,10 @@ public class WorldsManager {
 			EventPriority.HIGHEST,
 			new Flag() {
 				@Override
-				public ActionResult enters(final Player p, final Set<TrackedRegion> to) {
-					super.enters(p, to);
-					world.teleport(p);
-					Prefix.FACTION.sendMessage(p, "§aTu vas être téléporté vers le monde " + world.getWorldName() + "...");
+				public ActionResult enters(final EntryEvent event) {
+					super.enters(event);
+						world.teleport(event.getPlayer());
+						Prefix.FACTION.sendMessage(event.getPlayer(), "§aTu vas être téléporté vers le monde " + world.getWorldName() + "...");
 					return ActionResult.TELEPORT_ELSEWHERE;
 				}
 			}
