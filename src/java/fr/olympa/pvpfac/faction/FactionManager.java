@@ -1,10 +1,14 @@
 package fr.olympa.pvpfac.faction;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.List;
+
 import fr.olympa.api.clans.ClanPlayerInterface;
 import fr.olympa.api.clans.ClansManager;
 import fr.olympa.api.clans.gui.ClanManagementGUI;
 import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.sql.SQLColumn;
 import fr.olympa.api.utils.spigot.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
@@ -12,11 +16,6 @@ import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.gui.FactionManagementGUI;
 import fr.olympa.pvpfac.player.FactionPlayerData;
 import fr.olympa.pvpfac.player.FactionPlayerData.FactionRole;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.List;
 
 public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
@@ -30,7 +29,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 
 	public FactionManager() throws SQLException, ReflectiveOperationException {
 		super(PvPFaction.getInstance(), "pvpfac_factions");
-		new FactionCommand(this, PvPFactionPermission.FACTION_PLAYERS_COMMAND, "factions", "f", "fac").register();
+		new FactionCommand(this, PvPFactionPermission.FACTION_PLAYERS_COMMAND, PvPFactionPermission.FACTION_MANAGE_COMMAND, "factions", "f", "fac").register();
 		//		for (FactionType defaultFac : FactionType.getDefaultFactions().stream().filter(ft -> !getClans().stream().anyMatch(entry -> entry.getValue().getType() == ft)).collect(Collectors.toList())) {
 		//
 		//			PreparedStatement statement = createDefaultClanStatement.getStatement();
@@ -58,6 +57,7 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringCantLeaveChief = "Tu ne peux pas quitter la faction en en étant le chef. Transfère la direction de celle-ci à un autre joueur.";
 		stringCantChiefSelf = "Tu ne peux pas te transférer la direction de ta propre faction.";
 		stringPlayerNotInClan = "Le joueur %s ne fait pas partie de la faction.";
+		stringClanNotExist = "§cLa faction §4%s §cn'existe pas.";
 		stringMustBeInClan = "Tu dois appartenir à une faction pour faire cette commande.";
 		stringMustBeChief = "Tu dois être le chef de la faction pour effectuer cette commande.";
 		stringClanDisband = "§lLe clan a été dissous. Ceci est le dernier message que vous recevrez.";
@@ -78,26 +78,6 @@ public class FactionManager extends ClansManager<Faction, FactionPlayerData> {
 		stringItemLeaveChiefLore = new String[]{ "§7§oPour pouvoir quitter votre faction,", "§7§ovous devez tout d'abord", "§7§otransmettre la direction de celle-ci", "§7§oà un autre membre." };
 		stringClanNameTooLong = "Le nom d'une faction ne peut pas excéder %d caractères !";
 		stringItemDisband = "§cDémanteler la faction";
-	}
-
-	public Faction get(final String nameOrTagOrPlayer) throws SQLException {
-		Faction faction = getByName(nameOrTagOrPlayer);
-		if (faction == null) {
-			faction = getByTag(nameOrTagOrPlayer);
-		}
-		if (faction == null) {
-			final ClanPlayerInterface<Faction, FactionPlayerData> target = AccountProvider.get(nameOrTagOrPlayer);
-			faction = target.getClan();
-		}
-		return faction;
-	}
-
-	public Faction getByName(final String name) {
-		return getClans().stream().filter(c -> name.equalsIgnoreCase(c.getValue().getName())).map(c -> c.getValue()).findFirst().orElse(null);
-	}
-
-	public Faction getByTag(final String tag) {
-		return getClans().stream().filter(c -> tag.equalsIgnoreCase(c.getValue().getTag())).map(c -> c.getValue()).findFirst().orElse(null);
 	}
 
 	@Override

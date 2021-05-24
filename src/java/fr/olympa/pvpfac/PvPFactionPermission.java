@@ -14,6 +14,8 @@ public class PvPFactionPermission {
 	public static final OlympaSpigotPermission MONEY_COMMAND_MANAGE = new OlympaSpigotPermission(OlympaGroup.RESP_TECH);
 
 	public static final OlympaSpigotPermission FACTION_PLAYERS_COMMAND = new OlympaSpigotPermission(OlympaGroup.PLAYER);
+	public static final OlympaSpigotPermission FACTION_MANAGE_COMMAND = new OlympaSpigotPermission(OlympaGroup.MOD);
+	
 	public static final OlympaSpigotPermission FACTION_BYPASS = new OlympaSpigotPermission(OlympaGroup.RESP_TECH);
 
 	public static final OlympaSpigotPermission TAX_COMMAND = new OlympaSpigotPermission(OlympaGroup.RESP_TECH);

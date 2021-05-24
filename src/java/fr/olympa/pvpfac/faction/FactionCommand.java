@@ -1,5 +1,13 @@
 package fr.olympa.pvpfac.faction;
 
+import java.sql.SQLException;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.entity.Player;
+
 import fr.olympa.api.chat.ColorUtils;
 import fr.olympa.api.clans.ClansCommand;
 import fr.olympa.api.command.complex.Cmd;
@@ -24,22 +32,11 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.entity.Player;
-
-import java.sql.SQLException;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 
-	public FactionCommand(final FactionManager manager, final OlympaSpigotPermission permission, final String... aliases) {
-		super(manager, "Permet de gérer les factions.", permission, aliases);
-		this.addArgumentParser("FACTIONS", (player, arg) -> manager.getClans().stream().map(e -> e.getValue().getName()).collect(Collectors.toSet()),
-		                       manager::getByName,
-		                       x -> String.format("&cLa faction &4%s&c n'existe pas.", x)
-		);
+	public FactionCommand(final FactionManager manager, final OlympaSpigotPermission permission, final OlympaSpigotPermission managePermission, final String... aliases) {
+		super(manager, "Permet de gérer les factions.", permission, managePermission, aliases);
 		this.addArgumentParser("FACTION_ROLE", FactionRole.class, fr -> fr.name);
 		this.addArgumentParser("FACTION_CLAIM_TYPE", FactionClaimType.class);
 		this.addArgumentParser("CLAIM_PERM", FactionClaimPermLevel.class);
@@ -102,7 +99,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		}
 	}
 
-	@Cmd(player = true, min = 1, args = { "FACTIONS|FACTION_CLAIM_TYPE" })
+	@Cmd (player = true, min = 1, args = { "CLAN|FACTION_CLAIM_TYPE" })
 	public void forceclaim(final CommandContext cmd) {
 		if (!PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player)) {
 			sendDoNotHavePermission();
@@ -261,7 +258,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		sendMessage(Prefix.FACTION, "Tu parles désormais en chat &2" + askChat.getName() + "&a.");
 	}
 
-	@Cmd(player = true, aliases = { "who", "f" }, args = "PLAYERS|FACTIONS")
+	@Cmd (player = true, aliases = { "who", "f" }, args = "PLAYERS|CLAN")
 	public void show(final CommandContext cmd) {
 		Faction faction = getPlayerClan(false);
 		if (cmd.getArgumentsLength() == 0) {
@@ -306,7 +303,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 	}
 
 
-	@Cmd(player = true, aliases = "cp", args = { "set|info|tuto", "PLAYERS|FACTIONS", "CLAIM_PERM", "FACTION_ROLE" }, min = 1)
+	@Cmd (player = true, aliases = "cp", args = { "set|info|tuto", "PLAYERS|CLAN", "CLAIM_PERM", "FACTION_ROLE" }, min = 1)
 	public void claimperm(final CommandContext cmd) {
 		final FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(getPlayer().getLocation().getChunk());
 
