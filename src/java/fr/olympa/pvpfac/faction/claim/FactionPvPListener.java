@@ -25,9 +25,8 @@ public class FactionPvPListener implements Listener {
 		final Entity entityVictim = event.getEntity();
 		final Entity entityAttacker = event.getDamager();
 		final Faction victimFaction;
-		if (!(entityVictim instanceof Player)) return;
+		if (!(entityVictim instanceof final Player victim)) return;
 
-		final Player victim = (Player) entityVictim;
 		final FactionPlayer victimFactionPlayer = AccountProvider.get(victim.getUniqueId());
 		victimFaction = victimFactionPlayer.getClan();
 		if (victimFaction == null) return;

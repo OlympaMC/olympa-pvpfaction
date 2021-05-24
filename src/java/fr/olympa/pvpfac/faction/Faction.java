@@ -130,7 +130,6 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	 *
 	 * @return True if the faction is an ally.
 	 *
-	 * @
 	 */
 	public boolean isAlly(final Faction fac) {
 		throw new UnsupportedOperationException("Gestion des factions alliées non encore implémentée !");

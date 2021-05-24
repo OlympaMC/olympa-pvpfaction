@@ -151,7 +151,7 @@ public class FactionClaimListener implements Listener {
 	}
 
 	/**
-	 * Return true if event was cancelled, false otherwise
+	 * Return true if event was cancelled, false otherwise.
 	 */
 	private boolean isActionCancelled(final Location loc, final Player p, final Cancellable event, final Function<FactionClaimPermLevel, Boolean> method, final String denyMessage) {
 		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID())) return false;

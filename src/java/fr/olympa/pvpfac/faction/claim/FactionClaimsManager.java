@@ -13,6 +13,7 @@ import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -86,7 +87,7 @@ public class FactionClaimsManager implements Listener {
 		}
 	}
 
-	public FactionClaim ofChunk(final Chunk chunk) {
+	public @Nullable FactionClaim ofChunk(final Chunk chunk) {
 		FactionClaim claim = claims.getIfPresent(chunk);
 		if (claim != null) {
 			return claim;
@@ -148,7 +149,7 @@ public class FactionClaimsManager implements Listener {
 		return claim;
 	}
 
-	public Set<FactionClaim> ofFaction(final Faction faction) {
+	public @Nullable Set<FactionClaim> ofFaction(final Faction faction) {
 		try (final PreparedStatement statement = SELECT_CLAIMS_BY_FACTION.createStatement()) {
 			statement.setInt(1, faction.getID());
 			final ResultSet resultSet = statement.executeQuery();

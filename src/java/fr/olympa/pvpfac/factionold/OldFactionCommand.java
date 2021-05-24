@@ -4,6 +4,7 @@ import fr.olympa.api.command.OlympaCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -549,7 +550,7 @@ public class OldFactionCommand extends OlympaCommand {
 	}
 
 	@Override
-	public List<String> onTabComplete(final CommandSender sender, final Command cmd, final String label, final String[] args) {
+	public @Nullable List<String> onTabComplete(final CommandSender sender, final Command cmd, final String label, final String[] args) {
 		// TODO Auto-generated method stub
 		return null;
 	}

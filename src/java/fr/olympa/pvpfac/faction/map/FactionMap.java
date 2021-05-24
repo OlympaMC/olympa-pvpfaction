@@ -52,21 +52,7 @@ public class FactionMap {
 		sj.add("&6MAP %s %co".replace("%co", location.getBlockX() + " " + location.getBlockZ()));
 		final StringBuilder sb = new StringBuilder();
 		switch (facing) {
-			default:
-			case NORTH:
-				facingName = "Nord";
-				startX = chunkX - mapRadiusSize * sidesCoeff;
-				endX = chunkX + mapRadiusSize * sidesCoeff;
-				startZ = chunkZ - mapRadiusSize;
-				endZ = chunkZ + mapRadiusSize;
-				for (int iZ = startZ; endZ > iZ; iZ++) {
-					for (int iX = startX; endX > iX; iX++) {
-						sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
-					}
-					sb.append("\n");
-				}
-				break;
-			case EAST:
+			case EAST -> {
 				facingName = "Est";
 				startX = chunkX + mapRadiusSize;
 				endX = chunkX - mapRadiusSize;
@@ -78,8 +64,8 @@ public class FactionMap {
 					}
 					sb.append("\n");
 				}
-				break;
-			case WEST:
+			}
+			case WEST -> {
 				facingName = "Ouest";
 				startX = chunkX - mapRadiusSize;
 				endX = chunkX + mapRadiusSize;
@@ -91,8 +77,8 @@ public class FactionMap {
 					}
 					sb.append("\n");
 				}
-				break;
-			case SOUTH:
+			}
+			case SOUTH -> {
 				facingName = "Sud";
 				startX = chunkX + mapRadiusSize * sidesCoeff;
 				endX = chunkX - mapRadiusSize * sidesCoeff;
@@ -104,7 +90,20 @@ public class FactionMap {
 					}
 					sb.append("\n");
 				}
-				break;
+			}
+			default -> {
+				facingName = "Nord";
+				startX = chunkX - mapRadiusSize * sidesCoeff;
+				endX = chunkX + mapRadiusSize * sidesCoeff;
+				startZ = chunkZ - mapRadiusSize;
+				endZ = chunkZ + mapRadiusSize;
+				for (int iZ = startZ; endZ > iZ; iZ++) {
+					for (int iX = startX; endX > iX; iX++) {
+						sb.append(getChunkLetter(manager.ofChunk(world.getChunkAt(iX, iZ)), factions, indexSymbole++, playerFaction, iZ == chunkZ && iX == chunkX));
+					}
+					sb.append("\n");
+				}
+			}
 		}
 		sj.add(sb.toString());
 		if (!factions.isEmpty()) {

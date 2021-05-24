@@ -1,6 +1,7 @@
 package fr.olympa.pvpfac.faction.chat;
 
 import fr.olympa.api.utils.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -32,15 +33,11 @@ public enum FactionChat {
 		return this.surname.stream().anyMatch(sur -> Utils.equalsIgnoreAccents(surname, sur));
 	}
 
-	public @Nullable FactionChat getOther() {
-		switch (this) {
-			case GENERAL:
-				return FactionChat.FACTION;
-			case FACTION:
-				return FactionChat.ALLY;
-			case ALLY:
-				return FactionChat.GENERAL;
-		}
-		return null;
+	public @NotNull FactionChat getOther() {
+		return switch (this) {
+			case GENERAL -> FactionChat.FACTION;
+			case FACTION -> FactionChat.ALLY;
+			case ALLY -> FactionChat.GENERAL;
+		};
 	}
 }

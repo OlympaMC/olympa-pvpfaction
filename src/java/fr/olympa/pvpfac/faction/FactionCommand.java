@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import fr.olympa.api.provider.OlympaPlayerObject;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
@@ -292,10 +293,10 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		sj.add("&3Crée le : &b" + Utils.timestampToDate(creationTime) + "&3 (" + Utils.timestampToDuration(creationTime) + ")");
 		sj.add("&3Claims/Power/MaxPower : &b" + faction.getClaimsPowerMaxPower());
 		sj.add("&3Joueurs max: &b" + faction.getMaxSize());
-		sj.add("&3Joueurs connectés: &a" + faction.getOnlineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &a")));
+		sj.add("&3Joueurs connectés: &a" + faction.getOnlineFactionPlayers().stream().map(OlympaPlayerObject::getName).collect(Collectors.joining("&b, &a")));
 		try {
 			// BUG java.lang.NullPointerException -> pas plus d'informations, c'est la ligne du dessous
-			sj.add("&3Joueurs déconnectés: &c" + faction.getOfflineFactionPlayers().stream().map(p -> p.getName()).collect(Collectors.joining("&b, &c")));
+			sj.add("&3Joueurs déconnectés: &c" + faction.getOfflineFactionPlayers().stream().map(OlympaPlayerObject::getName).collect(Collectors.joining("&b, &c")));
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

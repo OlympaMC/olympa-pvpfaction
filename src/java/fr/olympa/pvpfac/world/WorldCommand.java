@@ -73,6 +73,11 @@ public class WorldCommand extends ComplexCommand {
 		}).enterOrLeave();
 	}
 
+	@Cmd(player = true, description = "Permet de supprimer un portail.")
+	public void removeportal(final CommandContext cmd) {
+		// TODO
+	}
+
 
 }
 
