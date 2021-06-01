@@ -1,15 +1,15 @@
 package fr.olympa.pvpfac.faction;
 
-import fr.olympa.api.clans.Clan;
-import fr.olympa.api.clans.ClanPlayerInterface;
-import fr.olympa.api.clans.ClansManager;
-import fr.olympa.api.lines.DynamicLine;
-import fr.olympa.api.lines.FixedLine;
-import fr.olympa.api.lines.TimerLine;
-import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.scoreboard.sign.Scoreboard;
-import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.api.spigot.clans.Clan;
+import fr.olympa.api.spigot.clans.ClanPlayerInterface;
+import fr.olympa.api.spigot.clans.ClansManager;
+import fr.olympa.api.spigot.lines.DynamicLine;
+import fr.olympa.api.spigot.lines.FixedLine;
+import fr.olympa.api.spigot.lines.TimerLine;
+import fr.olympa.api.common.player.OlympaPlayerInformations;
+import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.spigot.scoreboard.sign.Scoreboard;
+import fr.olympa.api.spigot.utils.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.claim.FactionClaim;
 import fr.olympa.pvpfac.faction.claim.FactionClaimsManager;

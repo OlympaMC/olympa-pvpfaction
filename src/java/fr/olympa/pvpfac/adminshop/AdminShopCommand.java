@@ -1,8 +1,8 @@
 package fr.olympa.pvpfac.adminshop;
 
-import fr.olympa.api.command.complex.Cmd;
-import fr.olympa.api.command.complex.CommandContext;
-import fr.olympa.api.command.complex.ComplexCommand;
+import fr.olympa.api.common.command.complex.Cmd;
+import fr.olympa.api.common.command.complex.CommandContext;
+import fr.olympa.api.spigot.command.ComplexCommand;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.adminshop.gui.AdminShopGui;

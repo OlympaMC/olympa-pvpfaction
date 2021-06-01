@@ -1,9 +1,9 @@
 package fr.olympa.pvpfac.adminshop;
 
-import fr.olympa.api.item.OlympaItemBuild;
+import fr.olympa.api.spigot.item.OlympaItemBuild;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.api.utils.Utils;
-import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.api.spigot.utils.SpigotUtils;
 import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

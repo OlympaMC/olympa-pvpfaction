@@ -1,6 +1,6 @@
 package fr.olympa.pvpfac.adminshop.gui;
 
-import fr.olympa.api.gui.OlympaGUI;
+import fr.olympa.api.spigot.gui.OlympaGUI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;

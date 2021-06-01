@@ -1,8 +1,8 @@
 package fr.olympa.pvpfac.faction.gui;
 
-import fr.olympa.api.clans.ClanPlayerInterface;
-import fr.olympa.api.clans.ClansManager;
-import fr.olympa.api.clans.gui.ClanManagementGUI;
+import fr.olympa.api.spigot.clans.ClanPlayerInterface;
+import fr.olympa.api.spigot.clans.ClansManager;
+import fr.olympa.api.spigot.clans.gui.ClanManagementGUI;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.player.FactionPlayerData;
 

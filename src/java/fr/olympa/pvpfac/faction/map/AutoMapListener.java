@@ -1,7 +1,7 @@
 package fr.olympa.pvpfac.faction.map;
 
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.spigot.utils.SpigotUtils;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

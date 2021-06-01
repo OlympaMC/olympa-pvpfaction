@@ -1,22 +1,23 @@
 package fr.olympa.pvpfac.adminshop;
 
-import fr.olympa.api.command.OlympaCommand;
-import fr.olympa.api.config.CustomConfig;
-import fr.olympa.api.module.OlympaModule;
-import fr.olympa.api.module.OlympaModule.ModuleApi;
-import fr.olympa.api.module.SpigotModule;
-import fr.olympa.api.plugin.OlympaAPIPlugin;
-import fr.olympa.api.sort.Sorting;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import fr.olympa.api.common.module.OlympaModule;
+import fr.olympa.api.common.module.OlympaModule.ModuleApi;
+import fr.olympa.api.common.module.SpigotModule;
+import fr.olympa.api.common.plugin.OlympaAPIPlugin;
+import fr.olympa.api.common.sort.Sorting;
+import fr.olympa.api.spigot.command.OlympaCommand;
+import fr.olympa.api.spigot.config.CustomConfig;
 
 public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 
@@ -30,7 +31,7 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		this.pl = pl;
 		try {
 			final OlympaModule<AdminShopManager, Listener, OlympaAPIPlugin, OlympaCommand> adminShopModule = new SpigotModule<>(pl, "adminshop_" + pl.getName(), plugin -> this)
-				.cmd(AdminShopCommand.class);
+					.cmd(AdminShopCommand.class);
 			adminShopModule.enableModule();
 			adminShopModule.registerModule();
 		} catch (final Exception e) {
@@ -39,9 +40,8 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 	}
 
 	public void writeToConfig() {
-		for (final AdminShopItem item : items) {
+		for (final AdminShopItem item : items)
 			addItemToConfig(item);
-		}
 		config.save();
 	}
 
@@ -50,23 +50,22 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 		config.set("items." + item.getId() + ".amont", item.getMaterial());
 		config.set("items." + item.getId() + ".value", item.getMaterial());
 		config.set("items." + item.getId() + ".enabled", item.isEnable());
-		if (item.getItemStackOriginal() != null) {
+		if (item.getItemStackOriginal() != null)
 			config.getConfigurationSection("items").set(item.getId() + ".item", item.getItemStackOriginal());
-		}
 		config.save();
 	}
 
 	public List<AdminShopItem> getItemPage(final int page, final Boolean enableOrDisableOrAll) {
 		Stream<AdminShopItem> stream;
-		if (enableOrDisableOrAll == null) {
+		if (enableOrDisableOrAll == null)
 			stream = items.stream().sorted(new Sorting<>(it -> it.isEnable() ? 1 : 0));
-		} else if (enableOrDisableOrAll) {
+		else if (enableOrDisableOrAll)
 			stream = items.stream().filter(AdminShopItem::isEnable);
-		} else {
+		else
 			stream = items.stream().filter(it -> !it.isEnable());
-		}
 
-		if (page > 1) stream = stream.skip((long) (page - 1) * getPageSize());
+		if (page > 1)
+			stream = stream.skip((long) (page - 1) * getPageSize());
 		return stream.limit(getPageSize()).collect(Collectors.toList());
 	}
 
@@ -106,13 +105,11 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 			AdminShopItem item;
 			for (final String key : configSectionItems.getKeys(true)) {
 				item = new AdminShopItem(
-					config.getMaterial(configSectionItems.getCurrentPath() + "." + key + ".material"),
-					configSectionItems.getInt(key + ".amont"),
-					configSectionItems.getDouble(key + ".value")
-				);
-				if (item.getValue() > 0 && configSectionItems.getBoolean(key + ".enabled")) {
+						config.getMaterial(configSectionItems.getCurrentPath() + "." + key + ".material"),
+						configSectionItems.getInt(key + ".amont"),
+						configSectionItems.getDouble(key + ".value"));
+				if (item.getValue() > 0 && configSectionItems.getBoolean(key + ".enabled"))
 					item.enable();
-				}
 				item.item = configSectionItems.getItemStack(key + ".item");
 				items.add(item);
 			}
@@ -120,9 +117,8 @@ public class AdminShopManager implements ModuleApi<OlympaAPIPlugin> {
 	}
 
 	public boolean addItem(final AdminShopItem item) {
-		if (getItemById(item.getId()) != null) {
+		if (getItemById(item.getId()) != null)
 			return false;
-		}
 		items.add(item);
 		addItemToConfig(item);
 		return true;

@@ -1,20 +1,5 @@
 package fr.olympa.pvpfac.player;
 
-import fr.olympa.api.clans.ClanPlayerInterface;
-import fr.olympa.api.economy.OlympaMoney;
-import fr.olympa.api.enderchest.EnderChestPlayerInterface;
-import fr.olympa.api.item.ItemUtils;
-import fr.olympa.api.provider.AccountProvider;
-import fr.olympa.api.provider.OlympaPlayerObject;
-import fr.olympa.api.sql.SQLColumn;
-import fr.olympa.api.trades.TradeBag;
-import fr.olympa.api.trades.TradePlayerInterface;
-import fr.olympa.api.utils.observable.ObservableInt;
-import fr.olympa.pvpfac.faction.Faction;
-import fr.olympa.pvpfac.faction.chat.FactionChat;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,6 +7,22 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import fr.olympa.api.common.observable.ObservableInt;
+import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.OlympaPlayerObject;
+import fr.olympa.api.common.sql.SQLColumn;
+import fr.olympa.api.spigot.clans.ClanPlayerInterface;
+import fr.olympa.api.spigot.economy.OlympaMoney;
+import fr.olympa.api.spigot.enderchest.EnderChestPlayerInterface;
+import fr.olympa.api.spigot.item.ItemUtils;
+import fr.olympa.api.spigot.trades.TradeBag;
+import fr.olympa.api.spigot.trades.TradePlayerInterface;
+import fr.olympa.pvpfac.faction.Faction;
+import fr.olympa.pvpfac.faction.chat.FactionChat;
 
 public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInterface<Faction, FactionPlayerData>, EnderChestPlayerInterface, TradePlayerInterface {
 
@@ -47,18 +48,18 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	}
 
 	public boolean addPower() {
-		if (power.get() >= POWER_MAX) {
+		if (power.get() >= POWER_MAX)
 			return false;
-		} else {
+		else {
 			power.increment();
 			return true;
 		}
 	}
 
 	public boolean removePower() {
-		if (power.get() <= -POWER_MAX) {
+		if (power.get() <= -POWER_MAX)
 			return false;
-		} else {
+		else {
 			power.decrement();
 			return true;
 		}
@@ -117,7 +118,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 
 	@Override
 	public void setEnderChestContents(final ItemStack[] contents) {
-		this.enderChestContents = contents;
+		enderChestContents = contents;
 		try {
 			COLUMN_ENDER_CHEST.updateAsync(this, ItemUtils.serializeItemsArray(enderChestContents), null, null);
 		} catch (final IOException e) {

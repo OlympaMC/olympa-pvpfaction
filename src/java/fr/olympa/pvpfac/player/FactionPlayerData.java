@@ -1,8 +1,8 @@
 package fr.olympa.pvpfac.player;
 
-import fr.olympa.api.clans.ClanPlayerData;
-import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.utils.observable.ObservableValue;
+import fr.olympa.api.spigot.clans.ClanPlayerData;
+import fr.olympa.api.common.player.OlympaPlayerInformations;
+import fr.olympa.api.common.observable.ObservableValue;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.faction.Faction;
 import fr.olympa.pvpfac.faction.claim.FactionClaimPermLevel;

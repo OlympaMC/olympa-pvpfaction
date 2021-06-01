@@ -1,6 +1,6 @@
 package fr.olympa.pvpfac.adminshop.gui;
 
-import fr.olympa.api.gui.OlympaGUI;
+import fr.olympa.api.spigot.gui.OlympaGUI;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.adminshop.AdminShopItem;

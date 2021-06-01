@@ -5,12 +5,12 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import fr.olympa.api.clans.ClanPlayerInterface;
-import fr.olympa.api.clans.ClansManager;
-import fr.olympa.api.clans.gui.ClanManagementGUI;
-import fr.olympa.api.player.OlympaPlayerInformations;
-import fr.olympa.api.sql.SQLColumn;
-import fr.olympa.api.utils.spigot.SpigotUtils;
+import fr.olympa.api.spigot.clans.ClanPlayerInterface;
+import fr.olympa.api.spigot.clans.ClansManager;
+import fr.olympa.api.spigot.clans.gui.ClanManagementGUI;
+import fr.olympa.api.common.player.OlympaPlayerInformations;
+import fr.olympa.api.common.sql.SQLColumn;
+import fr.olympa.api.spigot.utils.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;
 import fr.olympa.pvpfac.faction.gui.FactionManagementGUI;

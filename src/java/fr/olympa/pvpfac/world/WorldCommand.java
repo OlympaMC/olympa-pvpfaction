@@ -1,10 +1,10 @@
 package fr.olympa.pvpfac.world;
 
-import fr.olympa.api.command.complex.Cmd;
-import fr.olympa.api.command.complex.CommandContext;
-import fr.olympa.api.command.complex.ComplexCommand;
-import fr.olympa.api.editor.RegionEditor;
-import fr.olympa.api.region.shapes.Cuboid;
+import fr.olympa.api.common.command.complex.Cmd;
+import fr.olympa.api.common.command.complex.CommandContext;
+import fr.olympa.api.spigot.command.ComplexCommand;
+import fr.olympa.api.spigot.editor.RegionEditor;
+import fr.olympa.api.spigot.region.shapes.Cuboid;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.PvPFaction;
 import fr.olympa.pvpfac.PvPFactionPermission;

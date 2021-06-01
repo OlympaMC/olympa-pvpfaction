@@ -1,7 +1,7 @@
 package fr.olympa.pvpfac.faction.chat;
 
-import fr.olympa.api.chat.ColorUtils;
-import fr.olympa.api.provider.AccountProvider;
+import fr.olympa.api.common.chat.ColorUtils;
+import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import org.bukkit.entity.Player;
