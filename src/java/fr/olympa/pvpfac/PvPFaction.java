@@ -1,5 +1,7 @@
 package fr.olympa.pvpfac;
 
+import org.bukkit.plugin.PluginManager;
+
 import fr.olympa.api.auctions.AuctionsManager;
 import fr.olympa.api.command.essentials.BackCommand;
 import fr.olympa.api.command.essentials.FeedCommand;
@@ -11,8 +13,8 @@ import fr.olympa.api.groups.OlympaGroup;
 import fr.olympa.api.lines.CyclingLine;
 import fr.olympa.api.lines.DynamicLine;
 import fr.olympa.api.lines.FixedLine;
-import fr.olympa.api.permission.OlympaAPIPermissions;
 import fr.olympa.api.permission.OlympaPermission;
+import fr.olympa.api.permission.list.OlympaAPIPermissionsSpigot;
 import fr.olympa.api.plugin.OlympaAPIPlugin;
 import fr.olympa.api.provider.AccountProvider;
 import fr.olympa.api.scoreboard.sign.Scoreboard;
@@ -27,7 +29,6 @@ import fr.olympa.pvpfac.faction.map.AutoMapListener;
 import fr.olympa.pvpfac.faction.power.FactionPowerListener;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import fr.olympa.pvpfac.world.WorldsManager;
-import org.bukkit.plugin.PluginManager;
 
 public class PvPFaction extends OlympaAPIPlugin {
 
@@ -47,10 +48,10 @@ public class PvPFaction extends OlympaAPIPlugin {
 	public void onEnable() {
 		instance = this;
 		super.onEnable();
-		OlympaAPIPermissions.TP_COMMAND.setMinGroup(OlympaGroup.DEVP);
-		OlympaAPIPermissions.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.DEVP);
-		OlympaAPIPermissions.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.DEVP);
-		OlympaAPIPermissions.FLY_COMMAND.setMinGroup(OlympaGroup.DEVP);
+		OlympaAPIPermissionsSpigot.TP_COMMAND.setMinGroup(OlympaGroup.DEVP);
+		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND.setMinGroup(OlympaGroup.DEVP);
+		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.DEVP);
+		OlympaAPIPermissionsSpigot.FLY_COMMAND.setMinGroup(OlympaGroup.DEVP);
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
 		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 
@@ -82,14 +83,13 @@ public class PvPFaction extends OlympaAPIPlugin {
 		}
 
 		new MoneyCommand<FactionPlayer>(
-			this,
-			"money",
-			"Gérer son porte-monnaie.",
-			PvPFactionPermission.MONEY_COMMAND,
-			PvPFactionPermission.MONEY_COMMAND_OTHER,
-			PvPFactionPermission.MONEY_COMMAND_MANAGE,
-			"monnaie"
-		).register();
+				this,
+				"money",
+				"Gérer son porte-monnaie.",
+				PvPFactionPermission.MONEY_COMMAND,
+				PvPFactionPermission.MONEY_COMMAND_OTHER,
+				PvPFactionPermission.MONEY_COMMAND_MANAGE,
+				"monnaie").register();
 		trades = new TradesManager<>(this, 10);
 
 		new HealCommand(this, PvPFactionPermission.MOD_COMMANDS).register();
@@ -102,14 +102,12 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 		// Not needed now ? OlympaCore.getInstance().getRegionManager().awaitWorldTracking("world", event -> event.getRegion().registerFlags(claimsManager.damageFlag, claimsManager.playerBlocksFlag, claimsManager.playerBlockInteractFlag));
 		scoreboards = new ScoreboardManager<FactionPlayer>(this, "§6Olympa §e§lPvPFaction").addLines(
-			FixedLine.EMPTY_LINE,
-			lineMoney,
-			FixedLine.EMPTY_LINE,
-			lineGroup
-		).addFooters(
-			FixedLine.EMPTY_LINE,
-			CyclingLine.olympaAnimation()
-		);
+				FixedLine.EMPTY_LINE,
+				lineMoney,
+				FixedLine.EMPTY_LINE,
+				lineGroup).addFooters(
+						FixedLine.EMPTY_LINE,
+						CyclingLine.olympaAnimation());
 
 		/*IProtocolSupport protocolSupport = OlympaCore.getInstance().getProtocolSupport();
 		if (protocolSupport != null)
@@ -119,9 +117,8 @@ public class PvPFaction extends OlympaAPIPlugin {
 
 	@Override
 	public void onDisable() {
-		if (scoreboards != null) {
+		if (scoreboards != null)
 			scoreboards.unload();
-		}
 		adminShop.disable(this);
 		sendMessage("§4" + getDescription().getName() + "§c (" + getDescription().getVersion() + ") est désactivé.");
 	}
