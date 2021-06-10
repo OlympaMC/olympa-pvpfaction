@@ -116,7 +116,7 @@ public class FactionClaimListener implements Listener {
 
 		if (damager.getType() != EntityType.PLAYER) return;
 
-		final FactionPlayer damagerFactionPlayer = AccountProvider.get(damager.getUniqueId());
+		final FactionPlayer damagerFactionPlayer = AccountProvider.getter().get(damager.getUniqueId());
 		final FactionClaim damagerClaim = PvPFaction.getInstance().getClaimsManager().ofChunk(damager.getLocation().getChunk());
 		if (damagerClaim.getType() != null && !damagerClaim.getType().canPvp()) {
 			e.setCancelled(true);
@@ -126,7 +126,7 @@ public class FactionClaimListener implements Listener {
 		final FactionClaim claim = PvPFaction.getInstance().getClaimsManager().ofChunk(e.getEntity().getLocation().getChunk());
 
 		if (target.getType() == EntityType.PLAYER) {
-			final FactionPlayer targetFactionPlayer = AccountProvider.get(target.getUniqueId());
+			final FactionPlayer targetFactionPlayer = AccountProvider.getter().get(target.getUniqueId());
 
 			if (targetFactionPlayer.getClan() != null &&
 			    (targetFactionPlayer.getClan().equals(damagerFactionPlayer.getClan()) || targetFactionPlayer.getClan().isAlly(damagerFactionPlayer.getClan()))) {
@@ -156,7 +156,7 @@ public class FactionClaimListener implements Listener {
 	private boolean isActionCancelled(final Location loc, final Player p, final Cancellable event, final Function<FactionClaimPermLevel, Boolean> method, final String denyMessage) {
 		if (!WorldsManager.CLAIM_WORLD.getWorld().getUID().equals(loc.getWorld().getUID())) return false;
 
-		if (!method.apply(PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getPlayerPerm(AccountProvider.get(p.getUniqueId())))) {
+		if (!method.apply(PvPFaction.getInstance().getClaimsManager().ofChunk(loc.getChunk()).getPlayerPerm(AccountProvider.getter().get(p.getUniqueId())))) {
 			Prefix.FACTION.sendMessage(p, denyMessage);
 			//Bukkit.broadcastMessage("CANCELLED : " + event + " triggered by " + p);
 			event.setCancelled(true);
@@ -190,14 +190,14 @@ public class FactionClaimListener implements Listener {
 		}
 
 		final Location location = e.getBlockClicked().getLocation();
-		final Faction faction = ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getClan();
+		final Faction faction = ((FactionPlayer) AccountProvider.getter().get(p.getUniqueId())).getClan();
 
 		//if (faction != null && faction.getOnlineFactionPlayers().stream().filter(player -> SpigotUtils.playerisIn(player.getPlayer(), location)).findFirst().isPresent()) {
 		if (
 			faction != null && Bukkit.getOnlinePlayers().stream().anyMatch(
 				pl ->
 					SpigotUtils.playerisIn(pl, location) &&
-					faction.isAlly(((FactionPlayer) AccountProvider.get(pl.getUniqueId())).getClan())
+					faction.isAlly(((FactionPlayer) AccountProvider.getter().get(pl.getUniqueId())).getClan())
 			)
 		) {
 			Prefix.FACTION.sendMessage(p, "Eh, brûle pas le collègue !");

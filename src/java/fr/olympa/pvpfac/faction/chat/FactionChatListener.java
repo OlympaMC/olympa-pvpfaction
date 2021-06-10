@@ -17,7 +17,7 @@ public class FactionChatListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerChat(final AsyncPlayerChatEvent event) {
 		final Player player = event.getPlayer();
-		final FactionPlayer factionPlayer = AccountProvider.get(player.getUniqueId());
+		final FactionPlayer factionPlayer = AccountProvider.getter().get(player.getUniqueId());
 		if (factionPlayer == null) return;
 
 		final FactionChat chat = factionPlayer.getChat();

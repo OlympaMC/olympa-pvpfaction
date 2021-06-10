@@ -73,7 +73,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			fp = getOlympaPlayer();
 		else
 			try {
-				fp = AccountProvider.get(cmd.getArgument(0, ""));
+				fp = AccountProvider.getter().get(cmd.getArgument(0, ""));
 				if (cmd.getArgumentsLength() != 1 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player) && cmd.getArgument(1) instanceof Integer) {
 					fp.setPower(cmd.getArgument(1));
 					sendMessage(Prefix.FACTION, "&aLe power de &2" + fp.getName() + "&a est désormais de &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + ".");
@@ -319,7 +319,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		final FactionClaimPermLevel perm = cmd.getArgument(2);
 
 		if (cmd.getArgument(1) instanceof Player) {
-			final FactionPlayer fp = AccountProvider.get(((Player) cmd.getArgument(1)).getUniqueId());
+			final FactionPlayer fp = AccountProvider.getter().get(((Player) cmd.getArgument(1)).getUniqueId());
 			if (claim.setPlayerLevel(fp, perm))
 				sendMessage(Prefix.FACTION, "Permission de %s définie sur %s.", fp.getName(), perm.toString().toLowerCase());
 			else

@@ -44,7 +44,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	}
 
 	public static FactionPlayer get(final Player p) {
-		return AccountProvider.get(p.getUniqueId());
+		return AccountProvider.getter().get(p.getUniqueId());
 	}
 
 	public boolean addPower() {

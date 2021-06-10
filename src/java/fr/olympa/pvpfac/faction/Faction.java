@@ -115,7 +115,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	public String getNameColored(final UUID uuid) {
-		return getNameColored(((FactionPlayer) AccountProvider.get(uuid)).getClan());
+		return getNameColored(((FactionPlayer) AccountProvider.getter().get(uuid)).getClan());
 	}
 
 	public String getNameColored(final Faction clan) {
@@ -161,7 +161,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	public int getPower() {
-		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.get(p.getUniqueId())).getPower()).sum();
+		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.getter().get(p.getUniqueId())).getPower()).sum();
 	}
 
 	public int getMaxPower() {
@@ -183,12 +183,12 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public Set<FactionPlayer> getOfflineFactionPlayers() {
 		return members.values().stream()
 			.filter(entry -> !entry.isConnected())
-			.map(p -> (FactionPlayer) AccountProvider.get(p.getPlayerInformations().getUUID()))
+			.map(p -> (FactionPlayer) AccountProvider.getter().get(p.getPlayerInformations().getUUID()))
 			.collect(Collectors.toSet());
 	}
 
 	public Set<FactionPlayer> getOnlineFactionPlayers() {
-		return getPlayers().stream().map(p -> (FactionPlayer) AccountProvider.get(p.getUniqueId())).collect(Collectors.toSet());
+		return getPlayers().stream().map(p -> (FactionPlayer) AccountProvider.getter().get(p.getUniqueId())).collect(Collectors.toSet());
 	}
 
 	@Override

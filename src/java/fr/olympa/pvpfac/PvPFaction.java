@@ -2,6 +2,11 @@ package fr.olympa.pvpfac;
 
 import org.bukkit.plugin.PluginManager;
 
+import fr.olympa.api.common.groups.OlympaGroup;
+import fr.olympa.api.common.permission.OlympaPermission;
+import fr.olympa.api.common.permission.list.OlympaAPIPermissionsSpigot;
+import fr.olympa.api.common.plugin.OlympaAPIPlugin;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.spigot.auctions.AuctionsManager;
 import fr.olympa.api.spigot.command.essentials.BackCommand;
 import fr.olympa.api.spigot.command.essentials.FeedCommand;
@@ -9,14 +14,9 @@ import fr.olympa.api.spigot.command.essentials.HealCommand;
 import fr.olympa.api.spigot.command.essentials.tp.TpaHandler;
 import fr.olympa.api.spigot.economy.MoneyCommand;
 import fr.olympa.api.spigot.economy.tax.TaxManager;
-import fr.olympa.api.common.groups.OlympaGroup;
 import fr.olympa.api.spigot.lines.CyclingLine;
 import fr.olympa.api.spigot.lines.DynamicLine;
 import fr.olympa.api.spigot.lines.FixedLine;
-import fr.olympa.api.common.permission.OlympaPermission;
-import fr.olympa.api.common.permission.list.OlympaAPIPermissionsSpigot;
-import fr.olympa.api.common.plugin.OlympaAPIPlugin;
-import fr.olympa.api.common.provider.AccountProvider;
 import fr.olympa.api.spigot.scoreboard.sign.Scoreboard;
 import fr.olympa.api.spigot.scoreboard.sign.ScoreboardManager;
 import fr.olympa.api.spigot.trades.TradesManager;
@@ -53,7 +53,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 		OlympaAPIPermissionsSpigot.GAMEMODE_COMMAND_CREATIVE.setMinGroup(OlympaGroup.DEVP);
 		OlympaAPIPermissionsSpigot.FLY_COMMAND.setMinGroup(OlympaGroup.DEVP);
 		OlympaPermission.registerPermissions(PvPFactionPermission.class);
-		AccountProvider.setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
+		AccountProviderAPI.getter().setPlayerProvider(FactionPlayer.class, FactionPlayer::new, "pvpfac", FactionPlayer.COLUMNS);
 
 		try {
 			taxManager = new TaxManager(this, PvPFactionPermission.TAX_COMMAND, "pvpfac_tax", 0);

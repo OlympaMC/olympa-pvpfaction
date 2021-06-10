@@ -28,7 +28,7 @@ public class FactionPvPListener implements Listener {
 //		if (!(entityVictim instanceof final Player victim)) return;
 		if (!(entityVictim instanceof Player victim)) return;
 
-		final FactionPlayer victimFactionPlayer = AccountProvider.get(victim.getUniqueId());
+		final FactionPlayer victimFactionPlayer = AccountProvider.getter().get(victim.getUniqueId());
 		victimFaction = victimFactionPlayer.getClan();
 		if (victimFaction == null) return;
 
@@ -42,7 +42,7 @@ public class FactionPvPListener implements Listener {
 		}
 		if (attacker == null) return;
 
-		final FactionPlayer attackerFactionPlayer = AccountProvider.get(attacker.getUniqueId());
+		final FactionPlayer attackerFactionPlayer = AccountProvider.getter().get(attacker.getUniqueId());
 		final Faction attackerFaction = attackerFactionPlayer.getClan();
 		if (attackerFaction == null) return;
 
@@ -70,7 +70,7 @@ public class FactionPvPListener implements Listener {
 		if (material != Material.LAVA_BUCKET) return;
 
 		final Location location = event.getBlockClicked().getLocation();
-		final FactionPlayer attackerFactionPlayer = AccountProvider.get(player.getUniqueId());
+		final FactionPlayer attackerFactionPlayer = AccountProvider.getter().get(player.getUniqueId());
 		final Faction faction = attackerFactionPlayer.getClan();
 		if (faction.getOnlineFactionPlayers().stream().anyMatch(p -> SpigotUtils.playerisIn(p.getPlayer(), location))) {
 			Prefix.FACTION.sendMessage(player, "Brûle pas le collègue !");

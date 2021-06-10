@@ -24,7 +24,7 @@ public class AutoMapListener implements Listener {
 		final Location to = event.getTo();
 		final Player player = event.getPlayer();
 		if (!FactionMap.autoMapPlayers.contains(player) || SpigotUtils.isSameChunk(from.getChunk(), to.getChunk())) return;
-		FactionMap.sendMap(player, ((FactionPlayer) AccountProvider.get(player.getUniqueId())).getClan());
+		FactionMap.sendMap(player, ((FactionPlayer) AccountProvider.getter().get(player.getUniqueId())).getClan());
 	}
 
 }
