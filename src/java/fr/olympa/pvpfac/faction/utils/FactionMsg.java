@@ -26,7 +26,7 @@ public class FactionMsg {
 	}
 
 	//	public static boolean youHaveNoFaction(Player player) {
-	//		return youHaveNoFaction(player, ((FactionPlayer) AccountProvider.getter().get(player.getUniqueId())).getFaction());
+	//		return youHaveNoFaction(player, ((FactionPlayer) AccountProviderAPI.getter().get(player.getUniqueId())).getFaction());
 	//	}
 
 	public static boolean youHaveNoFaction(final Player player, final Faction faction) {

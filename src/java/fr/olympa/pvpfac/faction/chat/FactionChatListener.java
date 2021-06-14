@@ -1,7 +1,7 @@
 package fr.olympa.pvpfac.faction.chat;
 
 import fr.olympa.api.common.chat.ColorUtils;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public class FactionChatListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerChat(final AsyncPlayerChatEvent event) {
 		final Player player = event.getPlayer();
-		final FactionPlayer factionPlayer = AccountProvider.getter().get(player.getUniqueId());
+		final FactionPlayer factionPlayer = AccountProviderAPI.getter().get(player.getUniqueId());
 		if (factionPlayer == null) return;
 
 		final FactionChat chat = factionPlayer.getChat();

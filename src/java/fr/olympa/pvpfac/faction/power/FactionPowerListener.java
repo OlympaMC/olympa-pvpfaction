@@ -11,7 +11,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.common.task.OlympaTask;
 import fr.olympa.api.utils.Prefix;
 import fr.olympa.pvpfac.PvPFaction;
@@ -23,7 +23,7 @@ public class FactionPowerListener implements Listener {
 	public void onPlayerJoin(final PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 		final UUID uuid = player.getUniqueId();
-		final FactionPlayer fp = AccountProvider.getter().get(uuid);
+		final FactionPlayer fp = AccountProviderAPI.getter().get(uuid);
 		PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30, 60, TimeUnit.MINUTES);
 	}
 
@@ -38,7 +38,7 @@ public class FactionPowerListener implements Listener {
 	public void onPlayerDeath(final PlayerDeathEvent event) {
 		final Player player = event.getEntity();
 		final UUID uuid = player.getUniqueId();
-		final FactionPlayer fp = AccountProvider.getter().get(uuid);
+		final FactionPlayer fp = AccountProviderAPI.getter().get(uuid);
 		if (!fp.removePower())
 			return;
 

@@ -20,7 +20,7 @@ public class OldFactionCommand extends OlympaCommand {
 	public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
 		return false;
 		/*if (player != null) {
-			FactionPlayer fp = AccountProvider.getter().get(player.getUniqueId());
+			FactionPlayer fp = AccountProviderAPI.getter().get(player.getUniqueId());
 			Faction faction = fp.getFaction();
 			if (args.length > 0) {
 				switch (args[0]) {
@@ -83,7 +83,7 @@ public class OldFactionCommand extends OlympaCommand {
 						sendUnknownPlayer(args[1]);
 						return false;
 					}
-					FactionPlayer fpTarget = AccountProvider.getter().get(target.getUniqueId());
+					FactionPlayer fpTarget = AccountProviderAPI.getter().get(target.getUniqueId());
 					OlympaFaction factionTarget = fpTarget.getFaction();
 
 					if (factionTarget != null) {
@@ -389,7 +389,7 @@ public class OldFactionCommand extends OlympaCommand {
 						sendUnknownPlayer(args[1]);
 						return false;
 					}
-					fpTarget = AccountProvider.getter().get(target.getUniqueId());
+					fpTarget = AccountProviderAPI.getter().get(target.getUniqueId());
 					factionTarget = fpTarget.getFaction();
 					if (factionTarget.getId() != faction.getId()) {
 						sendError("Le joueur &4" + target.getName() + "&c n'est pas dans ta faction.");
@@ -431,7 +431,7 @@ public class OldFactionCommand extends OlympaCommand {
 						sendError("Le joueur &4" + args[1] + "&c n'existe pas.");
 						return false;
 					}
-					fpTarget = AccountProvider.getter().get(target.getUniqueId());
+					fpTarget = AccountProviderAPI.getter().get(target.getUniqueId());
 					factionTarget = fpTarget.getFaction();
 					if (factionTarget.getId() != faction.getId()) {
 						sendError("Le joueur &4" + target.getName() + "&c n'est pas dans ta faction.");
@@ -494,7 +494,7 @@ public class OldFactionCommand extends OlympaCommand {
 							sendUnknownPlayer(args[1]);
 							return false;
 						}
-						fpTarget = AccountProvider.getter().get(target.getUniqueId());
+						fpTarget = AccountProviderAPI.getter().get(target.getUniqueId());
 						factionTarget = fpTarget.getFaction();
 						sendMessage(Prefix.FACTION, "&2" + target.getName() + "&a a &2" + fpTarget.getPower() + "&a power.");
 					} else {

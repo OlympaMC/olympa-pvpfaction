@@ -12,7 +12,7 @@ import fr.olympa.api.common.chat.ColorUtils;
 import fr.olympa.api.common.command.complex.Cmd;
 import fr.olympa.api.common.command.complex.CommandContext;
 import fr.olympa.api.common.permission.OlympaSpigotPermission;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.common.provider.OlympaPlayerObject;
 import fr.olympa.api.spigot.clans.ClansCommand;
 import fr.olympa.api.utils.Prefix;
@@ -73,7 +73,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 			fp = getOlympaPlayer();
 		else
 			try {
-				fp = AccountProvider.getter().get(cmd.getArgument(0, ""));
+				fp = AccountProviderAPI.getter().get(cmd.getArgument(0, ""));
 				if (cmd.getArgumentsLength() != 1 && PvPFactionPermission.FACTION_BYPASS.hasSenderPermission(player) && cmd.getArgument(1) instanceof Integer) {
 					fp.setPower(cmd.getArgument(1));
 					sendMessage(Prefix.FACTION, "&aLe power de &2" + fp.getName() + "&a est désormais de &2" + fp.getPower() + "&a/" + FactionPlayer.POWER_MAX + ".");
@@ -319,7 +319,7 @@ public class FactionCommand extends ClansCommand<Faction, FactionPlayerData> {
 		final FactionClaimPermLevel perm = cmd.getArgument(2);
 
 		if (cmd.getArgument(1) instanceof Player) {
-			final FactionPlayer fp = AccountProvider.getter().get(((Player) cmd.getArgument(1)).getUniqueId());
+			final FactionPlayer fp = AccountProviderAPI.getter().get(((Player) cmd.getArgument(1)).getUniqueId());
 			if (claim.setPlayerLevel(fp, perm))
 				sendMessage(Prefix.FACTION, "Permission de %s définie sur %s.", fp.getName(), perm.toString().toLowerCase());
 			else

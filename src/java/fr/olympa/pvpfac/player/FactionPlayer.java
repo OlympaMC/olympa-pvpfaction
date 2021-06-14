@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.olympa.api.common.observable.ObservableInt;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.common.provider.OlympaPlayerObject;
 import fr.olympa.api.common.sql.SQLColumn;
 import fr.olympa.api.spigot.clans.ClanPlayerInterface;
@@ -44,7 +44,7 @@ public class FactionPlayer extends OlympaPlayerObject implements ClanPlayerInter
 	}
 
 	public static FactionPlayer get(final Player p) {
-		return AccountProvider.getter().get(p.getUniqueId());
+		return AccountProviderAPI.getter().get(p.getUniqueId());
 	}
 
 	public boolean addPower() {

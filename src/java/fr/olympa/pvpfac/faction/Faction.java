@@ -7,7 +7,7 @@ import fr.olympa.api.spigot.lines.DynamicLine;
 import fr.olympa.api.spigot.lines.FixedLine;
 import fr.olympa.api.spigot.lines.TimerLine;
 import fr.olympa.api.common.player.OlympaPlayerInformations;
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.spigot.scoreboard.sign.Scoreboard;
 import fr.olympa.api.spigot.utils.SpigotUtils;
 import fr.olympa.pvpfac.PvPFaction;
@@ -115,7 +115,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	public String getNameColored(final UUID uuid) {
-		return getNameColored(((FactionPlayer) AccountProvider.getter().get(uuid)).getClan());
+		return getNameColored(((FactionPlayer) AccountProviderAPI.getter().get(uuid)).getClan());
 	}
 
 	public String getNameColored(final Faction clan) {
@@ -161,7 +161,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	}
 
 	public int getPower() {
-		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProvider.getter().get(p.getUniqueId())).getPower()).sum();
+		return getPlayers().stream().mapToInt(p -> ((FactionPlayer) AccountProviderAPI.getter().get(p.getUniqueId())).getPower()).sum();
 	}
 
 	public int getMaxPower() {
@@ -183,12 +183,12 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	public Set<FactionPlayer> getOfflineFactionPlayers() {
 		return members.values().stream()
 			.filter(entry -> !entry.isConnected())
-			.map(p -> (FactionPlayer) AccountProvider.getter().get(p.getPlayerInformations().getUUID()))
+			.map(p -> (FactionPlayer) AccountProviderAPI.getter().get(p.getPlayerInformations().getUUID()))
 			.collect(Collectors.toSet());
 	}
 
 	public Set<FactionPlayer> getOnlineFactionPlayers() {
-		return getPlayers().stream().map(p -> (FactionPlayer) AccountProvider.getter().get(p.getUniqueId())).collect(Collectors.toSet());
+		return getPlayers().stream().map(p -> (FactionPlayer) AccountProviderAPI.getter().get(p.getUniqueId())).collect(Collectors.toSet());
 	}
 
 	@Override

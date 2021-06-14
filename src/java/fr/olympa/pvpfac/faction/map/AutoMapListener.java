@@ -1,6 +1,6 @@
 package fr.olympa.pvpfac.faction.map;
 
-import fr.olympa.api.common.provider.AccountProvider;
+import fr.olympa.api.common.provider.AccountProviderAPI;
 import fr.olympa.api.spigot.utils.SpigotUtils;
 import fr.olympa.pvpfac.player.FactionPlayer;
 import org.bukkit.Location;
@@ -24,7 +24,7 @@ public class AutoMapListener implements Listener {
 		final Location to = event.getTo();
 		final Player player = event.getPlayer();
 		if (!FactionMap.autoMapPlayers.contains(player) || SpigotUtils.isSameChunk(from.getChunk(), to.getChunk())) return;
-		FactionMap.sendMap(player, ((FactionPlayer) AccountProvider.getter().get(player.getUniqueId())).getClan());
+		FactionMap.sendMap(player, ((FactionPlayer) AccountProviderAPI.getter().get(player.getUniqueId())).getClan());
 	}
 
 }
