@@ -136,13 +136,13 @@ public class FactionClaimListener implements Listener {
 		} else if (claim != null) {
 			if (target.getType() == EntityType.ARMOR_STAND || target.getType() == EntityType.ITEM_FRAME || target.getType() == EntityType.PAINTING) {
 				isActionCancelled(
-					e.getEntity().getLocation(), damagerFactionPlayer.getPlayer(), e,
+					e.getEntity().getLocation(), (Player) damagerFactionPlayer.getPlayer(), e,
 					FactionClaimPermLevel::canInteractContainers,
 					"§cPas touche à ce qui ne t'appartient pas !"
 				);
 			} else {
 				isActionCancelled(
-					e.getEntity().getLocation(), damagerFactionPlayer.getPlayer(), e,
+					e.getEntity().getLocation(), (Player) damagerFactionPlayer.getPlayer(), e,
 					FactionClaimPermLevel::canDamageEntities,
 					"§7Tu ne peux pas attaquer d'entités dans ce claim."
 				);

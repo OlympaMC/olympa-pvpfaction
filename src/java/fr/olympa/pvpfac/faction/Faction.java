@@ -18,6 +18,7 @@ import fr.olympa.pvpfac.player.FactionPlayerData;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 	private static final DynamicLine<Scoreboard<FactionPlayer>> header = new DynamicLine<>(x -> "§7" + x.getOlympaPlayer().getClan().getName() + " :");
 	private static final TimerLine<Scoreboard<FactionPlayer>> players = new TimerLine<>((x) -> {
 		Faction fac = x.getOlympaPlayer().getClan();
-		Player p = x.getOlympaPlayer().getPlayer();
+		Player p = (Player) x.getOlympaPlayer().getPlayer();
 		Map<String, Integer> players = new HashMap<>();
 		for (FactionPlayerData member : fac.getMembers()) {
 			String memberName = member.getPlayerInformations().getName();
@@ -44,7 +45,7 @@ public class Faction extends Clan<Faction, FactionPlayerData> {
 			} else if (member.getConnectedPlayer() == x.getOlympaPlayer()) {
 				players.put("§6● §l" + memberName, 1);
 			} else {
-				Location loc = member.getConnectedPlayer().getPlayer().getLocation();
+				Location loc = ((Entity) member.getConnectedPlayer().getPlayer()).getLocation();
 				players.put("§e● " + memberName + " §l" + SpigotUtils.getDirectionToLocation(p, loc), 2);
 			}
 		}

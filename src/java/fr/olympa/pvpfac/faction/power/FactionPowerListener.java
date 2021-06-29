@@ -46,6 +46,6 @@ public class FactionPowerListener implements Listener {
 		if (!task.taskExist("pvpfac_power_" + uuid))
 			PvPFaction.getInstance().getTask().scheduleSyncRepeatingTask("pvpfac_power_" + uuid, new FactionPowerTask(fp), 30, 60, TimeUnit.MINUTES);
 		// TODO Vérifier, il me semble qu'avec le code actuel, on perd 1 de power
-		Prefix.FACTION.sendMessage(fp.getPlayer(), "&c-2 powers (&4%s&c/%s)", fp.getPower(), FactionPlayer.POWER_MAX);
+		Prefix.FACTION.sendMessage((Player) fp.getPlayer(), "&c-2 powers (&4%s&c/%s)", fp.getPower(), FactionPlayer.POWER_MAX);
 	}
 }
