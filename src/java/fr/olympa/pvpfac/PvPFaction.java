@@ -11,7 +11,6 @@ import fr.olympa.api.spigot.auctions.AuctionsManager;
 import fr.olympa.api.spigot.command.essentials.BackCommand;
 import fr.olympa.api.spigot.command.essentials.FeedCommand;
 import fr.olympa.api.spigot.command.essentials.HealCommand;
-import fr.olympa.api.spigot.command.essentials.tp.TpaHandler;
 import fr.olympa.api.spigot.economy.MoneyCommand;
 import fr.olympa.api.spigot.economy.tax.TaxManager;
 import fr.olympa.api.spigot.lines.CyclingLine;
@@ -74,7 +73,7 @@ public class PvPFaction extends OlympaAPIPlugin {
 			pluginManager.registerEvents(factionManager = new FactionManager(), this);
 			pluginManager.registerEvents(claimsManager = new FactionClaimsManager(), this);
 			//			pluginManager.registerEvents(new Test(), this);
-			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this);
+			//			pluginManager.registerEvents(new TpaHandler(this, PvPFactionPermission.TPA_COMMANDS), this); // TODO add
 
 			worldsManager = new WorldsManager(this);
 		} catch (final Exception ex) {
