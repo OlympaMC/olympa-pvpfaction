@@ -68,6 +68,11 @@ public class AdminShopGui extends OlympaGUI {
 		}
 		return true;
 	}
+	
+	@Override
+	public boolean noDoubleClick() {
+		return false;
+	}
 
 	@Override
 	public boolean onClickCursor(final Player player, final ItemStack current, final ItemStack cursor, final int slot) {
